@@ -1,14 +1,15 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, ImageBackground , View , Image } from 'react-native';
-
-import logo from './assets/logo.png';
-import fondo from './assets/fondo.png';
+import { StyleSheet, ImageBackground , View, Image } from 'react-native';
+import LoginForm from './src/views/login.js';
+import logo from './src/assets/logo.png';
+import fondo from './src/assets/fondo.png';
 
 export default function App() {
   return (
     <View style={styles.container}>
         <ImageBackground source={fondo} style={styles.fondo}>
           <Image source={logo} style={styles.logo} />
+          <LoginForm/>
         </ImageBackground>
         <StatusBar style="auto" />
       </View>
@@ -32,10 +33,11 @@ const styles = StyleSheet.create({
     alignItems:'center'
   },
   logo:{
+    resizeMode: 'contain',
     width: '70%',
     height: '30%',
-    position: 'absolute',
-    top: '3%'
+    position: 'relative',
   }
+  
 });
 
