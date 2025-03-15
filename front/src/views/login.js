@@ -13,6 +13,7 @@ const LoginForm = () => {
             Alert.alert('Error en el ingreso');
         }
     }
+    
     return(
         <View>
                 <Text style={styles.title}>Iniciar Sesión</Text>
