@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, ImageBackground, View, Image } from 'react-native';
+import { ImageBackground, View, Image } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -7,6 +7,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 // Imports de componentes y assets
 import LoginForm from './src/views/login.js';
 import Welcome from './src/views/welcome.js';
+import recuperarContrasena from './src/views/recuperarContrasena.js';
 import logo from './src/assets/logo.png';
 import fondo from './src/assets/fondo.png';
 
@@ -52,6 +53,11 @@ export default function App() {
           options={{ title: 'Inicia Sesión' }}
         />
         <Stack.Screen 
+          name="recuperarContrasena" 
+          component={recuperarContrasena} 
+          options={{ title: 'Recuperar Contraseña' }}
+        />
+        <Stack.Screen 
           name="MainApp" 
           component={MainTabNavigator} 
           options={{ headerShown: false }}
@@ -61,42 +67,3 @@ export default function App() {
   );
 }
 
-
-// Estilos
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'column',
-  },
-  fondo: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    flex: 1,
-    resizeMode: 'cover',
-    alignItems: 'center'
-  },
-  logo: {
-    resizeMode: 'contain',
-    width: '70%',
-    height: '30%',
-    position: 'relative',
-  },
-  button: {
-    backgroundColor: '#007BFF',
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 25,
-    marginTop: 20,
-    elevation: 3,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  }  
-});
