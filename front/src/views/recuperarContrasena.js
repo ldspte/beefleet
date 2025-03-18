@@ -24,10 +24,6 @@ const recuperarContrasena = ({navigation}) => {
                 <TouchableOpacity style={styles.button}>
                     <Text style={styles.buttonText}>Enviar</Text>
                 </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Text style={styles.backButtonText}>Volver</Text>
-                </TouchableOpacity>
             </View>
         </ImageBackground>
         ); 
@@ -61,7 +57,8 @@ const recuperarContrasena = ({navigation}) => {
             textAlign: 'center',
         },
         input: {
-            width: '80%',
+            height: 200,
+            width: 300,
             height: 50,
             backgroundColor: 'rgba(255, 255, 255, 0.2)',
             color: 'white',
