@@ -38,7 +38,12 @@ const LoginForm = () => {
                 <Text style={styles.title}>Iniciar Sesión</Text>
                 <TextInput
                     style={[styles.input, isWeb && styles.webInput]}
+<<<<<<< Updated upstream
                     placeholder="Email"
+=======
+                    placeholder="Correo electrónico"
+                    placeholderTextColor="white"
+>>>>>>> Stashed changes
                     value={email}
                     onChangeText={setEmail}
                     keyboardType="email-address"
@@ -47,6 +52,7 @@ const LoginForm = () => {
                 <TextInput
                     style={[styles.input, isWeb && styles.webInput]}
                     placeholder="Contraseña"
+                    placeholderTextColor="white"
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry
@@ -98,6 +104,7 @@ const styles = StyleSheet.create({
         color: 'white',
     },
     input: {
+<<<<<<< Updated upstream
         width: 340,
         height: 50,
         borderWidth: 1,
@@ -107,6 +114,16 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         backgroundColor: 'white',
         maxWidth: '100%',
+=======
+        height: 200,
+        width: 300,
+        height: 50,
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        color: 'white',
+        borderRadius: 10,
+        paddingHorizontal: 15,
+        marginBottom: 20,
+>>>>>>> Stashed changes
     },
     webInput: {
         width: 340,
