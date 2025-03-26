@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Text, TextInput, Alert, TouchableOpacity, Image, ImageBackground, Platform, Dimensions } from "react-native";
 import { useNavigation } from '@react-navigation/native';
+import * as Asset from "expo-asset"; // Para precargar la imagen
 
 const LoginForm = () => {
     const [email, setEmail] = useState('');
@@ -38,12 +39,10 @@ const LoginForm = () => {
                 <Text style={styles.title}>Iniciar Sesión</Text>
                 <TextInput
                     style={[styles.input, isWeb && styles.webInput]}
-<<<<<<< Updated upstream
+                    Updated upstream
                     placeholder="Email"
-=======
                     placeholder="Correo electrónico"
                     placeholderTextColor="white"
->>>>>>> Stashed changes
                     value={email}
                     onChangeText={setEmail}
                     keyboardType="email-address"
@@ -104,7 +103,6 @@ const styles = StyleSheet.create({
         color: 'white',
     },
     input: {
-<<<<<<< Updated upstream
         width: 340,
         height: 50,
         borderWidth: 1,
@@ -114,7 +112,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         backgroundColor: 'white',
         maxWidth: '100%',
-=======
+
         height: 200,
         width: 300,
         height: 50,
@@ -123,7 +121,6 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         paddingHorizontal: 15,
         marginBottom: 20,
->>>>>>> Stashed changes
     },
     webInput: {
         width: 340,
