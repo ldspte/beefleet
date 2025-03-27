@@ -45,12 +45,12 @@ export default function App() {
         <Stack.Screen 
           name="Welcome" 
           component={Welcome} 
-          options={{ title: 'Bienvenido' }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen 
           name="LoginForm" 
           component={LoginForm} 
-          options={{ title: 'Inicia Sesión' }}
+          options={{ title: 'Iniciar Sesión' }}
         />
         <Stack.Screen 
           name="recuperarContrasena" 
