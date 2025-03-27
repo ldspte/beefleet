@@ -1,6 +1,8 @@
 import React from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
-import { useNavigation } from "@react-navigation/native"; //permite cambiar la pantalla cuando se presionen los botones
+// import { useNavigation } from "@react-navigation/native"; //permite cambiar la pantalla cuando se presionen los botones
+import * as Asset from "expo-asset"; // Para precargar la imagen 
+
 const PerfilConductor = () => {
     return (
       <ImageBackground source={require("../assets/fondo.png")} style={styles.backgroundImage}>

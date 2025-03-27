@@ -40,7 +40,6 @@ const LoginForm = () => {
                 <TextInput
                     style={[styles.input, isWeb && styles.webInput]}
                     Updated upstream
-                    placeholder="Email"
                     placeholder="Correo electrónico"
                     placeholderTextColor="white"
                     value={email}
