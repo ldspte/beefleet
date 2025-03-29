@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Text, TextInput, Alert, TouchableOpacity, Image, ImageBackground } from "react-native";
+import { StyleSheet, View, Text, TextInput, Alert, TouchableOpacity, Image, ImageBackground, Platform, Dimensions } from "react-native";
 import { useNavigation } from '@react-navigation/native';
+import * as Asset from "expo-asset"; // Para precargar la imagen
 
 const LoginForm = () => {
     const [email, setEmail] = useState('');
@@ -19,12 +20,15 @@ const LoginForm = () => {
         }
     }
     
+    const isWeb = Platform.OS === 'web';
+    const windowWidth = Dimensions.get('window').width;
+    
     return(
         <ImageBackground 
         source={require('../assets/fondo.png')}
         style={styles.backgroundImage}
         >
-            <View style={styles.container}>
+            <View style={[styles.container, isWeb && styles.webContainer]}>
                 <View style={styles.logoContainer}>
                     <Image
                         source={require('../assets/logo.png')}
@@ -34,26 +38,29 @@ const LoginForm = () => {
                 </View>
                 <Text style={styles.title}>Iniciar Sesión</Text>
                 <TextInput
-                    style={styles.input}
-                    placeholder="Email"
+                    style={[styles.input, isWeb && styles.webInput]}
+                    Updated upstream
+                    placeholder="Correo electrónico"
+                    placeholderTextColor="white"
                     value={email}
                     onChangeText={setEmail}
                     keyboardType="email-address"
                     autoCapitalize="none"
                 />
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, isWeb && styles.webInput]}
                     placeholder="Contraseña"
+                    placeholderTextColor="white"
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry
                 />
-                <TouchableOpacity onPress={handleForgotPassword}>
+                <TouchableOpacity onPress={handleForgotPassword} style={styles.forgotContainer}>
                     <Text style={styles.forgotPassword}>¿Olvidaste la contraseña?</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                        style={styles.button}
-                        onPress={() => navigation.navigate('')}
+                    style={[styles.button, isWeb && styles.webButton]}
+                    onPress={handleLogin}
                 >
                     <Text style={styles.buttonText}>Iniciar Sesión</Text>
                 </TouchableOpacity>
@@ -68,19 +75,24 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
     },
-    logoContainer: {
-        marginBottom: 40,
-        alignItems: 'center',
-    },
-    logo: {
-        width: 150,  // Ajusta según el tamaño deseado
-        height: 150, // Ajusta según el tamaño deseado
-    },
     container: {
         flex: 1,
         padding: 20,
         justifyContent: 'center',
         backgroundColor: 'rgba(0,0,0,0.3)',
+        alignItems: 'center',
+    },
+    webContainer: {
+        maxWidth: '100%',
+        alignItems: 'center',
+    },
+    logoContainer: {
+        marginBottom: 40,
+        alignItems: 'center',
+    },
+    logo: {
+        width: 150,
+        height: 150,
     },
     title: {
         fontSize: 24,
@@ -90,30 +102,59 @@ const styles = StyleSheet.create({
         color: 'white',
     },
     input: {
+        width: 340,
         height: 50,
         borderWidth: 1,
         borderColor: '#ccc',
-        borderRadius: 5,
+        borderRadius: 10,
         marginBottom: 15,
         paddingHorizontal: 10,
         backgroundColor: 'white',
+        maxWidth: '100%',
+
+        height: 200,
+        width: 300,
+        height: 50,
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        color: 'white',
+        borderRadius: 10,
+        paddingHorizontal: 15,
+        marginBottom: 20,
+    },
+    webInput: {
+        width: 340,
+        alignSelf: 'center',
+    },
+    forgotContainer: {
+        width: '100%',
+        maxWidth: 340,
+        alignSelf: 'center',
     },
     forgotPassword: {
-        color: '#3498db',
+        color: 'white',
         textAlign: 'right',
         marginBottom: 20,
     },
     button: {
+        width: 270,
+        height: 50,
         backgroundColor: '#FB8500',
         paddingVertical: 12,
-        paddingHorizontal: 30,
+        paddingHorizontal: 70,
         borderRadius: 25,
-        marginTop: 20,
+        marginTop: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    webButton: {
+        width: 270,
+        alignSelf: 'center',
     },
     buttonText: {
         color: 'white',
         fontSize: 18,
         fontWeight: 'bold',
+        textAlign: 'center',
     },
 });
 

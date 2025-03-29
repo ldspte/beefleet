@@ -1,59 +1,92 @@
-import React, { useState } from "react";
-import { StyleSheet, View, Text, TextInput, Button, Alert } from "react-native";
+import React from "react";
+import { StyleSheet, View, Text, TextInput, Button, Image, TouchableOpacity, ImageBackground } from "react-native";
+import * as Asset from "expo-asset"; // Para precargar la imagen
 
+const recuperarContrasena = ({navigation}) => {
 
-const recuperarContrasena = () => {
-    const [email, setEmail] = useState('');
+        return(
+            <ImageBackground 
+            source={require('../assets/fondo.png')}
+            style={styles.backgroundImage}
+            >
 
-    const handleRecuperacion = () => {
-        if (email) {
-            Alert.alert('Recuperación en proceso', 'Se ha enviado un enlace a tu correo para recuperar la contraseña.');
-            // Aquí iría tu lógica de recuperación
-        } else {
-            Alert.alert('Error', 'Por favor ingresa un correo válido');
-        }
-    }
+         <View style={styles.container}>
+                <Text style={styles.title}>Recuperar Contraseña</Text>
+                <Text style={styles.subtitle}>Ingresa tu correo para recibir un enlace de recuperación</Text>
 
-    return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Recuperar Contraseña</Text>
-            <Text style={styles.subtitle}>Ingresa tu correo electrónico para recibir una nueva contraseña</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Email"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-            />
-            <Button title="Enviar" onPress={handleRecuperacion} />
-        </View>
-    )
-}
+                <TextInput
+                    style={styles.input}
+                    placeholder="Correo electrónico"
+                    placeholderTextColor="white"
+                    keyboardType="email-address"
+                />
 
-const styles = StyleSheet.create({
-    container: {
-        padding: 20,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        textAlign: 'center',
-    },
-    subtitle: {
-        textAlign: 'center',
-        marginBottom: 20,
-        color: '#666',
-    },
-    input: {
-        height: 50,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-        marginBottom: 20,
-        paddingHorizontal: 10,
-    },
-});
+                <TouchableOpacity style={styles.button}>
+                    <Text style={styles.buttonText}>Enviar</Text>
+                </TouchableOpacity>
+            </View>
+        </ImageBackground>
+        ); 
+};
+    //const [email, setEmail] = useState('');//
 
-export default recuperarContrasena;
+    const styles = StyleSheet.create({
+        backgroundImage: {
+            flex: 1,
+            width: '100%',
+            height: '100%',
+        },
+        container: {
+            flex: 1,
+            padding: 20,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0,0,0,0.3)',
+        },
+        title: {
+            fontSize: 28,
+            fontWeight: 'bold',
+            color: 'white',
+            marginBottom: 10,
+            textAlign: 'center',
+        },
+        subtitle: {
+            fontSize: 16,
+            color: 'white',
+            marginBottom: 20,
+            textAlign: 'center',
+        },
+        input: {
+            height: 200,
+            width: 300,
+            height: 50,
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            color: 'white',
+            borderRadius: 10,
+            paddingHorizontal: 15,
+            marginBottom: 20,
+        },
+        button: {
+            backgroundColor: '#FB8500',
+            paddingVertical: 12,
+            paddingHorizontal: 30,
+            borderRadius: 25,
+            marginTop: 10,
+        },
+        buttonText: {
+            color: 'white',
+            fontSize: 18,
+            fontWeight: 'bold',
+        },
+        backButton: {
+            marginTop: 15,
+        },
+        backButtonText: {
+            color: 'white',
+            fontSize: 16,
+            textDecorationLine: 'underline',
+        },
+    });
+    
+    export default recuperarContrasena; 
+    

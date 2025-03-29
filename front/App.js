@@ -8,6 +8,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import LoginForm from './src/views/login.js';
 import Welcome from './src/views/welcome.js';
 import recuperarContrasena from './src/views/recuperarContrasena.js';
+import PerfilConductor from './src/views/perfilConductor.js';//
 import logo from './src/assets/logo.png';
 import fondo from './src/assets/fondo.png';
 
