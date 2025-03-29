@@ -1,34 +1,30 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Text, TextInput, Alert, TouchableOpacity, Image, ImageBackground, Platform, Dimensions } from "react-native";
-import { useNavigation } from '@react-navigation/native';
-import * as Asset from "expo-asset"; // Para precargar la imagen
+import { StyleSheet, View, Text, TextInput, Alert, TouchableOpacity, Image, ImageBackground} from "react-native";
 
-const LoginForm = () => {
+const LoginForm = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const navigation = useNavigation();
     
-    const handleForgotPassword = () => {
-        navigation.navigate('recuperarContrasena'); // Navegar a la pantalla de recuperación
+    const handleRecuperarContraseña = () => {
+        console.log('Navegando a RecuperarPassword')
+        navigation.navigate('RecuperarContrasena'); // Navegar a la pantalla de recuperación
     }
     
     const handleLogin = () => {
         if (email && password) {
-            Alert.alert('Ingreso exitoso');
+            console.log('Navengando a ConduUser')
+            navigation.navigate('ConduUser');
         } else {
             Alert.alert('Error en el ingreso');
         }
     }
-    
-    const isWeb = Platform.OS === 'web';
-    const windowWidth = Dimensions.get('window').width;
     
     return(
         <ImageBackground 
         source={require('../assets/fondo.png')}
         style={styles.backgroundImage}
         >
-            <View style={[styles.container, isWeb && styles.webContainer]}>
+            <View style={styles.container}>
                 <View style={styles.logoContainer}>
                     <Image
                         source={require('../assets/logo.png')}
@@ -38,7 +34,7 @@ const LoginForm = () => {
                 </View>
                 <Text style={styles.title}>Iniciar Sesión</Text>
                 <TextInput
-                    style={[styles.input, isWeb && styles.webInput]}
+                    style={[styles.input, styles.webInput]}
                     Updated upstream
                     placeholder="Correo electrónico"
                     placeholderTextColor="white"
@@ -48,21 +44,21 @@ const LoginForm = () => {
                     autoCapitalize="none"
                 />
                 <TextInput
-                    style={[styles.input, isWeb && styles.webInput]}
+                    style={[styles.input, styles.webInput]}
                     placeholder="Contraseña"
                     placeholderTextColor="white"
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry
                 />
-                <TouchableOpacity onPress={handleForgotPassword} style={styles.forgotContainer}>
+                <TouchableOpacity onPress={handleRecuperarContraseña} style={styles.forgotContainer}>
                     <Text style={styles.forgotPassword}>¿Olvidaste la contraseña?</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                    style={[styles.button, isWeb && styles.webButton]}
+                    style={[styles.button]}
                     onPress={handleLogin}
                 >
-                    <Text style={styles.buttonText}>Iniciar Sesión</Text>
+                    <Text style={styles.buttonText}>Ingresa</Text>
                 </TouchableOpacity>
             </View>
         </ImageBackground>

@@ -1,8 +1,7 @@
 import React from "react";
 import { StyleSheet, View, Text, TextInput, Button, Image, TouchableOpacity, ImageBackground } from "react-native";
-import * as Asset from "expo-asset"; // Para precargar la imagen
 
-const recuperarContrasena = ({navigation}) => {
+const RecuperarContrasena = () => {
 
         return(
             <ImageBackground 
@@ -88,5 +87,5 @@ const recuperarContrasena = ({navigation}) => {
         },
     });
     
-    export default recuperarContrasena; 
+    export default RecuperarContrasena; 
     

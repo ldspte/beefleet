@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, Text, ImageBackground, TouchableOpacity, Image } from 'react-native';
-import * as Asset from "expo-asset"; // Para precargar la imagen
+
 const Welcome = ({ navigation }) => {
     return (
       <ImageBackground
@@ -17,7 +17,7 @@ const Welcome = ({ navigation }) => {
           </View>
           
           <Text style={styles.title}>Bienvenido</Text>
-          <Text style={styles.subtitle}>¡Gracias por usar nuestra aplicación!</Text>
+          <Text style={styles.subtitle}>¡Es un gusto verte de nuevo!</Text>
           
           <TouchableOpacity 
             style={styles.button}

@@ -1,42 +1,16 @@
-import { StatusBar } from 'expo-status-bar';
-import { ImageBackground, View, Image } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-// Imports de componentes y assets
+// Imports de pantallas
 import LoginForm from './src/views/login.js';
 import Welcome from './src/views/welcome.js';
-import recuperarContrasena from './src/views/recuperarContrasena.js';
-import PerfilConductor from './src/views/perfilConductor.js';//
-import logo from './src/assets/logo.png';
-import fondo from './src/assets/fondo.png';
+import RecuperarContrasena from './src/views/recuperarContrasena.js';
+import ConduUser from './src/views/conduUser.js';//
 
 // Inicialización de navegadores
 const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator();
 
-// Componente para la navegación con Tabs (para usar después de iniciar sesión)
-function MainTabNavigator() {
-  return (
-    <Tab.Navigator>
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Profile" component={Welcome} />
-    </Tab.Navigator>
-  );
-}
-
-// Componente para la pantalla con el fondo y logo
-function HomeScreen() {
-  return (
-    <View style={styles.container}>
-      <ImageBackground source={fondo} style={styles.fondo}>
-        <Image source={logo} style={styles.logo} />
-      </ImageBackground>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
 
 // Componente principal App
 export default function App() {
@@ -53,15 +27,15 @@ export default function App() {
           component={LoginForm} 
           options={{ title: 'Iniciar Sesión' }}
         />
-        <Stack.Screen 
-          name="recuperarContrasena" 
-          component={recuperarContrasena} 
-          options={{ title: 'Recuperar Contraseña' }}
+        <Stack.Screen
+          name="ConduUser"
+          component={ConduUser}
+          options={{ title:'Perfil Conductor' }}
         />
         <Stack.Screen 
-          name="MainApp" 
-          component={MainTabNavigator} 
-          options={{ headerShown: false }}
+          name="RecuperarContrasena" 
+          component={RecuperarContrasena} 
+          options={{ title: 'Recuperar Contraseña' }}
         />
       </Stack.Navigator>
     </NavigationContainer>
