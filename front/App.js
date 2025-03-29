@@ -1,43 +1,44 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, ImageBackground , View, Image } from 'react-native';
-import LoginForm from './src/views/login.js';
-import logo from './src/assets/logo.png';
-import fondo from './src/assets/fondo.png';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
+// Imports de pantallas
+import LoginForm from './src/views/login.js';
+import Welcome from './src/views/welcome.js';
+import RecuperarContrasena from './src/views/recuperarContrasena.js';
+import ConduUser from './src/views/conduUser.js';//
+
+// Inicialización de navegadores
+const Stack = createStackNavigator();
+
+
+// Componente principal App
 export default function App() {
   return (
-    <View style={styles.container}>
-        <ImageBackground source={fondo} style={styles.fondo}>
-          <Image source={logo} style={styles.logo} />
-          <LoginForm/>
-        </ImageBackground>
-        <StatusBar style="auto" />
-      </View>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Welcome">
+        <Stack.Screen 
+          name="Welcome" 
+          component={Welcome} 
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen 
+          name="LoginForm" 
+          component={LoginForm} 
+          options={{ title: 'Iniciar Sesión' }}
+        />
+        <Stack.Screen
+          name="ConduUser"
+          component={ConduUser}
+          options={{ title:'Perfil Conductor' }}
+        />
+        <Stack.Screen 
+          name="RecuperarContrasena" 
+          component={RecuperarContrasena} 
+          options={{ title: 'Recuperar Contraseña' }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex:'1',
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'column',
-  },
-  fondo: {
-    width: '100%', 
-    height:'100%',
-    justifyContent:'center',
-    flex:'1',
-    resizeMode:'cover', 
-    alignItems:'center'
-  },
-  logo:{
-    resizeMode: 'contain',
-    width: '70%',
-    height: '30%',
-    position: 'relative',
-  }
-  
-});
 

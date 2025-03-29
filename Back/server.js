@@ -9,16 +9,23 @@ app.use(express.json());
 
 app.get('/', async (req, res) => {
   try {
-    const result = await db;
-    res.json(result);
+    const [rows] = await db.query('SELECT 1');
+    res.json({
+      status: 'Base de datos conectada con éxito',
+      result: rows
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error connecting to database' });
+    console.error('Database error', error);
+    res.status(500).json({ 
+      message: 'Error connecting to database',
+      error: error.message
+    });
   }
 });
 
-app.listen(3001, () => {
-  console.log('Server listening on port 3000');
+const PORT = 3001;
+app.listen(PORT, () => {
+  console.log(`Server listening on http://localhost:${PORT}`);
 });
 
 
