@@ -1,4 +1,4 @@
-const mysql = require('mysql2/promise');
+const mysql  =require('mysql2/promise');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -9,20 +9,11 @@ const db = mysql.createPool({
   database: process.env.DB_NAME
 });
 
-const getallUsers = async() => {
-  const [files] = await db.query(
-    'SELECT * FROM Usuarios'
-  );
-  return files;
-}
 
-const getaUsersById = async(id) => {
-  const [files] = await db.query(
-    'SELECT * FROM Usuarios WHERE id_usuario = ?',
-    [id]
-  );
-  return files[0];
-}
+module.exports = {db};
+
+
+
 
 const getLoads = async() => {
   const files = await db.query(

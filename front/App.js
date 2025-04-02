@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, ImageBackground , View, Image } from 'react-native';
+import { StyleSheet, ImageBackground , View, Image  } from 'react-native';
 import LoginForm from './src/views/login.js';
 import logo from './src/assets/logo.png';
 import fondo from './src/assets/fondo.png';
