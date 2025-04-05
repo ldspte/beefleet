@@ -1,56 +1,74 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 
 const ConduUser = () => {
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Image 
-          source={require('../assets/user.png')} 
-          style={styles.profileImage}
-        />
-        <Text style={styles.name}>Nombre del Conductor</Text>
-        <Text style={styles.subtitle}>Conductor Activo</Text>
-      </View>
+    <ScrollView style={styles.scroll}> 
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Image 
+            source={require('../assets/user.png')} 
+            style={styles.profileImage}
+          />
+          <Text style={styles.name}>Nombre del Conductor</Text>
+          <Text style={styles.subtitle}>Conductor Activo</Text>
+        </View>
 
-      <View style={styles.infoSection}>
-        <Text style={styles.sectionTitle}>Información Personal</Text>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Email:</Text>
-          <Text style={styles.infoValue}>conductor@ejemplo.com</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Teléfono:</Text>
-          <Text style={styles.infoValue}>+52 123 456 7890</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Vehículo:</Text>
-          <Text style={styles.infoValue}>Toyota Corolla (2020)</Text>
-        </View>
-      </View>
-
-      <View style={styles.statsSection}>
-        <Text style={styles.sectionTitle}>Estadísticas</Text>
-        <View style={styles.statsRow}>
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>4.8</Text>
-            <Text style={styles.statLabel}>Calificación</Text>
+        <View style={styles.infoSection}>
+          <Text style={styles.sectionTitle}>Información Personal</Text>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Documento:</Text>
+            <Text style={styles.infoValue}>123456789</Text>
           </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>352</Text>
-            <Text style={styles.statLabel}>Viajes</Text>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Email:</Text>
+            <Text style={styles.infoValue}>conductor@ejemplo.com</Text>
           </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>2a</Text>
-            <Text style={styles.statLabel}>Experiencia</Text>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Teléfono:</Text>
+            <Text style={styles.infoValue}>+52 123 456 7890</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Dirección:</Text>
+            <Text style={styles.infoValue}>Carrera #3 (Marinilla - Antioquia)</Text>
           </View>
         </View>
-      </View>
+        
+        <View style={styles.infoSection}>
+          <Text style={styles.sectionTitle}>Información Laboral</Text>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Número de Licencia:</Text>
+            <Text style={styles.infoValue}>c2</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Fecha de vencimiento:</Text>
+            <Text style={styles.infoValue}>25/05/25</Text>
+          </View>
+        </View>
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Cerrar Sesión</Text>
-      </TouchableOpacity>
-    </View>
+        <View style={styles.statsSection}>
+          <Text style={styles.sectionTitle}>Estadísticas</Text>
+          <View style={styles.statsRow}>
+            <View style={styles.statBox}>
+              <Text style={styles.statNumber}>5</Text>
+              <Text style={styles.statLabel}>Notificaciones</Text>
+            </View>
+            <View style={styles.statBox}>
+              <Text style={styles.statNumber}>352</Text>
+              <Text style={styles.statLabel}>Viajes</Text>
+            </View>
+            <View style={styles.statBox}>
+              <Text style={styles.statNumber}>2 años</Text>
+              <Text style={styles.statLabel}>Experiencia</Text>
+            </View>
+          </View>
+        </View>
+
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Cerrar Sesión</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -151,6 +169,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  scroll: {
+    height: 580,
+  }
 });
 
 export default ConduUser;
