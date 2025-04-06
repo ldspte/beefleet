@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 
-const ConduUser = () => {
+const ConduUser = ({navigation}) => {
   return (
     <ScrollView style={styles.scroll}> 
       <View style={styles.container}>
@@ -64,7 +64,10 @@ const ConduUser = () => {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity 
+          style={styles.button}
+          onPress={() => navigation.navigate('Welcome')}
+        >
           <Text style={styles.buttonText}>Cerrar Sesión</Text>
         </TouchableOpacity>
       </View>
