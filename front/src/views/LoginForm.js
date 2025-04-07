@@ -12,8 +12,8 @@ const LoginForm = ({ navigation }) => {
     
     const handleLogin = () => {
         if (email && password) {
-            console.log('Navengando a ConduUser')
-            navigation.navigate('ConduUser');
+            console.log('Navengando a ConduUser');
+            navigation.navigate('MainApp');
         } else {
             Alert.alert('Error en el ingreso');
         }
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     backgroundImage: {
         flex: 1,
         width: '100%',
-        height: '100%',
+        height: '100%'
     },
     container: {
         flex: 1,
@@ -81,10 +81,11 @@ const styles = StyleSheet.create({
     webContainer: {
         maxWidth: '100%',
         alignItems: 'center',
+        marginBottom: 50,
     },
     logoContainer: {
         marginBottom: 40,
-        alignItems: 'center',
+        alignItems: 'center'
     },
     logo: {
         width: 150,
@@ -98,28 +99,17 @@ const styles = StyleSheet.create({
         color: 'white',
     },
     input: {
-        width: 340,
-        height: 50,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 10,
-        marginBottom: 15,
-        paddingHorizontal: 10,
-        backgroundColor: 'white',
-        maxWidth: '100%',
-
-        height: 200,
         width: 300,
         height: 50,
         backgroundColor: 'rgba(255, 255, 255, 0.2)',
         color: 'white',
         borderRadius: 10,
-        paddingHorizontal: 15,
-        marginBottom: 20,
+        paddingHorizontal: 15
     },
     webInput: {
         width: 340,
         alignSelf: 'center',
+        marginBottom: 20,
     },
     forgotContainer: {
         width: '100%',

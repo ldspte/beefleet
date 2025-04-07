@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // Asegúrate de tener esta dependencia instalada
 
-export default function Home() {
+const Home = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -13,27 +13,27 @@ export default function Home() {
         
         <View style={styles.cardsContainer}>
           <TouchableOpacity style={styles.card}>
-            <Ionicons name="car-outline" size={40} color="#007BFF" />
-            <Text style={styles.cardTitle}>Viajes Activos</Text>
-            <Text style={styles.cardCount}>3</Text>
+            <Ionicons name="car-outline" size={40} color="#FB8500" />
+            <Text style={styles.cardTitle}>Tu Vehículo</Text>
+            <Text style={styles.cardCount}>ABC 123</Text>
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.card}>
-            <Ionicons name="calendar-outline" size={40} color="#007BFF" />
-            <Text style={styles.cardTitle}>Programados</Text>
-            <Text style={styles.cardCount}>5</Text>
+            <Ionicons name="navigate-circle-outline" size={40} color="#FB8500" />
+            <Text style={styles.cardTitle}>Rutas</Text>
+            <Text style={styles.cardCount}>Ver</Text>
           </TouchableOpacity>
         </View>
         
         <View style={styles.cardsContainer}>
           <TouchableOpacity style={styles.card}>
-            <Ionicons name="checkmark-circle-outline" size={40} color="#007BFF" />
+            <Ionicons name="checkmark-circle-outline" size={40} color="#FB8500" />
             <Text style={styles.cardTitle}>Completados</Text>
             <Text style={styles.cardCount}>12</Text>
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.card}>
-            <Ionicons name="analytics-outline" size={40} color="#007BFF" />
+            <Ionicons name="analytics-outline" size={40} color="#FB8500" />
             <Text style={styles.cardTitle}>Estadísticas</Text>
             <Text style={styles.cardCount}>Ver</Text>
           </TouchableOpacity>
@@ -43,17 +43,17 @@ export default function Home() {
           <Text style={styles.sectionTitle}>Actividad Reciente</Text>
           
           <View style={styles.activityItem}>
-            <Ionicons name="time-outline" size={20} color="#555" />
+            <Ionicons name="time-outline" size={20} color="#fca311" />
             <Text style={styles.activityText}>Viaje #1234 completado</Text>
           </View>
           
           <View style={styles.activityItem}>
-            <Ionicons name="time-outline" size={20} color="#555" />
+            <Ionicons name="time-outline" size={20} color="#fca311" />
             <Text style={styles.activityText}>Nuevo viaje asignado #4567</Text>
           </View>
           
           <View style={styles.activityItem}>
-            <Ionicons name="time-outline" size={20} color="#555" />
+            <Ionicons name="time-outline" size={20} color="#fca311" />
             <Text style={styles.activityText}>Mantenimiento programado</Text>
           </View>
         </View>
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   cardCount: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#007BFF',
+    color: '#dc2f02',
     marginTop: 4,
   },
   recentActivity: {
@@ -143,3 +143,5 @@ const styles = StyleSheet.create({
     color: '#333',
   },
 });
+
+export default Home;

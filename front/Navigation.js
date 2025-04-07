@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useContext, useEffect } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,15 +11,15 @@ import RecuperarContrasena from './src/views/recuperarContrasena.js';
 
 // Imports de pantallas principales (post-login)
 import ConduUser from './src/views/conduUser.js';
-import Home from './src/views/Home.js'; 
-import Notifications from './src/views/Notifications.js'; 
+import Home from './src/views/Home.js';
+import Notifications from './src/views/Notifications.js';
 
 // Inicialización de navegadores
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // Bottom Tab Navigator (visible después del login)
-const BottomTabNavigator = () => {
+function MainTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -35,28 +36,28 @@ const BottomTabNavigator = () => {
           
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#007BFF',
+        tabBarActiveTintColor: '#FB8500',
         tabBarInactiveTintColor: 'gray',
       })}
     >
       <Tab.Screen 
         name="Home" 
         component={Home} 
-        options={{ headerShown: false }}
+        options={{ headerShown: false }} 
       />
       <Tab.Screen 
         name="Notifications" 
         component={Notifications} 
-        options={{ headerShown: false }}
+        options={{ headerShown: false }} 
       />
       <Tab.Screen 
         name="Profile" 
         component={ConduUser} 
-        options={{ headerShown: false }}
+        options={{ headerShown: false }} 
       />
     </Tab.Navigator>
   );
-};
+}
 
 // Stack Navigator principal
 const Navigation = () => {
@@ -66,28 +67,22 @@ const Navigation = () => {
       <Stack.Screen 
         name="Welcome" 
         component={Welcome} 
-        options={{ headerShown: false }}
+        options={{ headerShown: false }} 
       />
       <Stack.Screen 
         name="LoginForm" 
         component={LoginForm} 
-        options={{ title: 'Iniciar Sesión' }}
+        options={{ title: 'Iniciar Sesión' }} 
       />
       <Stack.Screen 
         name="RecuperarContrasena" 
         component={RecuperarContrasena} 
-        options={{ title: 'Recuperar Contraseña' }}
-      />
-      
-      <Stack.Screen
-        name="ConduUser"
-        component={ConduUser}
-        options={{ title: 'Perfil Conductor' }}
+        options={{ title: 'Recuperar Contraseña' }} 
       />
       <Stack.Screen 
         name="MainApp" 
-        component={BottomTabNavigator} 
-        options={{ headerShown: false }}
+        component={MainTabs} 
+        options={{ headerShown: false }} 
       />
     </Stack.Navigator>
   );
