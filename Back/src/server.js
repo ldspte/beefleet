@@ -3,11 +3,14 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { body, validationResult } = require('express-validator');
-const pool = require('./db'); // Asegúrate de tener tu pool de conexiones configurado
+const pool = require('./database'); // Asegúrate de tener tu pool de conexiones configurado
 const app = express();
 app.use(cors());
 app.use(express.json());
 const SECRET_KEY = process.env.SECRET_KEY || 'lossimpsom'; // Cambia esto por una clave secreta más segura
+const dirversRoute = require('./routes/driversRoute');
+
+app.use(dirversRoute)
 
 // Registro de usuario
 app.post('/api/register', [
@@ -95,9 +98,11 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
-app.listen(3001, () => {
-  console.log('Server listening on port 3001');
-});
+// app.listen(3001, () => {
+//   console.log('Server listening on port 3001');
+// });
+
+module.exports = app;
 
 
 
