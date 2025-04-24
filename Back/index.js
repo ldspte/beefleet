@@ -1,3 +1,1 @@
-import app from "./server";
-
-
+const app = require('./src/server.js');

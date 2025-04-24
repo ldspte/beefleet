@@ -10,12 +10,35 @@ const LoginForm = ({ navigation }) => {
         navigation.navigate('RecuperarContrasena'); // Navegar a la pantalla de recuperación
     }
     
-    const handleLogin = () => {
+    const handleLogin = async () => {
         if (email && password) {
-            console.log('Navengando a ConduUser');
-            navigation.navigate('MainApp');
+            try {
+                const response = await fetch('http://localhost:3001/api/loginDrivers', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        correo_conductor: email,
+                        contraseña: password,
+                    }),
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    // Falta Guardar el token en el almacenamiento local o en el estado global
+                    console.log('Login successful:', data);
+                    Alert.alert('Inicio de sesión exitoso');
+                    navigation.navigate('ConduUser'); // Navegar a la pantalla principal
+                } else {
+                    Alert.alert('Error', data.message || 'Credenciales incorrectas');
+                }
+            } catch (error) {
+                console.error('Error during login:', error);
+                Alert.alert('Error', 'Hubo un problema al iniciar sesión. Inténtalo de nuevo más tarde.');
+                
+            }
         } else {
-            Alert.alert('Error en el ingreso');
+            Alert.alert('Por favor, Completa todos los campos');
         }
     }
     
