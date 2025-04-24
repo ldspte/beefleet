@@ -16,6 +16,14 @@ const getUsersById = async(id) => {
     return files[0];
 }
 
+const createUser = async(user) => {
+    const [result] = await db.query(
+      'INSERT INTO Usuarios (nombre, apellido, email, telefono) VALUES (?, ?, ?, ?)',
+      [user.nombre, user.apellido, user.email, user.telefono]
+    );
+    return result.insertId;
+}
+
 
 
 module.exports = {
