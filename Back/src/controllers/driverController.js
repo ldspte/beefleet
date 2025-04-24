@@ -2,7 +2,7 @@ const db = require('../database.js');
 
 const getDrivers = async() => {
   const results = await db.query(`
-    SELECT * FROM conductores  
+    SELECT * FROM Conductores  
   `)
   return results;
 }
