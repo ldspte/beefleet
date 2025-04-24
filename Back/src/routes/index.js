@@ -9,30 +9,30 @@ const { getDrivers, getDriversById, createDriver, updateDriver, deleteDriver } =
 
 
 // Registro de usuario
-route.post('/api/register', [
-    body('email_usuario').isString().notEmpty(),
-    body('contraseña').isLength({ min: 6 })
-  ], async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+// route.post('/api/register', [
+//     body('email_usuario').isString().notEmpty(),
+//     body('contraseña').isLength({ min: 6 })
+//   ], async (req, res) => {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//       return res.status(400).json({ errors: errors.array() });
+//     }
   
-    const { email_usuario, password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
+//     const { email_usuario, password } = req.body;
+//     const hashedPassword = await bcrypt.hash(password, 10);
   
-    try {
-      await pool.query('INSERT INTO Usuarios (email_usuario, contraseña) VALUES (?, ?)', [email_usuario, hashedPassword]);
-      res.status(201).send('User  registered');
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error registering user' });
-    }
-});
+//     try {
+//       await pool.query('INSERT INTO Usuarios (email_usuario, contraseña) VALUES (?, ?)', [email_usuario, hashedPassword]);
+//       res.status(201).send('User  registered');
+//     } catch (error) {
+//       console.error(error);
+//       res.status(500).json({ message: 'Error registering user' });
+//     }
+// });
   
-  // Inicio de sesión
-route.post('/api/login ', [
-  body('email_usuario').isString().notEmpty(),
+  // Inicio de sesión Conductor
+route.post('/api/loginDrivers ', [
+  body('correo_conductor').isString().notEmpty(),
   body('contraseña').isString().notEmpty()
 ], async (req, res) => {
   const errors = validationResult(req);
@@ -40,15 +40,15 @@ route.post('/api/login ', [
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { email_usuario, password } = req.body;
+  const { correo_conductor, password } = req.body;
   try {
-    const [user] = await pool.query('SELECT * FROM Usuarios WHERE email_usuario = ?', [email_usuario]);
+    const [user] = await pool.query('SELECT * FROM Conductores WHERE correo_conductor = ?', [correo_conductor]);
 
     if (!user.length || !(await bcrypt.compare(password, user[0].contraseña))) {
       return res.status(401).send('Invalid credentials');
     }
 
-    const token = jwt.sign({ id: user[0].id_usuario }, SECRET_KEY, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user[0].id_conductor }, SECRET_KEY, { expiresIn: '1h' });
     res.json({ token });
   } catch (error) {
     console.error(error);
