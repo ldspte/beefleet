@@ -1,13 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // Asegúrate de tener esta dependencia instalada
+import { Ionicons } from '@expo/vector-icons'; 
 
 const Home = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Bienvenido</Text>
+          <Text style={styles.headerTitle}>Bienvenido </Text>
           <Text style={styles.headerSubtitle}>Sistema de Camiones</Text>
         </View>
         
