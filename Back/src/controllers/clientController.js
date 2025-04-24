@@ -1,4 +1,4 @@
-const db = require('../database.js');
+const {db} = require('../database.js');
 
 const getClients = async() => {
   const results = await db.query(`
