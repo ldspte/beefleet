@@ -12,4 +12,8 @@ const db = mysql.createPool({
 });
 
 
+<<<<<<< HEAD
 module.exports = db;
+=======
+module.exports = {db};
+>>>>>>> 52dcd98a50ed82802a9bf2fbb86b140c5e97fcbb
