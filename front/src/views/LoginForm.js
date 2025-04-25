@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Text, TextInput, Alert, TouchableOpacity, Image, ImageBackground} from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginForm = ({ navigation }) => {
     const [email, setEmail] = useState('');
@@ -14,19 +15,21 @@ const LoginForm = ({ navigation }) => {
         if (email && password) {
             console.log(email, password);
             try {
-                const response = await fetch('http://localhost:3001/api/logindrivers', {
+                const response = await fetch('http://localhost:3001/api/logindrivers/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        email : 'correo_conductor',
-                        password : 'contraseña',
+                        correo_conductor : email,
+                        contraseña : password,
                     }),
                 });
                 const data = await response.json();
                 if (response.ok) {
                     // Falta Guardar el token en el almacenamiento local o en el estado global
+                     // Almacena el token en AsyncStorage
+                    await AsyncStorage.setItem('token', data.token); // Asegúrate de que 'data.token' sea el campo correcto
                     console.log('Login successful:', data);
                     Alert.alert('Inicio de sesión exitoso');
                     navigation.navigate('ConduUser'); // Navegar a la pantalla principal

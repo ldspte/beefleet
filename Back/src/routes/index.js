@@ -13,27 +13,7 @@ const {getRoutes, getRoutesById, createRoute, updateRoute, deleteRoute} = requir
 const {getVehicles, getVehiclesById, createVehicle, updateVehicle, deleteVehicle} = require('../controllers/vehicleController');
 
 
-// Registro de usuario
-// route.post('/api/register', [
-//     body('email_usuario').isString().notEmpty(),
-//     body('contraseña').isLength({ min: 6 })
-//   ], async (req, res) => {
-//     const errors = validationResult(req);
-//     if (!errors.isEmpty()) {
-//       return res.status(400).json({ errors: errors.array() });
-//     }
-  
-//     const { email_usuario, password } = req.body;
-//     const hashedPassword = await bcrypt.hash(password, 10);
-  
-//     try {
-//       await pool.query('INSERT INTO Usuarios (email_usuario, contraseña) VALUES (?, ?)', [email_usuario, hashedPassword]);
-//       res.status(201).send('User  registered');
-//     } catch (error) {
-//       console.error(error);
-//       res.status(500).json({ message: 'Error registering user' });
-//     }
-// });
+
 // Inicio de sesión Conductor
 
 
@@ -224,8 +204,278 @@ route.get('/api/vehicles/:id', async(req,res)=>{
 })
 
 
+// Crear vehiculo
+
+route.post('/api/vehicles', async (req,res) => {
+  const {placa, modelo, peso, matricula, seguro, estado_vehiculo} = req.body;
+  try {
+    const vehicle = await createVehicle(placa, modelo, peso, matricula, seguro, estado_vehiculo);
+    return res.status(201).json({ vehicle });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error creating vehicle' });
+  }
+});
+
+// Actualizar vehiculo
+
+route.put('/api/vehicles/:id', async (req,res) => {
+  const { id_vehiculo } = req.params;
+  const {placa, modelo, peso, matricula, seguro, estado_vehiculo} = req.body;
+  try {
+    const vehicle = await updateVehicle(id_vehiculo, placa, modelo, peso, matricula, seguro, estado_vehiculo);
+    if (!vehicle) {
+      return res.status(404).json({ message: 'Vehicle not found' });
+    }
+    return res.status(200).json({ message: 'Vehicle updated successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error updating vehicle' });
+  }
+});
+// eliminar vehiculo
+
+route.delete('/api/vehicles/:id', async (req,res) => {
+  const { id_vehiculo } = req.params;
+  try {
+    const vehicle = await deleteVehicle(id_vehiculo);
+    if (!vehicle) {
+      return res.status(404).json({ message: 'Vehicle not found' });
+    }
+    return res.status(200).json({ message: 'Vehicle deleted successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error deleting vehicle' });
+  }
+});
 
 
+//obtener Clientes
+route.get('/api/clients', async (req,res) => {
+  try {
+    const values = await getClients();
+    return res.status(200).json(values);
+  } catch (error) {
+    return res.status(500).json({ message: 'Error fetching clients' });
+  }
+});
+
+
+// obtener cliente por ID
+route.get('/api/clients/:id', async (req,res) => {
+  const { id_cliente } = req.params;
+  try {
+    const client = await getClientsById(id_cliente);
+    if (!client) {
+      return res.status(404).json({ message: 'Client not found' });
+    }
+    return res.status(200).json(client);
+  } catch (error) {
+    return res.status(500).json({ message: 'Error fetching client' });
+  }
+});
+
+// crear cliente
+
+route.post('/api/clients', async (req,res) => {
+  const {tipo_documento, documento, nombre_cliente, apellido_cliente, direccion, ciudad, telefono, empresa} = req.body;
+  try {
+    const client = await createClient(tipo_documento, documento, nombre_cliente, apellido_cliente, direccion, ciudad, telefono, empresa);
+    return res.status(201).json({ client });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error creating client' });
+  }
+});
+// actualizar cliente
+
+route.put('/api/clients/:id', async (req,res) => {
+  const { id_cliente } = req.params;
+  const {tipo_documento, documento, nombre_cliente, apellido_cliente, direccion, ciudad, telefono, empresa} = req.body;
+  try {
+    const client = await updateClient(id_cliente, tipo_documento, documento, nombre_cliente, apellido_cliente, direccion, ciudad, telefono, empresa);
+    if (!client) {
+      return res.status(404).json({ message: 'Client not found' });
+    }
+    return res.status(200).json({ message: 'Client updated successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error updating client' });
+  }
+});
+// eliminar cliente
+
+route.delete('/api/clients/:id', async (req,res) => {
+  const { id_cliente } = req.params;
+  try {
+    const client = await deleteClient(id_cliente);
+    if (!client) {
+      return res.status(404).json({ message: 'Client not found' });
+    }
+    return res.status(200).json({ message: 'Client deleted successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error deleting client' });
+  }
+});
+
+
+//obtener ventas
+
+route.get('api/sales', async (req,res) => {
+  try {
+    const values = await getSales();
+    return res.status(200).json(values);
+  } catch (error) {
+    return res.status(500).json({ message: 'Error fetching sales' });
+  }
+});
+
+//obtener Venta por ID 
+
+route.get('api/sales/:id', async (req,res) => {
+  const { id_venta } = req.params;
+  try {
+    const sale = await getSalesById(id_venta);
+    if (!sale) {
+      return res.status(404).json({ message: 'Sale not found' });
+    }
+    return res.status(200).json(sale);
+  } catch (error) {
+    return res.status(500).json({ message: 'Error fetching sale' });
+  }
+});
+
+
+// crear venta
+
+
+route.post('/api/sales', async (req,res) => {
+  const {fecha, valor, descripcion, carga} = req.body;
+  try {
+    const sale = await createSale(fecha, valor, descripcion, carga);
+    return res.status(201).json({ sale });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error creating sale' });
+  }
+});
+
+
+//actualizar venta
+
+route.put('/api/sales/:id', async (req,res) => {
+  const { id_venta } = req.params;
+  const {fecha, valor, descripcion, carga} = req.body;
+  try {
+    const sale = await updateSale(id_venta, fecha, valor, descripcion, carga);
+    if (!sale) {
+      return res.status(404).json({ message: 'Sale not found' });
+    }
+    return res.status(200).json({ message: 'Sale updated successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error updating sale' });
+  }
+});
+
+// eliminar venta
+route.delete('/api/sales/:id', async (req,res) => {
+  const { id_venta } = req.params;
+  try {
+    const sale = await deleteSale(id_venta);
+    if (!sale) {
+      return res.status(404).json({ message: 'Sale not found' });
+    }
+    return res.status(200).json({ message: 'Sale deleted successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error deleting sale' });
+  }
+});
+
+
+//obtener rutas
+
+route.get('/api/routes', async (req,res) => {
+  try {
+    const values = await getRoutes();
+    return res.status(200).json(values);
+  } catch (error) {
+    return res.status(500).json({ message: 'Error fetching routes' });
+  }
+});
+
+//obtener ruta por ID
+
+route.get('/api/routes/:id', async (req,res) => {
+  const { id_ruta } = req.params;
+  try {
+    const route = await getRoutesById(id_ruta);
+    if (!route) {
+      return res.status(404).json({ message: 'Route not found' });
+    }
+    return res.status(200).json(route);
+  } catch (error) {
+    return res.status(500).json({ message: 'Error fetching route' });
+  }
+});
+
+// crear ruta
+
+route.post('/api/routes', async (req,res) => {
+  const {origen, destino, distancia, carga} = req.body;
+  try {
+    const route = await createRoute(origen, destino, distancia, carga);
+    return res.status(201).json({ route });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error creating route' });
+  }
+});
+
+// actualizar ruta
+
+route.put('/api/routes/:id', async (req,res) => {
+  const {id_ruta, origen, destino, distancia, carga} = req.body;
+  try {
+    const route = await updateRoute(id_ruta, origen, destino, distancia, carga);
+    if (!route) {
+      return res.status(404).json({ message: 'Route not found' });
+    }
+    return res.status(200).json({ message: 'Route updated successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error updating route' });
+  }
+});
+
+// eliminar ruta
+
+route.delete('/api/routes/:id', async (req,res) => {
+  const { id_ruta } = req.params;
+  try {
+    const route = await deleteRoute(id_ruta);
+    if (!route) {
+      return res.status(404).json({ message: 'Route not found' });
+    }
+    return res.status(200).json({ message: 'Route deleted successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error deleting route' });
+  }
+});
+
+
+// Registro de usuario
+// route.post('/api/register', [
+//     body('email_usuario').isString().notEmpty(),
+//     body('contraseña').isLength({ min: 6 })
+//   ], async (req, res) => {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//       return res.status(400).json({ errors: errors.array() });
+//     }
+  
+//     const { email_usuario, password } = req.body;
+//     const hashedPassword = await bcrypt.hash(password, 10);
+  
+//     try {
+//       await pool.query('INSERT INTO Usuarios (email_usuario, contraseña) VALUES (?, ?)', [email_usuario, hashedPassword]);
+//       res.status(201).send('User  registered');
+//     } catch (error) {
+//       console.error(error);
+//       res.status(500).json({ message: 'Error registering user' });
+//     }
+// });
 
 
 module.exports = route;
