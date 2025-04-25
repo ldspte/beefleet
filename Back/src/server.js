@@ -1,6 +1,7 @@
 const express = require('express'); // Asegúrate de importar express
 const cors = require('cors');
 const app = express();
+const bcrypt = require('bcryptjs');
 
 const route = require('./routes/index'); // Asegúrate de que la ruta sea correcta
 
@@ -17,6 +18,9 @@ app.use((err, req, res, next) => {
 // Iniciar el servidor
 app.listen(3001, () => {
   console.log('Server listening on port 3001');
+  const contraseña = 'losimpsom1';
+  const hashpassword = bcrypt.hashSync(contraseña, 10);
+  console.log(hashpassword);
 });
 
 module.exports = app;

@@ -29,9 +29,10 @@ const { getDrivers, getDriversById, createDriver, updateDriver, deleteDriver } =
 //       res.status(500).json({ message: 'Error registering user' });
 //     }
 // });
-  
-  // Inicio de sesión Conductor
-route.post('/api/loginDrivers ', [
+// Inicio de sesión Conductor
+
+
+route.post('/api/logindrivers', [
   body('correo_conductor').isString().notEmpty(),
   body('contraseña').isString().notEmpty()
 ], async (req, res) => {
@@ -40,14 +41,12 @@ route.post('/api/loginDrivers ', [
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { correo_conductor, password } = req.body;
+  const { correo_conductor, contraseña } = req.body;
   try {
-    const [user] = await pool.query('SELECT * FROM Conductores WHERE correo_conductor = ?', [correo_conductor]);
-
-    if (!user.length || !(await bcrypt.compare(password, user[0].contraseña))) {
+    const [user] = await db.query('SELECT * FROM Conductores WHERE correo_conductor = ?', [correo_conductor]);
+    if (!user.length || !(await bcrypt.compare(contraseña, user[0].contraseña))) {
       return res.status(401).send('Invalid credentials');
     }
-
     const token = jwt.sign({ id: user[0].id_conductor }, SECRET_KEY, { expiresIn: '1h' });
     res.json({ token });
   } catch (error) {
@@ -55,7 +54,6 @@ route.post('/api/loginDrivers ', [
     res.status(500).json({ message: 'Error logging in' });
   }
 });
-  
   // Middleware para proteger rutas
 const authenticateJWT = (req, res, next) => {
   const token = req.headers['authorization'];
