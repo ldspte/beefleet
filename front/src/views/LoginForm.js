@@ -12,6 +12,7 @@ const LoginForm = ({ navigation }) => {
     
     const handleLogin = async () => {
         if (email && password) {
+            console.log(email, password);
             try {
                 const response = await fetch('http://localhost:3001/api/logindrivers', {
                     method: 'POST',
@@ -19,8 +20,8 @@ const LoginForm = ({ navigation }) => {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        correo_conductor: email,
-                        contraseña: password,
+                        email : 'correo_conductor',
+                        password : 'contraseña',
                     }),
                 });
                 const data = await response.json();

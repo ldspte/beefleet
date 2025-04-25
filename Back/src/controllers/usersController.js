@@ -1,4 +1,4 @@
-const {db} = require('../db');
+const {db} = require('../database');
 
 function generatePassword(longitud=10) {
     const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+[]{}|;:,.<>?';
