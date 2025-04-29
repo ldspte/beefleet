@@ -30,9 +30,12 @@ const LoginForm = ({ navigation }) => {
                     // Falta Guardar el token en el almacenamiento local o en el estado global
                      // Almacena el token en AsyncStorage
                     await AsyncStorage.setItem('token', data.token); // Asegúrate de que 'data.token' sea el campo correcto
-                    console.log('Login successful:', data);
+                    await AsyncStorage.setItem('id_conductor', data.user[0].id_conductor); // Almacena el id del conductor
+                    const dirverId = await AsyncStorage.getItem(data.user[0].id_conductor)
+                    console.log('Driver ID:', dirverId); // Verifica que el ID se haya almacenado correctamente
+                    console.log('Login successful:', data.user[0].id_conductor);
                     Alert.alert('Inicio de sesión exitoso');
-                    navigation.navigate('ConduUser'); // Navegar a la pantalla principal
+                    navigation.navigate('MainApp'); // Navegar a la pantalla principal
                 } else {
                     Alert.alert('Error', data.message || 'Credenciales incorrectas');
                 }

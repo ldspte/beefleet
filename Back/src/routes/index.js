@@ -33,7 +33,7 @@ route.post('/api/logindrivers', [
       return res.status(401).send('Invalid credentials');
     }
     const token = jwt.sign({ id: user[0].id_conductor }, SECRET_KEY, { expiresIn: '1h' });
-    res.json({ token });
+    res.json({ token , user});
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error logging in' });
@@ -74,7 +74,7 @@ route.get('/', async (req, res) => {
 
 // Obtener todos los conductores
 
-route.get('/api/drivers', async (req,res) => {
+route.get('/api/drivers', authenticateJWT, async (req,res) => {
   try {
     const values = await getDrivers();
     return res.status(200).json(values);
@@ -85,7 +85,7 @@ route.get('/api/drivers', async (req,res) => {
 
 // crear un conductor
 
-route.post('/api/drivers', async (req,res) => {
+route.post('/api/drivers', authenticateJWT, async (req,res) => {
   const {tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion } = req.body;
   try {
     const driver = await createDriver(tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion);
@@ -97,7 +97,7 @@ route.post('/api/drivers', async (req,res) => {
 
 // Buscar por id conductor
 
-route.get('/api/drivers/:id', async (req,res) => {
+route.get('/api/drivers/:id_conductor', async (req,res) => {
   const { id_conductor } = req.params;
   try {
     const driver = await getDriversById(id_conductor);
@@ -112,7 +112,7 @@ route.get('/api/drivers/:id', async (req,res) => {
 
 //actualizar conductor
 
-route.put('/api/drivers/:id', async (req,res) => {
+route.put('/api/drivers/:id', authenticateJWT, async (req,res) => {
   const { id_conductor } = req.params;
   const { tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion } = req.body;
   try {
@@ -128,7 +128,7 @@ route.put('/api/drivers/:id', async (req,res) => {
 
 
 // eliminar conductor
-route.delete('/api/drivers/:id', async (req,res) => {
+route.delete('/api/drivers/:id', authenticateJWT, async (req,res) => {
   const { id_conductor } = req.params;
   try {
     const driver = await deleteDriver(id_conductor);
@@ -179,7 +179,7 @@ route.post('/api/loginadmin', [
 
 // Obtener todos los vehiculos
 
-route.get('/api/vehicles', async (req,res) => {
+route.get('/api/vehicles', authenticateJWT, async (req,res) => {
   try {
     const values = await getVehicles();
     return res.status(200).json(values);
@@ -190,7 +190,7 @@ route.get('/api/vehicles', async (req,res) => {
 
 // Obtener vehiculo por ID 
 
-route.get('/api/vehicles/:id', async(req,res)=>{
+route.get('/api/vehicles/:id', authenticateJWT, async(req,res)=>{
   try {
     const id_vehiculo = req.params;
     const vehiculo = await getVehiclesById(id_vehiculo);
@@ -206,7 +206,7 @@ route.get('/api/vehicles/:id', async(req,res)=>{
 
 // Crear vehiculo
 
-route.post('/api/vehicles', async (req,res) => {
+route.post('/api/vehicles', authenticateJWT,  async (req,res) => {
   const {placa, modelo, peso, matricula, seguro, estado_vehiculo} = req.body;
   try {
     const vehicle = await createVehicle(placa, modelo, peso, matricula, seguro, estado_vehiculo);
@@ -218,7 +218,7 @@ route.post('/api/vehicles', async (req,res) => {
 
 // Actualizar vehiculo
 
-route.put('/api/vehicles/:id', async (req,res) => {
+route.put('/api/vehicles/:id', authenticateJWT, async (req,res) => {
   const { id_vehiculo } = req.params;
   const {placa, modelo, peso, matricula, seguro, estado_vehiculo} = req.body;
   try {
@@ -233,7 +233,7 @@ route.put('/api/vehicles/:id', async (req,res) => {
 });
 // eliminar vehiculo
 
-route.delete('/api/vehicles/:id', async (req,res) => {
+route.delete('/api/vehicles/:id', authenticateJWT, async (req,res) => {
   const { id_vehiculo } = req.params;
   try {
     const vehicle = await deleteVehicle(id_vehiculo);
@@ -248,7 +248,7 @@ route.delete('/api/vehicles/:id', async (req,res) => {
 
 
 //obtener Clientes
-route.get('/api/clients', async (req,res) => {
+route.get('/api/clients', authenticateJWT, async (req,res) => {
   try {
     const values = await getClients();
     return res.status(200).json(values);
@@ -259,7 +259,7 @@ route.get('/api/clients', async (req,res) => {
 
 
 // obtener cliente por ID
-route.get('/api/clients/:id', async (req,res) => {
+route.get('/api/clients/:id', authenticateJWT, async (req,res) => {
   const { id_cliente } = req.params;
   try {
     const client = await getClientsById(id_cliente);
@@ -274,7 +274,7 @@ route.get('/api/clients/:id', async (req,res) => {
 
 // crear cliente
 
-route.post('/api/clients', async (req,res) => {
+route.post('/api/clients', authenticateJWT, async (req,res) => {
   const {tipo_documento, documento, nombre_cliente, apellido_cliente, direccion, ciudad, telefono, empresa} = req.body;
   try {
     const client = await createClient(tipo_documento, documento, nombre_cliente, apellido_cliente, direccion, ciudad, telefono, empresa);
@@ -285,7 +285,7 @@ route.post('/api/clients', async (req,res) => {
 });
 // actualizar cliente
 
-route.put('/api/clients/:id', async (req,res) => {
+route.put('/api/clients/:id', authenticateJWT, async (req,res) => {
   const { id_cliente } = req.params;
   const {tipo_documento, documento, nombre_cliente, apellido_cliente, direccion, ciudad, telefono, empresa} = req.body;
   try {
@@ -300,7 +300,7 @@ route.put('/api/clients/:id', async (req,res) => {
 });
 // eliminar cliente
 
-route.delete('/api/clients/:id', async (req,res) => {
+route.delete('/api/clients/:id', authenticateJWT, async (req,res) => {
   const { id_cliente } = req.params;
   try {
     const client = await deleteClient(id_cliente);
@@ -316,7 +316,7 @@ route.delete('/api/clients/:id', async (req,res) => {
 
 //obtener ventas
 
-route.get('api/sales', async (req,res) => {
+route.get('api/sales', authenticateJWT, async (req,res) => {
   try {
     const values = await getSales();
     return res.status(200).json(values);
@@ -327,7 +327,7 @@ route.get('api/sales', async (req,res) => {
 
 //obtener Venta por ID 
 
-route.get('api/sales/:id', async (req,res) => {
+route.get('api/sales/:id', authenticateJWT, async (req,res) => {
   const { id_venta } = req.params;
   try {
     const sale = await getSalesById(id_venta);
@@ -344,7 +344,7 @@ route.get('api/sales/:id', async (req,res) => {
 // crear venta
 
 
-route.post('/api/sales', async (req,res) => {
+route.post('/api/sales', authenticateJWT, async (req,res) => {
   const {fecha, valor, descripcion, carga} = req.body;
   try {
     const sale = await createSale(fecha, valor, descripcion, carga);
@@ -357,7 +357,7 @@ route.post('/api/sales', async (req,res) => {
 
 //actualizar venta
 
-route.put('/api/sales/:id', async (req,res) => {
+route.put('/api/sales/:id', authenticateJWT, async (req,res) => {
   const { id_venta } = req.params;
   const {fecha, valor, descripcion, carga} = req.body;
   try {
@@ -372,7 +372,7 @@ route.put('/api/sales/:id', async (req,res) => {
 });
 
 // eliminar venta
-route.delete('/api/sales/:id', async (req,res) => {
+route.delete('/api/sales/:id', authenticateJWT, async (req,res) => {
   const { id_venta } = req.params;
   try {
     const sale = await deleteSale(id_venta);
@@ -388,7 +388,7 @@ route.delete('/api/sales/:id', async (req,res) => {
 
 //obtener rutas
 
-route.get('/api/routes', async (req,res) => {
+route.get('/api/routes', authenticateJWT, async (req,res) => {
   try {
     const values = await getRoutes();
     return res.status(200).json(values);
@@ -399,7 +399,7 @@ route.get('/api/routes', async (req,res) => {
 
 //obtener ruta por ID
 
-route.get('/api/routes/:id', async (req,res) => {
+route.get('/api/routes/:id', authenticateJWT, async (req,res) => {
   const { id_ruta } = req.params;
   try {
     const route = await getRoutesById(id_ruta);
@@ -414,7 +414,7 @@ route.get('/api/routes/:id', async (req,res) => {
 
 // crear ruta
 
-route.post('/api/routes', async (req,res) => {
+route.post('/api/routes', authenticateJWT, async (req,res) => {
   const {origen, destino, distancia, carga} = req.body;
   try {
     const route = await createRoute(origen, destino, distancia, carga);
@@ -426,7 +426,7 @@ route.post('/api/routes', async (req,res) => {
 
 // actualizar ruta
 
-route.put('/api/routes/:id', async (req,res) => {
+route.put('/api/routes/:id', authenticateJWT, async (req,res) => {
   const {id_ruta, origen, destino, distancia, carga} = req.body;
   try {
     const route = await updateRoute(id_ruta, origen, destino, distancia, carga);
@@ -441,7 +441,7 @@ route.put('/api/routes/:id', async (req,res) => {
 
 // eliminar ruta
 
-route.delete('/api/routes/:id', async (req,res) => {
+route.delete('/api/routes/:id', authenticateJWT, async (req,res) => {
   const { id_ruta } = req.params;
   try {
     const route = await deleteRoute(id_ruta);

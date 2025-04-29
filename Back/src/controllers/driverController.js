@@ -19,13 +19,13 @@ const getDrivers = async() => {
   return results;
 }
 
-const getDriversById = async(id) => {
+const getDriversById = async(id_conductor) => {
   const result = await db.query(`
     SELECT * FROM conductores WHERE id_conductor = ?
   `,
-  [id]
+  [id_conductor]
   );
-  return result;
+  return result.length > 0 ? result[0] : null;
 }
 
 const createDriver = async(tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion) => {

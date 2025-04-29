@@ -1,8 +1,60 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
+import React , {useEffect, useState} from 'react';
+import { View, Text, TextInput , StyleSheet, Image, ActivityIndicator , Alert, TouchableOpacity, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ConduUser = ({navigation}) => {
+
+    const [driverInfo, setDriverInfo] = useState({
+      tipo_documento:'',
+      documento:'',
+      nombre_conductor:'',
+      apellido_conductor:'',
+      correo_conductor:'',
+      foto:'',
+      telefono:'',
+      ciudad:'',
+      direccion:'',
+    });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const token = await AsyncStorage.getItem('token');
+                const driverId = await AsyncStorage.getItem('id_conductor'); // Asegúrate de que este ID sea el correcto
+                console.log(driverId);
+                const response = await fetch(`http://localhost:3001/api/drivers/${driverId}`, { // Cambia localhost por tu IP
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`, // Asegúrate de que tu API acepte el token en el encabezado
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(data); // Verifica la estructura de la respuesta
+                    setDriverInfo(data); // Asumiendo que la respuesta tiene la estructura adecuada
+                } else {
+                    Alert.alert('Error', 'No se pudo obtener la información del usuario.');
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                Alert.alert('Error', 'Hubo un problema al obtener la información del usuario.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUserData();
+    }, []);
+
+    if (loading) {
+        return <ActivityIndicator size="large" color="#0000ff" />; // Indicador de carga
+    }
+  
+
   return (
     <LinearGradient
       colors={['#4c669f', '#3b5998', '#192f6a']} // Puedes cambiar estos colores
@@ -17,7 +69,7 @@ const ConduUser = ({navigation}) => {
               source={require('../assets/user.png')} 
               style={styles.profileImage}
             />
-            <Text style={styles.name}>Nombre del Conductor</Text>
+            <Text style={styles.name} >{driverInfo[0].nombre_conductor}</Text>
             <Text style={styles.subtitle}>Conductor Activo</Text>
           </View>
 
@@ -25,19 +77,19 @@ const ConduUser = ({navigation}) => {
             <Text style={styles.sectionTitle}>Información Personal</Text>
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Documento:</Text>
-              <Text style={styles.infoValue}>123456789</Text>
+              <Text style={styles.infoValue}>{driverInfo[0].documento}</Text>
             </View>
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Email:</Text>
-              <Text style={styles.infoValue}>conductor@ejemplo.com</Text>
+              <Text style={styles.infoValue}>{driverInfo[0].correo_conductor}</Text>
             </View>
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Teléfono:</Text>
-              <Text style={styles.infoValue}>+52 123 456 7890</Text>
+              <Text style={styles.infoValue} >{driverInfo[0].telefono}</Text>
             </View>
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Dirección:</Text>
-              <Text style={styles.infoValue}>Carrera #3 (Marinilla - Antioquia)</Text>
+              <Text style={styles.infoValue}>{driverInfo[0].direccion}</Text>
             </View>
           </View>
           
