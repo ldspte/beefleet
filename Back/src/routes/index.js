@@ -13,7 +13,7 @@ const {getRoutes, getRoutesById, createRoute, updateRoute, deleteRoute} = requir
 const {getVehicles, getVehiclesById, createVehicle, updateVehicle, deleteVehicle} = require('../controllers/vehicleController');
 
 
-// Registro de usuario
+// Registro de usuarioroute
 // route.post('/api/register', [
 //     body('email_usuario').isString().notEmpty(),
 //     body('contraseña').isLength({ min: 6 })
@@ -37,7 +37,7 @@ const {getVehicles, getVehiclesById, createVehicle, updateVehicle, deleteVehicle
 // Inicio de sesión Conductor
 
 
-route.post('/api/logindrivers', [
+route.post('/api/loginDrivers', [
   body('correo_conductor').isString().notEmpty(),
   body('contraseña').isString().notEmpty()
 ], async (req, res) => {

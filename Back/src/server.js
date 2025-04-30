@@ -1,11 +1,11 @@
-const express = require('express'); // Asegúrate de importar express
+const express = require('express'); 
 const cors = require('cors');
 const app = express();
 const bcrypt = require('bcryptjs');
 
-const route = require('./routes/index'); // Asegúrate de que la ruta sea correcta
+const route = require('./routes/index'); 
 
-app.use(cors()); // Puedes configurar CORS aquí si es necesario
+app.use(cors()); 
 app.use(express.json());
 app.use('/', route);
 
