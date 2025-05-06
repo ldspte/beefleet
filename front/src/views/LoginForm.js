@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Text, TextInput, Alert, TouchableOpacity, Image, ImageBackground} from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 const LoginForm = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -10,10 +9,9 @@ const LoginForm = ({ navigation }) => {
         console.log('Navegando a RecuperarPassword')
         navigation.navigate('RecuperarContrasena'); // Navegar a la pantalla de recuperación
     }
-    
     const handleLogin = async () => {
+        console.log(email, password);
         if (email && password) {
-            console.log(email, password);
             try {
                 const response = await fetch('http://localhost:3001/api/logindrivers/', {
                     method: 'POST',
@@ -21,33 +19,28 @@ const LoginForm = ({ navigation }) => {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        correo_conductor : email,
-                        contraseña : password,
+                        correo_conductor: email,
+                        contrasena: password,
                     }),
                 });
-                const data = await response.json();
+    
+                const data = await response.json(); // Procesa la respuesta como JSON
                 if (response.ok) {
-                    // Falta Guardar el token en el almacenamiento local o en el estado global
-                     // Almacena el token en AsyncStorage
-                    await AsyncStorage.setItem('token', data.token); // Asegúrate de que 'data.token' sea el campo correcto
-                    await AsyncStorage.setItem('id_conductor', data.user[0].id_conductor); // Almacena el id del conductor
-                    const dirverId = await AsyncStorage.getItem(data.user[0].id_conductor)
-                    console.log('Driver ID:', dirverId); // Verifica que el ID se haya almacenado correctamente
-                    console.log('Login successful:', data.user[0].id_conductor);
+                    await AsyncStorage.setItem('token', data.token);
+                    console.log('Login successful:', data);
                     Alert.alert('Inicio de sesión exitoso');
-                    navigation.navigate('MainApp'); // Navegar a la pantalla principal
+                    navigation.navigate('MainApp');
                 } else {
                     Alert.alert('Error', data.message || 'Credenciales incorrectas');
                 }
             } catch (error) {
                 console.error('Error during login:', error);
                 Alert.alert('Error', 'Hubo un problema al iniciar sesión. Inténtalo de nuevo más tarde.');
-                
             }
         } else {
             Alert.alert('Por favor, Completa todos los campos');
         }
-    }
+    };
     
     return(
         <ImageBackground 
