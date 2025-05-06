@@ -15,6 +15,8 @@ const ConduUser = ({navigation}) => {
       telefono:'',
       ciudad:'',
       direccion:'',
+      licencia:'',
+      fecha_vencimiento:''
     });
     const [loading, setLoading] = useState(true);
 
@@ -66,7 +68,8 @@ const ConduUser = ({navigation}) => {
         <View style={styles.container}>
           <View style={styles.header}>
             <Image 
-              source={require('../assets/user.png')} 
+              //source={require('../assets/user.png')}
+              source={{  uri: driverInfo.foto ? uri: driverInfo.foto   }} 
               style={styles.profileImage}
             />
             <Text style={styles.name} >{driverInfo[0].nombre_conductor}</Text>

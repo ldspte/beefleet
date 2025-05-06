@@ -41,7 +41,7 @@ const LoginForm = ({ navigation }) => {
                 }
             } catch (error) {
                 console.error('Error during login:', error);
-                Alert.alert('Error', 'Hubo un problema al iniciar sesión. Inténtalo de nuevo más tarde.');
+                Alert.alert('Correo Electronico o Contraseña Invalidos');
                 
             }
         } else {
