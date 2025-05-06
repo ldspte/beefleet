@@ -84,6 +84,7 @@ const Navigation = () => {
         component={MainTabs} 
         options={{ headerShown: false }} 
       />
+      
     </Stack.Navigator>
   );
 };
