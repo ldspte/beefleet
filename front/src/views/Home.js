@@ -20,7 +20,7 @@ const Home = ({ navigation }) => {
           
           <TouchableOpacity style={styles.card}>
             <Ionicons name="navigate-circle-outline" size={40} color="#FB8500" />
-            <Text style={styles.cardTitle}>Rutas</Text>
+            <Text style={styles.cardTitle}>Tus Viajes</Text>
             <Text style={styles.cardCount}>Ver</Text>
           </TouchableOpacity>
         </View>

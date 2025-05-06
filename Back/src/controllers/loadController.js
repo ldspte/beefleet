@@ -46,10 +46,20 @@ const deleteLoad = async(id_carga) => {
 }
 
 
+const getLoadsByDriver = async(id_conductor) => {
+    const result = await db.query(`
+        SELECT * FROM cargas WHERE conductor = ?
+    `,
+    [id_conductor]
+    );
+    return result;
+}
+
 module.exports = {
   getLoads,
   getLoadsById,
   createLoad,
   updateLoad,
-  deleteLoad
+  deleteLoad,
+  getLoadsByDriver
 }
