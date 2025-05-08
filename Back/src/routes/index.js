@@ -15,28 +15,27 @@ const {getVehicles, getVehiclesById, createVehicle, updateVehicle, deleteVehicle
 
 
 // Inicio de sesión Conductor
-
-
 route.post('/api/logindrivers', [
   body('correo_conductor').isString().notEmpty(),
-  body('contraseña').isString().notEmpty()
+  body('contrasena').isString().notEmpty()
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { correo_conductor, contraseña } = req.body;
+  const { correo_conductor, contrasena } = req.body;
   try {
-    const [user] = await db.query('SELECT * FROM Conductores WHERE correo_conductor = ?', [correo_conductor]);
-    if (!user.length || !(await bcrypt.compare(contraseña, user[0].contraseña))) {
-      return res.status(401).send('Invalid credentials');
+    const [user] = await db.query('SELECT * FROM conductores WHERE correo_conductor = ?', [correo_conductor]);
+    if (!user.length) {
+      return res.status(401).json({ message: 'Invalid credentials' }); // Devuelve JSON aquí
     }
+
     const token = jwt.sign({ id: user[0].id_conductor }, SECRET_KEY, { expiresIn: '1h' });
-    res.json({ token });
+    res.json({ token }); // Devuelve el token como JSON
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error logging in' });
+    console.error('Error en el servidor:', error);
+    res.status(500).json({ message: 'Error logging in', error: error.message }); // Devuelve JSON en caso de error
   }
 });
   // Middleware para proteger rutas
@@ -153,17 +152,17 @@ route.delete('/api/drivers/:id', async (req,res) => {
 
 route.post('/api/loginadmin', [
   body('correo_usuario').isString().notEmpty(),
-  body('contraseña').isString().notEmpty()
+  body('contrasena').isString().notEmpty()
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { correo_usuario, contraseña } = req.body;
+  const { correo_usuario, contrasena } = req.body;
   try {
-    const [user] = await db.query('SELECT * FROM Conductores WHERE correo_conductor = ?', [correo_usuario]);
-    if (!user.length || !(await bcrypt.compare(contraseña, user[0].contraseña))) {
+    const [user] = await db.query('SELECT * FROM conductores WHERE correo_conductor = ?', [correo_usuario]);
+    if (!user.length || !(await bcrypt.compare(contrasena, user[0].contrasena))) {
       return res.status(401).send('Invalid credentials');
     }
     const token = jwt.sign({ id: user[0].id_usuario }, SECRET_KEY, { expiresIn: '1h' });
@@ -458,7 +457,7 @@ route.delete('/api/routes/:id', async (req,res) => {
 // Registro de usuario
 // route.post('/api/register', [
 //     body('email_usuario').isString().notEmpty(),
-//     body('contraseña').isLength({ min: 6 })
+//     body('contrasena').isLength({ min: 6 })
 //   ], async (req, res) => {
 //     const errors = validationResult(req);
 //     if (!errors.isEmpty()) {
@@ -469,7 +468,7 @@ route.delete('/api/routes/:id', async (req,res) => {
 //     const hashedPassword = await bcrypt.hash(password, 10);
   
 //     try {
-//       await pool.query('INSERT INTO Usuarios (email_usuario, contraseña) VALUES (?, ?)', [email_usuario, hashedPassword]);
+//       await pool.query('INSERT INTO Usuarios (email_usuario, contrasena) VALUES (?, ?)', [email_usuario, hashedPassword]);
 //       res.status(201).send('User  registered');
 //     } catch (error) {
 //       console.error(error);

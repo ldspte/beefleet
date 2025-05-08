@@ -14,7 +14,7 @@ function generatePassword(longitud=10) {
 
 const getDrivers = async() => {
   const results = await db.query(`
-    SELECT * FROM Conductores  
+    SELECT * FROM conductores  
   `)
   return results;
 }
@@ -42,7 +42,7 @@ const createDriver = async(tipo_documento, documento, nombre_conductor, apellido
 
 const updateDriver = async(id_conductor, tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion) => {
   const result = await db.query(`
-    UPDATE Conductores SET tipo_documento = ?, documento = ?, nombre_conductor = ?, apellido_conductor = ?, correo_conductor = ?, foto = ?, telefono = ?, ciudad = ? , direccion = ? WHERE id_conductor = ?
+    UPDATE conductores SET tipo_documento = ?, documento = ?, nombre_conductor = ?, apellido_conductor = ?, correo_conductor = ?, foto = ?, telefono = ?, ciudad = ? , direccion = ? WHERE id_conductor = ?
   `,
   [tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion, id_conductor]
   );
@@ -51,7 +51,7 @@ const updateDriver = async(id_conductor, tipo_documento, documento, nombre_condu
 
 const deleteDriver = async(id) => {
   const result = await db.query(`
-    DELETE FROM Conductores WHERE id_conductor = ?
+    DELETE FROM conductores WHERE id_conductor = ?
   `,
   [id]
   );

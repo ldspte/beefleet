@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 
 const route = require('./routes/index'); // Asegúrate de que la ruta sea correcta
 
-app.use(cors()); // Puedes configurar CORS aquí si es necesario
+app.use(cors()); // Puedes configurar CORS aquí si es necesarioDXZZDSWS0¿
 app.use(express.json());
 app.use('/', route);
 
