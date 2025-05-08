@@ -20,14 +20,14 @@ const LoginForm = ({ navigation }) => {
                     },
                     body: JSON.stringify({
                         correo_conductor: email,
-                        contrasena: password,
+                        contraseña: password,
                     }),
                 });
     
                 const data = await response.json(); // Procesa la respuesta como JSON
                 if (response.ok) {
                     await AsyncStorage.setItem('token', data.token);
-                    console.log('Login successful:', data);
+                    await AsyncStorage.setItem('id_conductor', data.user[0].id_conductor); // Asegúrate de que id_conductor sea un string
                     Alert.alert('Inicio de sesión exitoso');
                     navigation.navigate('MainApp');
                 } else {

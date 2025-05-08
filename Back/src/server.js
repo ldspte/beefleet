@@ -18,7 +18,7 @@ app.use((err, req, res, next) => {
 // Iniciar el servidor
 app.listen(3001, () => {
   console.log('Server listening on port 3001');
-  const contraseña = 'juli2345';
+  const contraseña = 'hola123';
   const hashpassword = bcrypt.hashSync(contraseña, 10);
   console.log(hashpassword);
 });
