@@ -15,6 +15,7 @@ const ConduUser = ({navigation}) => {
       telefono:'',
       ciudad:'',
       direccion:'',
+      
     });
     const [loading, setLoading] = useState(true);
 
