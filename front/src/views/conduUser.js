@@ -15,9 +15,9 @@ const ConduUser = ({navigation}) => {
       telefono:'',
       ciudad:'',
       direccion:'',
-      
-      licencia:'',
-      fecha_vencimiento:''
+      tipo_licencia:'',
+      fecha_vencimiento:'',
+      experiencia:''
     });
     const [loading, setLoading] = useState(true);
 
@@ -101,11 +101,11 @@ const ConduUser = ({navigation}) => {
             <Text style={styles.sectionTitle}>Información Laboral</Text>
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Número de Licencia:</Text>
-              <Text style={styles.infoValue}>c2</Text>
+              <Text style={styles.infoValue}>{driverInfo[0].tipo_licencia}</Text>
             </View>
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Fecha de vencimiento:</Text>
-              <Text style={styles.infoValue}>25/05/25</Text>
+              <Text style={styles.infoValue}>{driverInfo[0].fecha_vencimiento}</Text>
             </View>
           </View>
 
@@ -121,7 +121,7 @@ const ConduUser = ({navigation}) => {
                 <Text style={styles.statLabel}>Viajes</Text>
               </View>
               <View style={styles.statBox}>
-                <Text style={styles.statNumber}>2 años</Text>
+                <Text style={styles.statNumber}>{driverInfo[0].experiencia} años</Text>
                 <Text style={styles.statLabel}>Experiencia</Text>
               </View>
             </View>
