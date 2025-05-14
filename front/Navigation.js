@@ -12,7 +12,7 @@ import RecuperarContrasena from './src/views/recuperarContrasena.js';
 // Imports de pantallas principales (post-login)
 import ConduUser from './src/views/conduUser.js';
 import Home from './src/views/Home.js';
-import Notifications from './src/views/Notifications.js';
+import ReportesScreen from './src/views/ReportesScreen.js';
 
 // Inicialización de navegadores
 const Stack = createStackNavigator();
@@ -28,8 +28,8 @@ function MainTabs() {
           
           if (route.name === 'Home') {
             iconName = focused ? 'home' : 'home-outline';
-          } else if (route.name === 'Notifications') {
-            iconName = focused ? 'notifications' : 'notifications-outline';
+          } else if (route.name === 'ReportesScreen') {
+            iconName = focused ? 'chatbox-ellpises' : 'chatbox-ellipses-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
           }
@@ -47,7 +47,7 @@ function MainTabs() {
       />
       <Tab.Screen 
         name="Notifications" 
-        component={Notifications} 
+        component={ReportesScreen} 
         options={{ headerShown: false }} 
       />
       <Tab.Screen 
