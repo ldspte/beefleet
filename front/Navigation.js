@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -13,10 +13,59 @@ import RecuperarContrasena from './src/views/recuperarContrasena.js';
 import ConduUser from './src/views/conduUser.js';
 import Home from './src/views/Home.js';
 import ReportesScreen from './src/views/ReportesScreen.js';
+import RutasScreen from './src/views/RutasScreen.js';
 
 // Inicialización de navegadores
-const Stack = createStackNavigator();
+const AuthStack = createStackNavigator();
+const HomeStack = createStackNavigator();
+const ReportesStack = createStackNavigator();
+const ProfileStack = createStackNavigator();
+const RootStack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+
+// Stack Navigator para Home
+function HomeStackScreen() {
+  return (
+    <HomeStack.Navigator>
+      <HomeStack.Screen 
+        name="HomeScreen" 
+        component={Home} 
+        options={{ headerShown: false }} 
+      />
+      <HomeStack.Screen 
+        name="RutasScreen" 
+        component={RutasScreen} 
+        options={{ title: 'Rutas' }} 
+      />
+    </HomeStack.Navigator>
+  );
+}
+
+// Stack Navigator para Reportes
+function ReportesStackScreen() {
+  return (
+    <ReportesStack.Navigator>
+      <ReportesStack.Screen 
+        name="ReportesScreen" 
+        component={ReportesScreen} 
+        options={{ headerShown: false }} 
+      />
+    </ReportesStack.Navigator>
+  );
+}
+
+// Stack Navigator para Profile
+function ProfileStackScreen() {
+  return (
+    <ProfileStack.Navigator>
+      <ProfileStack.Screen 
+        name="ProfileScreen" 
+        component={ConduUser} 
+        options={{ headerShown: false }} 
+      />
+    </ProfileStack.Navigator>
+  );
+}
 
 // Bottom Tab Navigator (visible después del login)
 function MainTabs() {
@@ -28,8 +77,8 @@ function MainTabs() {
           
           if (route.name === 'Home') {
             iconName = focused ? 'home' : 'home-outline';
-          } else if (route.name === 'ReportesScreen') {
-            iconName = focused ? 'chatbox-ellpises' : 'chatbox-ellipses-outline';
+          } else if (route.name === 'Reportes') {
+            iconName = focused ? 'chatbox-ellipses' : 'chatbox-ellipses-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
           }
@@ -42,50 +91,53 @@ function MainTabs() {
     >
       <Tab.Screen 
         name="Home" 
-        component={Home} 
+        component={HomeStackScreen} 
         options={{ headerShown: false }} 
       />
       <Tab.Screen 
-        name="Notifications" 
-        component={ReportesScreen} 
+        name="Reportes" 
+        component={ReportesStackScreen} 
         options={{ headerShown: false }} 
       />
       <Tab.Screen 
         name="Profile" 
-        component={ConduUser} 
+        component={ProfileStackScreen} 
         options={{ headerShown: false }} 
       />
     </Tab.Navigator>
   );
 }
 
-// Stack Navigator principal
-const Navigation = () => {
+// Stack de autenticación
+function AuthStackScreen() {
   return (
-    <Stack.Navigator initialRouteName="Welcome">
-      {/* Pantallas de autenticación */}
-      <Stack.Screen 
+    <AuthStack.Navigator initialRouteName="Welcome">
+      <AuthStack.Screen 
         name="Welcome" 
         component={Welcome} 
         options={{ headerShown: false }} 
       />
-      <Stack.Screen 
+      <AuthStack.Screen 
         name="LoginForm" 
         component={LoginForm} 
         options={{ title: 'Iniciar Sesión' }} 
       />
-      <Stack.Screen 
+      <AuthStack.Screen 
         name="RecuperarContrasena" 
         component={RecuperarContrasena} 
         options={{ title: 'Recuperar Contraseña' }} 
       />
-      <Stack.Screen 
-        name="MainApp" 
-        component={MainTabs} 
-        options={{ headerShown: false }} 
-      />
-      
-    </Stack.Navigator>
+    </AuthStack.Navigator>
+  );
+}
+
+// Stack Navigator principal
+const Navigation = () => {
+  return (
+    <RootStack.Navigator screenOptions={{ headerShown: false }}>
+      <RootStack.Screen name="Auth" component={AuthStackScreen} />
+      <RootStack.Screen name="MainApp" component={MainTabs} />
+    </RootStack.Navigator>
   );
 };
 
