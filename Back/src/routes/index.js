@@ -32,11 +32,7 @@ route.post('/api/logindrivers', [
     }
 
     const token = jwt.sign({ id: user[0].id_conductor }, SECRET_KEY, { expiresIn: '1h' });
-<<<<<<< HEAD
-    res.json({ token }); // Devuelve el token como JSON
-=======
     res.json({ token , user});
->>>>>>> 317a0e118d83929993eb34994926161ff8c8d32d
   } catch (error) {
     console.error('Error en el servidor:', error);
     res.status(500).json({ message: 'Error logging in', error: error.message }); // Devuelve JSON en caso de error
