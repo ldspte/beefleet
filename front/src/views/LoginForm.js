@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Text, TextInput, Alert, TouchableOpacity, Image, ImageBackground} from "react-native";
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const LoginForm = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -9,39 +9,38 @@ const LoginForm = ({ navigation }) => {
         console.log('Navegando a RecuperarPassword')
         navigation.navigate('RecuperarContrasena'); // Navegar a la pantalla de recuperación
     }
-    
     const handleLogin = async () => {
+        console.log(email, password);
         if (email && password) {
-            console.log(email, password);
             try {
-                const response = await fetch('http://localhost:3001/api/logindrivers', {
+                const response = await fetch('http://localhost:3001/api/logindrivers/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        email : 'correo_conductor',
-                        password : 'contraseña',
+                        correo_conductor: email,
+                        contraseña: password,
                     }),
                 });
-                const data = await response.json();
+    
+                const data = await response.json(); // Procesa la respuesta como JSON
                 if (response.ok) {
-                    // Falta Guardar el token en el almacenamiento local o en el estado global
-                    console.log('Login successful:', data);
+                    await AsyncStorage.setItem('token', data.token);
+                    await AsyncStorage.setItem('id_conductor', data.user[0].id_conductor); // Asegúrate de que id_conductor sea un string
                     Alert.alert('Inicio de sesión exitoso');
-                    navigation.navigate('ConduUser'); // Navegar a la pantalla principal
+                    navigation.navigate('MainApp');
                 } else {
                     Alert.alert('Error', data.message || 'Credenciales incorrectas');
                 }
             } catch (error) {
                 console.error('Error during login:', error);
-                Alert.alert('Error', 'Hubo un problema al iniciar sesión. Inténtalo de nuevo más tarde.');
-                
+                Alert.alert('Correo Electronico o Contraseña Invalidos');
             }
         } else {
             Alert.alert('Por favor, Completa todos los campos');
         }
-    }
+    };
     
     return(
         <ImageBackground 
@@ -121,6 +120,9 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         textAlign: 'center',
         color: 'white',
+        textShadowColor: 'rgba(0, 0, 0, 0.5)',
+        textShadowOffset: { width: 0, height: 2 },
+        textShadowRadius: 4,
     },
     input: {
         width: 300,

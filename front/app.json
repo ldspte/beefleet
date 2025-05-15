@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "front",
-    "slug": "front",
+    "name": "Beefleet",
+    "slug": "Beefleet",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/fondo.png",
