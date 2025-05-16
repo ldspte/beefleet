@@ -28,11 +28,11 @@ const RutasScreen = () => {
         
         // Datos simulados de la base de datos
         const rutasData = [
-          { id_ruta: '1', origen: 'Ciudad de México', destino: 'Guadalajara', distancia: '540 km', carga: 'Electrónicos' },
-          { id_ruta: '2', origen: 'Monterrey', destino: 'Tijuana', distancia: '2,300 km', carga: 'Alimentos' },
-          { id_ruta: '3', origen: 'Veracruz', destino: 'Mérida', distancia: '730 km', carga: 'Material de construcción' },
-          { id_ruta: '4', origen: 'Puebla', destino: 'León', distancia: '420 km', carga: 'Textiles' },
-          { id_ruta: '5', origen: 'Cancún', destino: 'Ciudad de México', distancia: '1,650 km', carga: 'Productos turísticos' },
+          { id_ruta: '1', origen: 'Rionegro', destino: 'Bogotá', distancia: '540 km', carga: 'Electrónicos' },
+          { id_ruta: '2', origen: 'Bucaramanga', destino: 'Rionegro', distancia: '2,300 km', carga: 'Alimentos' },
+          { id_ruta: '3', origen: 'Bogotá', destino: 'Garzón', distancia: '730 km', carga: 'Material de construcción' },
+          { id_ruta: '4', origen: 'Rionegro', destino: 'Bucaramanga', distancia: '420 km', carga: 'Textiles' },
+          { id_ruta: '5', origen: 'Bogotá', destino: 'Rionegro', distancia: '1,650 km', carga: 'Productos turísticos' },
         ];
         
         setRutas(rutasData);
