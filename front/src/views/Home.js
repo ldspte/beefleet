@@ -1,8 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; 
+import { useNavigation } from '@react-navigation/native';
 
-const Home = ({ navigation }) => {
+const Home = ({ }) => {
+const navigation = useNavigation();
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -18,7 +21,10 @@ const Home = ({ navigation }) => {
             <Text style={styles.cardCount}>ABC 123</Text>
           </TouchableOpacity>
           
-          <TouchableOpacity style={styles.card}>
+          <TouchableOpacity 
+            style={styles.card}
+            onPress={() => navigation.navigate('RutasScreen')}
+          >
             <Ionicons name="navigate-circle-outline" size={40} color="#FB8500" />
             <Text style={styles.cardTitle}>Tus Viajes</Text>
             <Text style={styles.cardCount}>Ver</Text>

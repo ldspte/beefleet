@@ -120,6 +120,9 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         textAlign: 'center',
         color: 'white',
+        textShadowColor: 'rgba(0, 0, 0, 0.5)',
+        textShadowOffset: { width: 0, height: 2 },
+        textShadowRadius: 4,
     },
     input: {
         width: 300,
