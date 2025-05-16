@@ -28,13 +28,13 @@ const getDriversById = async(id_conductor) => {
   return result.length > 0 ? result[0] : null;
 }
 
-const createDriver = async(tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion) => {
+const createDriver = async(tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion,  tipo_licencia, fecha_vencimiento, experiencia) => {
   const password = generatePassword();
   const hashedPassword = await bcrypt.hash(password, 10);
   const result = await db.query(`
-    INSERT INTO conductores (tipo_documento, documento, nombre_conductor, apellido_conducor, correo_conductor, foto, telefono, ciudad, contraseña, direccion) VALUES  (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO conductores (tipo_documento, documento, nombre_conductor, apellido_conducor, correo_conductor, foto, telefono, ciudad, contraseña, direccion tipo_licencia, fecha_vencimiento, experiencia) VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `,
-  [tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, hashedPassword, direccion]
+  [tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, hashedPassword, direccion, tipo_licencia, fecha_vencimiento, experiencia]
   );
   return result;
 }
@@ -42,18 +42,18 @@ const createDriver = async(tipo_documento, documento, nombre_conductor, apellido
 
 const updateDriver = async(id_conductor, tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion) => {
   const result = await db.query(`
-    UPDATE Conductores SET tipo_documento = ?, documento = ?, nombre_conductor = ?, apellido_conductor = ?, correo_conductor = ?, foto = ?, telefono = ?, ciudad = ? , direccion = ? WHERE id_conductor = ?
+    UPDATE Conductores SET tipo_documento = ?, documento = ?, nombre_conductor = ?, apellido_conductor = ?, correo_conductor = ?, foto = ?, telefono = ?, ciudad = ? , direccion = ? , tipo_licencia = ?, fecha_vencimiento = ?, experiencia = ?  WHERE id_conductor = ?
   `,
-  [tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion, id_conductor]
+  [tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion, tipo_licencia, fecha_vencimiento, experiencia, id_conductor]
   );
   return result;
 }
 
-const deleteDriver = async(id) => {
+const deleteDriver = async(id_conductor) => {
   const result = await db.query(`
     DELETE FROM Conductores WHERE id_conductor = ?
   `,
-  [id]
+  [id_conductor]
   );
   return result;
 }

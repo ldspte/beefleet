@@ -54,7 +54,7 @@ route.post('/api/admin', [
 
   const { correo_usuario, contraseña } = req.body;
   try {
-    const [user] = await db.query('SELECT * FROM Usuario WHERE correo_usuario = ?', [correo_usuario]);
+    const [user] = await db.query('SELECT * FROM usuarios WHERE correo_usuario = ?', [correo_usuario]);
     if (!user.length || !(await bcrypt.compare(contraseña, user[0].contraseña))) {
       return res.status(401).send('Invalid credentials');
     }
@@ -87,7 +87,7 @@ const authenticateJWT = (req, res, next) => {
   
 // Obtener todos los conductores
 
-route.get('/api/drivers', authenticateJWT, async (req,res) => {
+route.get('/api/drivers', async (req,res) => {
   try {
     const values = await getDrivers();
     return res.status(200).json(values);
@@ -206,6 +206,23 @@ route.post('/api/loginadmin', [
     res.status(500).json({ message: 'Error logging in' });
   }
 });
+
+//obtener Usuario por id
+
+route.get('/api/admin/:id_usuario', authenticateJWT, async (req,res) => {
+  const { id_usuario } = req.params;
+  try {
+    const user = await getDriversById(id_usuario);
+    if (!user) {
+      return res.status(404).json({ message: 'Driver not found' });
+    }
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(500).json({ message: 'Error fetching driver' });
+  }
+})
+
+
 
 
 //rutas de vehiculos

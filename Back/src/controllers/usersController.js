@@ -18,11 +18,12 @@ const getUsers = async() => {
 }
 
 const getUsersById = async(id_usuario) => {
-    const [files] = await db.query(
-      'SELECT * FROM Usuarios WHERE id_usuario = ?',
-      [id_usuario]
-    );
-    return files[0];
+    const result = await db.query(`
+    SELECT * FROM Usuarios WHERE id_usuario = ?
+  `,
+  [id_usuario]
+  );
+  return result.length > 0 ? result[0] : null;
 }
 
 const createUser = async(nombre_usuario, apellido_usuario, email_usuario) => {
