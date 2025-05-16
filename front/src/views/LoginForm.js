@@ -20,14 +20,14 @@ const LoginForm = ({ navigation }) => {
                     },
                     body: JSON.stringify({
                         correo_conductor: email,
-                        contrasena: password,
+                        contraseña: password,
                     }),
                 });
     
                 const data = await response.json(); // Procesa la respuesta como JSON
                 if (response.ok) {
                     await AsyncStorage.setItem('token', data.token);
-                    console.log('Login successful:', data);
+                    await AsyncStorage.setItem('id_conductor', data.user[0].id_conductor); // Asegúrate de que id_conductor sea un string
                     Alert.alert('Inicio de sesión exitoso');
                     navigation.navigate('MainApp');
                 } else {
@@ -35,7 +35,7 @@ const LoginForm = ({ navigation }) => {
                 }
             } catch (error) {
                 console.error('Error during login:', error);
-                Alert.alert('Error', 'Hubo un problema al iniciar sesión. Inténtalo de nuevo más tarde.');
+                Alert.alert('Correo Electronico o Contraseña Invalidos');
             }
         } else {
             Alert.alert('Por favor, Completa todos los campos');
@@ -120,6 +120,9 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         textAlign: 'center',
         color: 'white',
+        textShadowColor: 'rgba(0, 0, 0, 0.5)',
+        textShadowOffset: { width: 0, height: 2 },
+        textShadowRadius: 4,
     },
     input: {
         width: 300,

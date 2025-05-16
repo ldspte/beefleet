@@ -4,7 +4,7 @@ const getVehicles = async() => {
   const results = await db.query(`
     SELECT * FROM vehiculos  
   `)
-  return results;
+  return results;5
 }
 
 const getVehiclesById = async(id_vehiculo) => {
@@ -43,12 +43,23 @@ const deleteVehicle = async(id_vehiculo) => {
     return result;
 }
 
+const getVehiclesByDriver = async(id_conductor) => {
+    const result = await db.query(`
+        SELECT * FROM vehiculos WHERE id_conductor = ?
+    `,
+    [id_conductor]
+    );
+    return result;
+  }
+
+
 
 module.exports = {
   getVehicles,
   getVehiclesById,
   createVehicle,
   updateVehicle,
-  deleteVehicle
+  deleteVehicle,
+  getVehiclesByDriver
 }
 
