@@ -205,67 +205,40 @@ const ReportesScreen = () => {
             <TouchableOpacity 
               style={[
                 styles.statusButton, 
-                etapaActual === 'cargando' && styles.statusButtonActive
+                etapaActual === 'carga completada' && styles.statusButtonActive
               ]}
-              onPress={() => setEtapaActual('cargando')}
+              onPress={() => setEtapaActual('carga completada')}
             >
               <Text style={[
                 styles.statusButtonText,
-                etapaActual === 'cargando' && styles.statusButtonTextActive
-              ]}>Cargando</Text>
+                etapaActual === 'carga completada' && styles.statusButtonTextActive
+              ]}>Carga completada</Text>
             </TouchableOpacity>
             
             <TouchableOpacity 
               style={[
                 styles.statusButton, 
-                etapaActual === 'descargando' && styles.statusButtonActive
+                etapaActual === 'en viaje' && styles.statusButtonActive
               ]}
-              onPress={() => setEtapaActual('descargando')}
+              onPress={() => setEtapaActual('en viaje')}
             >
               <Text style={[
                 styles.statusButtonText,
-                etapaActual === 'descargando' && styles.statusButtonTextActive
-              ]}>Descargando</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={[
-                styles.statusButton, 
-                etapaActual === 'viajando' && styles.statusButtonActive
-              ]}
-              onPress={() => setEtapaActual('viajando')}
-            >
-              <Text style={[
-                styles.statusButtonText,
-                etapaActual === 'viajando' && styles.statusButtonTextActive
+                etapaActual === 'en viaje' && styles.statusButtonTextActive
               ]}>Viajando</Text>
             </TouchableOpacity>
-          </View>
-        </View>
-        
-        {/* Estado de Carga/Descarga Section */}
-        <View style={styles.cargoStatusSection}>
-          <Text style={styles.statusSectionTitle}>Estado de carga/descarga</Text>
-          
-          <View style={styles.cargoStatusButtonsContainer}>
-            <TouchableOpacity 
-              style={[
-                styles.cargoStatusButton, 
-                estadoCarga === 'carga' && styles.cargoStatusButtonActive
-              ]}
-              onPress={() => setEstadoCarga('carga')}
-            >
-              <Text style={styles.cargoStatusButtonText}>CARGA COMPLETADA</Text>
-            </TouchableOpacity>
             
             <TouchableOpacity 
               style={[
-                styles.cargoStatusButton, 
-                estadoCarga === 'descarga' && styles.cargoStatusButtonActive
+                styles.statusButton, 
+                etapaActual === 'descarga completada' && styles.statusButtonActive
               ]}
-              onPress={() => setEstadoCarga('descarga')}
+              onPress={() => setEtapaActual('descarga completada')}
             >
-              <Text style={styles.cargoStatusButtonText}>DESCARGA COMPLETADA</Text>
+              <Text style={[
+                styles.statusButtonText,
+                etapaActual === 'descarga completada' && styles.statusButtonTextActive
+              ]}>Descarga completada</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -544,11 +517,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statusButtonActive: {
-    backgroundColor: '#4285F4',
+    backgroundColor: '#FF9500',
   },
   statusButtonText: {
     color: '#666',
     fontWeight: '500',
+    textAlign: 'center',
+    justifyContent: 'center',
   },
   statusButtonTextActive: {
     color: '#fff',

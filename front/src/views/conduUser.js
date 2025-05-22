@@ -105,7 +105,7 @@ const ConduUser = ({navigation}) => {
             </View>
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Fecha de vencimiento:</Text>
-              <Text style={styles.infoValue}>{driverInfo[0].fecha_vencimiento}</Text>
+              <Text mode={"date"} style={styles.infoValue}>{driverInfo[0].fecha_vencimiento}</Text>
             </View>
           </View>
 
