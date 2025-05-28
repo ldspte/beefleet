@@ -15,7 +15,10 @@ const navigation = useNavigation();
         </View>
         
         <View style={styles.cardsContainer}>
-          <TouchableOpacity style={styles.card}>
+          <TouchableOpacity 
+            style={styles.card}
+            onPress={() => navigation.navigate('TruckDriverView')}
+          >
             <Ionicons name="car-outline" size={40} color="#FB8500" />
             <Text style={styles.cardTitle}>Tu Vehículo</Text>
             <Text style={styles.cardCount}>ABC 123</Text>
@@ -30,20 +33,7 @@ const navigation = useNavigation();
             <Text style={styles.cardCount}>Ver</Text>
           </TouchableOpacity>
         </View>
-        
-        <View style={styles.cardsContainer}>
-          <TouchableOpacity style={styles.card}>
-            <Ionicons name="checkmark-circle-outline" size={40} color="#FB8500" />
-            <Text style={styles.cardTitle}>Completados</Text>
-            <Text style={styles.cardCount}>12</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.card}>
-            <Ionicons name="analytics-outline" size={40} color="#FB8500" />
-            <Text style={styles.cardTitle}>Estadísticas</Text>
-            <Text style={styles.cardCount}>Ver</Text>
-          </TouchableOpacity>
-        </View>
+      
         
         <View style={styles.recentActivity}>
           <Text style={styles.sectionTitle}>Actividad Reciente</Text>

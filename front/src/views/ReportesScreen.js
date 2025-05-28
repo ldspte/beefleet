@@ -103,11 +103,6 @@ const ReportesScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>NOTIFICACIONES</Text>
-        </View>
-        
         {/* Agregar Reporte Section */}
         <View style={styles.reportSection}>
           <Text style={styles.reportSectionTitle}>Agregar reporte</Text>
@@ -179,26 +174,7 @@ const ReportesScreen = () => {
               </Text>
             </View>
           )}
-          
-          {/* Botón de enviar */}
-          <TouchableOpacity 
-            style={styles.sendButton}
-            onPress={handleSendReport}
-          >
-            <Text style={styles.sendButtonText}>Enviar notificación</Text>
-          </TouchableOpacity>
-          
-          {/* Mensaje de confirmación (solo aparece después de enviar) */}
-          {reportSent && (
-            <View style={styles.confirmationMessage}>
-              <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
-              <Text style={styles.confirmationText}>Reporte enviado</Text>
-            </View>
-          )}
-        </View>
-        
-        {/* Etapa Actual Section */}
-        <View style={styles.statusSection}>
+
           <Text style={styles.statusSectionTitle}>Etapa actual</Text>
           
           <View style={styles.statusButtonsContainer}>
@@ -241,6 +217,22 @@ const ReportesScreen = () => {
               ]}>Descarga completada</Text>
             </TouchableOpacity>
           </View>
+
+                    {/* Botón de enviar */}
+          <TouchableOpacity 
+            style={styles.sendButton}
+            onPress={handleSendReport}
+          >
+            <Text style={styles.sendButtonText}>Enviar notificación</Text>
+          </TouchableOpacity>
+          
+          {/* Mensaje de confirmación (solo aparece después de enviar) */}
+          {reportSent && (
+            <View style={styles.confirmationMessage}>
+              <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
+              <Text style={styles.confirmationText}>Reporte enviado</Text>
+            </View>
+          )}
         </View>
         
         {/* Botón de Emergencia */}
@@ -469,7 +461,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     padding: 14,
     alignItems: 'center',
-    marginTop: 5,
+    marginTop: 15,
     marginBottom: 10,
   },
   sendButtonText: {
