@@ -166,8 +166,8 @@ const TruckDriverView = ({ conductorId = 1 }) => {
 
       <View style={styles.actionButtons}>
         <TouchableOpacity
-         style={styles.primaryButton} 
-         onPress={() => navigation.navigate('ReportesScreen')}
+          style={styles.primaryButton} 
+          onPress={() => navigation.navigate('Reportes')}
         >
           <Icon name="report-problem" size={20} color="white" />
           <Text style={styles.primaryButtonText}>Reportar Problema</Text>

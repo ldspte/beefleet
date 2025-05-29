@@ -94,11 +94,12 @@ function MainTabs() {
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
           
-          if (route.name === 'Home') {
+          // Usar los nombres correctos de las rutas
+          if (route.name === 'Inicio') {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'Reportes') {
             iconName = focused ? 'chatbox-ellipses' : 'chatbox-ellipses-outline';
-          } else if (route.name === 'Profile') {
+          } else if (route.name === 'Perfil') {
             iconName = focused ? 'person' : 'person-outline';
           }
           
@@ -106,6 +107,17 @@ function MainTabs() {
         },
         tabBarActiveTintColor: '#FB8500',
         tabBarInactiveTintColor: 'gray',
+        tabBarStyle: {
+          backgroundColor: '#fff',
+          borderTopColor: '#e0e0e0',
+          height: 60,
+          paddingBottom: 5,
+          paddingTop: 5,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '500',
+        },
       })}
     >
       <Tab.Screen 

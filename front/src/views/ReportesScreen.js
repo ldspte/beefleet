@@ -18,7 +18,7 @@ const ReportesScreen = () => {
   // Estados para manejar las diferentes funcionalidades
   const [reportType , setReportType] = useState('');
   // Define reportTypeOptions como un array para usarlo con .map()
-  const reportTypeOptions = ['Falla mecánica', 'Retraso', 'Accidente', 'Problema de carga', 'Otro'];
+  const reportTypeOptions = ['Falla mecánica', 'Retraso', 'Accidente', 'Problema de carga', 'Carga completada', 'En viaje', 'Descarga completada', 'Otro'];
   const [showReportTypeDropdown, setShowReportTypeDropdown] = useState(false);
   const [etapaActual, setEtapaActual] = useState('');
   const [estadoCarga, setEstadoCarga] = useState('');

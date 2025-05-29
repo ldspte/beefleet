@@ -458,7 +458,7 @@ const styles = StyleSheet.create({
   },
   refreshButton: {
     flexDirection: 'row',
-    backgroundColor: '#4285F4',
+    backgroundColor: '#FB8500',
     borderRadius: 25,
     padding: 14,
     alignItems: 'center',
