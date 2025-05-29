@@ -28,13 +28,15 @@ const getDriversById = async(id_conductor) => {
   return result.length > 0 ? result[0] : null;
 }
 
-const createDriver = async(tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion) => {
+const createDriver = async(tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion, tipo_licencia, fecha_vencimiento, experiencia) => {
   const password = generatePassword();
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = '123' /* await bcrypt.hash(password, 10);*/
+  console.log('inicio')
   const result = await db.query(`
-    INSERT INTO conductores (tipo_documento, documento, nombre_conductor, apellido_conducor, correo_conductor, foto, telefono, ciudad, contraseña, direccion) VALUES  (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO conductores (tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion, tipo_licencia, fecha_vencimiento, experiencia, contraseña) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `,
-  [tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, hashedPassword, direccion]
+     [tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion, tipo_licencia, fecha_vencimiento, experiencia, hashedPassword]
   );
   return result;
 }
