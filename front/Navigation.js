@@ -14,14 +14,28 @@ import ConduUser from './src/views/conduUser.js';
 import Home from './src/views/Home.js';
 import ReportesScreen from './src/views/ReportesScreen.js';
 import RutasScreen from './src/views/RutasScreen.js';
+import TruckDriverView from './src/views/TruckDriverView.js';
 
 // Inicialización de navegadores
 const AuthStack = createStackNavigator();
 const HomeStack = createStackNavigator();
 const ReportesStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
+const TruckStack = createStackNavigator();
 const RootStack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+
+function TruckStackScreen() {
+  return (
+    <TruckStack.Navigator>
+      <TruckStack.Screen
+        name="ReportesScreen"
+        component={ReportesScreen}
+        options={{ title: 'ReportesScreen' }} 
+      />
+    </TruckStack.Navigator>
+  );
+}
 
 // Stack Navigator para Home
 function HomeStackScreen() {
@@ -36,6 +50,11 @@ function HomeStackScreen() {
         name="RutasScreen" 
         component={RutasScreen} 
         options={{ title: 'Rutas' }} 
+      />
+      <HomeStack.Screen 
+        name="TruckDriverView" 
+        component={TruckDriverView} 
+        options={{ title: 'Vehículo' }} 
       />
     </HomeStack.Navigator>
   );
@@ -75,11 +94,12 @@ function MainTabs() {
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
           
-          if (route.name === 'Home') {
+          // Usar los nombres correctos de las rutas
+          if (route.name === 'Inicio') {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'Reportes') {
             iconName = focused ? 'chatbox-ellipses' : 'chatbox-ellipses-outline';
-          } else if (route.name === 'Profile') {
+          } else if (route.name === 'Perfil') {
             iconName = focused ? 'person' : 'person-outline';
           }
           
@@ -87,10 +107,21 @@ function MainTabs() {
         },
         tabBarActiveTintColor: '#FB8500',
         tabBarInactiveTintColor: 'gray',
+        tabBarStyle: {
+          backgroundColor: '#fff',
+          borderTopColor: '#e0e0e0',
+          height: 60,
+          paddingBottom: 5,
+          paddingTop: 5,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '500',
+        },
       })}
     >
       <Tab.Screen 
-        name="Home" 
+        name="Inicio" 
         component={HomeStackScreen} 
         options={{ headerShown: false }} 
       />
@@ -100,7 +131,7 @@ function MainTabs() {
         options={{ headerShown: false }} 
       />
       <Tab.Screen 
-        name="Profile" 
+        name="Perfil" 
         component={ProfileStackScreen} 
         options={{ headerShown: false }} 
       />

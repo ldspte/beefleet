@@ -15,23 +15,32 @@ const {getVehicles, getVehiclesById, createVehicle, updateVehicle, deleteVehicle
 const {getLoads, getLoadsById, getLoadsByDriver, createLoad, updateLoad, deleteLoad} = require('../controllers/loadController');
 const {getStateVehicles, getStateVehiclesById, createStateVehicle, updateStateVehicle, deleteStateVehicle } = require('../controllers/stateVehicleController');
 
- // Middleware para proteger rutas
-const authenticateJWT = (req, res, next) => {
-  next()
-  /*const token = req.headers['authorization'];
-  console.log('inicio', token )
-  if (token) {
-    jwt.verify(token, SECRET_KEY, (err, user) => {
-      if (err) {
-        return res.sendStatus(403);
-      }
-      req.user = user;
-      ;
-    });
-  } else {
-    res.sendStatus(401);
-  }*/
-};
+// Registro de usuarioroute
+// route.post('/api/register', [
+//     body('email_usuario').isString().notEmpty(),
+//     body('contraseña').isLength({ min: 6 })
+//   ], async (req, res) => {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//       return res.status(400).json({ errors: errors.array() });
+//     }
+  
+//     const { email_usuario, password } = req.body;
+//     const hashedPassword = await bcrypt.hash(password, 10);
+  
+//     try {
+//       await pool.query('INSERT INTO Usuarios (email_usuario, contraseña) VALUES (?, ?)', [email_usuario, hashedPassword]);
+//       res.status(201).send('User  registered');
+//     } catch (error) {
+//       console.error(error);
+//       res.status(500).json({ message: 'Error registering user' });
+//     }
+// });
+// Inicio de sesión Conductor
+
+
+
+// Inicio de sesión Conductor
 
 // Inicio de sesión Conductor
 route.post('/api/logindrivers', [
@@ -72,7 +81,7 @@ route.post('/api/admin', [
 
   const { correo_usuario, contraseña } = req.body;
   try {
-    const [user] = await db.query('SELECT * FROM usuarios WHERE correo_usuario = ?', [correo_usuario]);
+    const [user] = await db.query('SELECT * FROM Usuarios WHERE correo_usuario = ?', [correo_usuario]);
     if (!user.length || !(await bcrypt.compare(contraseña, user[0].contraseña))) {
       return res.status(401).send('Invalid credentials');
     }
@@ -181,7 +190,7 @@ route.get('/api/vehicles/:id', authenticateJWT, async(req,res)=>{
 
 // Crear vehiculo
 
-route.post('/api/vehicles', authenticateJWT,  async (req,res) => {
+route.post('/api/vehicles',  async (req,res) => {
   const {placa, modelo, peso, matricula, seguro, estado_vehiculo} = req.body;
   try {
     const vehicle = await createVehicle(placa, modelo, peso, matricula, seguro, estado_vehiculo);
@@ -193,7 +202,7 @@ route.post('/api/vehicles', authenticateJWT,  async (req,res) => {
 
 // Actualizar vehiculo
 
-route.put('/api/vehicles/:id', authenticateJWT, async (req,res) => {
+route.put('/api/vehicles/:id', async (req,res) => {
   const { id_vehiculo } = req.params;
   const {placa, modelo, peso, matricula, seguro, estado_vehiculo} = req.body;
   try {
@@ -208,7 +217,7 @@ route.put('/api/vehicles/:id', authenticateJWT, async (req,res) => {
 });
 // eliminar vehiculo
 
-route.delete('/api/vehicles/:id', authenticateJWT, async (req,res) => {
+route.delete('/api/vehicles/:id', async (req,res) => {
   const { id_vehiculo } = req.params;
   try {
     const vehicle = await deleteVehicle(id_vehiculo);
@@ -223,7 +232,7 @@ route.delete('/api/vehicles/:id', authenticateJWT, async (req,res) => {
 
 
 //obtener Clientes
-route.get('/api/clients', authenticateJWT, async (req,res) => {
+route.get('/api/clients', async (req,res) => {
   try {
     const values = await getClients();
     return res.status(200).json(values);
@@ -363,7 +372,7 @@ route.delete('/api/sales/:id', authenticateJWT, async (req,res) => {
 
 //obtener rutas
 
-route.get('/api/routes', authenticateJWT, async (req,res) => {
+route.get('/api/routes', async (req,res) => {
   try {
     const values = await getRoutes();
     return res.status(200).json(values);
@@ -374,7 +383,7 @@ route.get('/api/routes', authenticateJWT, async (req,res) => {
 
 //obtener ruta por ID
 
-route.get('/api/routes/:id', authenticateJWT, async (req,res) => {
+route.get('/api/routes/:id', async (req,res) => {
   const { id_ruta } = req.params;
   try {
     const route = await getRoutesById(id_ruta);
@@ -389,7 +398,7 @@ route.get('/api/routes/:id', authenticateJWT, async (req,res) => {
 
 // crear ruta
 
-route.post('/api/routes', authenticateJWT, async (req,res) => {
+route.post('/api/routes', async (req,res) => {
   const {origen, destino, distancia, carga} = req.body;
   try {
     const route = await createRoute(origen, destino, distancia, carga);
@@ -401,7 +410,7 @@ route.post('/api/routes', authenticateJWT, async (req,res) => {
 
 // actualizar ruta
 
-route.put('/api/routes/:id', authenticateJWT, async (req,res) => {
+route.put('/api/routes/:id', async (req,res) => {
   const {id_ruta, origen, destino, distancia, carga} = req.body;
   try {
     const route = await updateRoute(id_ruta, origen, destino, distancia, carga);
@@ -416,7 +425,7 @@ route.put('/api/routes/:id', authenticateJWT, async (req,res) => {
 
 // eliminar ruta
 
-route.delete('/api/routes/:id', authenticateJWT, async (req,res) => {
+route.delete('/api/routes/:id', async (req,res) => {
   const { id_ruta } = req.params;
   try {
     const route = await deleteRoute(id_ruta);
