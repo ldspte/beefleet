@@ -32,7 +32,7 @@ route.post('/api/logindrivers', [
     if (!user.length || !(await bcrypt.compare(contraseña, user[0].contraseña))) {
       return res.status(401).send('Invalid credentials');
     }
-    const token = jwt.sign({ id: user[0].id_conductor }, SECRET_KEY, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user[0].id_conductor }, SECRET_KEY, { expiresIn: '3h' });
     res.json({ token , user});
   } catch (error) {
     console.error(error);
@@ -153,7 +153,7 @@ route.get('/api/drivers/:id_conductor', async (req,res) => {
 
 //actualizar conductor
 
-route.put('/api/drivers/:id_conductor', authenticateJWT, async (req,res) => {
+route.put('/api/drivers/:id_conductor', async (req,res) => {
   const { id_conductor } = req.params;
   const { tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion } = req.body;
   try {
@@ -169,7 +169,7 @@ route.put('/api/drivers/:id_conductor', authenticateJWT, async (req,res) => {
 
 
 // eliminar conductor
-route.delete('/api/drivers/:id', authenticateJWT, async (req,res) => {
+route.delete('/api/drivers/:id_conductor', async (req,res) => {
   const { id_conductor } = req.params;
   try {
     const driver = await deleteDriver(id_conductor);
@@ -268,7 +268,7 @@ route.post('/api/vehicles', authenticateJWT,  async (req,res) => {
 
 // Actualizar vehiculo
 
-route.put('/api/vehicles/:id', authenticateJWT, async (req,res) => {
+route.put('/api/vehicles/:id_vehiculo', authenticateJWT, async (req,res) => {
   const { id_vehiculo } = req.params;
   const {placa, modelo, peso, matricula, seguro, estado_vehiculo} = req.body;
   try {
@@ -283,7 +283,7 @@ route.put('/api/vehicles/:id', authenticateJWT, async (req,res) => {
 });
 // eliminar vehiculo
 
-route.delete('/api/vehicles/:id', authenticateJWT, async (req,res) => {
+route.delete('/api/vehicles/:id_vehiculo', authenticateJWT, async (req,res) => {
   const { id_vehiculo } = req.params;
   try {
     const vehicle = await deleteVehicle(id_vehiculo);
@@ -309,7 +309,7 @@ route.get('/api/clients', authenticateJWT, async (req,res) => {
 
 
 // obtener cliente por ID
-route.get('/api/clients/:id', authenticateJWT, async (req,res) => {
+route.get('/api/clients/:id_cliente', authenticateJWT, async (req,res) => {
   const { id_cliente } = req.params;
   try {
     const client = await getClientsById(id_cliente);
@@ -335,7 +335,7 @@ route.post('/api/clients', authenticateJWT, async (req,res) => {
 });
 // actualizar cliente
 
-route.put('/api/clients/:id', authenticateJWT, async (req,res) => {
+route.put('/api/clients/:id_cliente', authenticateJWT, async (req,res) => {
   const { id_cliente } = req.params;
   const {tipo_documento, documento, nombre_cliente, apellido_cliente, direccion, ciudad, telefono, empresa} = req.body;
   try {
@@ -350,7 +350,7 @@ route.put('/api/clients/:id', authenticateJWT, async (req,res) => {
 });
 // eliminar cliente
 
-route.delete('/api/clients/:id', authenticateJWT, async (req,res) => {
+route.delete('/api/clients/:id_cliente', authenticateJWT, async (req,res) => {
   const { id_cliente } = req.params;
   try {
     const client = await deleteClient(id_cliente);
@@ -377,7 +377,7 @@ route.get('api/sales', authenticateJWT, async (req,res) => {
 
 //obtener Venta por ID 
 
-route.get('api/sales/:id', authenticateJWT, async (req,res) => {
+route.get('api/sales/:id_venta', authenticateJWT, async (req,res) => {
   const { id_venta } = req.params;
   try {
     const sale = await getSalesById(id_venta);
@@ -407,7 +407,7 @@ route.post('/api/sales', authenticateJWT, async (req,res) => {
 
 //actualizar venta
 
-route.put('/api/sales/:id', authenticateJWT, async (req,res) => {
+route.put('/api/sales/:id_venta', authenticateJWT, async (req,res) => {
   const { id_venta } = req.params;
   const {fecha, valor, descripcion, carga} = req.body;
   try {
@@ -422,7 +422,7 @@ route.put('/api/sales/:id', authenticateJWT, async (req,res) => {
 });
 
 // eliminar venta
-route.delete('/api/sales/:id', authenticateJWT, async (req,res) => {
+route.delete('/api/sales/:id_venta', authenticateJWT, async (req,res) => {
   const { id_venta } = req.params;
   try {
     const sale = await deleteSale(id_venta);
@@ -449,7 +449,7 @@ route.get('/api/routes', authenticateJWT, async (req,res) => {
 
 //obtener ruta por ID
 
-route.get('/api/routes/:id', authenticateJWT, async (req,res) => {
+route.get('/api/routes/:id_ruta', authenticateJWT, async (req,res) => {
   const { id_ruta } = req.params;
   try {
     const route = await getRoutesById(id_ruta);
@@ -464,7 +464,7 @@ route.get('/api/routes/:id', authenticateJWT, async (req,res) => {
 
 // crear ruta
 
-route.post('/api/routes', authenticateJWT, async (req,res) => {
+route.post('/api/routes', async (req,res) => {
   const {origen, destino, distancia, carga} = req.body;
   try {
     const route = await createRoute(origen, destino, distancia, carga);
@@ -476,7 +476,7 @@ route.post('/api/routes', authenticateJWT, async (req,res) => {
 
 // actualizar ruta
 
-route.put('/api/routes/:id', authenticateJWT, async (req,res) => {
+route.put('/api/routes/:id_ruta', authenticateJWT, async (req,res) => {
   const {id_ruta, origen, destino, distancia, carga} = req.body;
   try {
     const route = await updateRoute(id_ruta, origen, destino, distancia, carga);
@@ -491,7 +491,7 @@ route.put('/api/routes/:id', authenticateJWT, async (req,res) => {
 
 // eliminar ruta
 
-route.delete('/api/routes/:id', authenticateJWT, async (req,res) => {
+route.delete('/api/routes/:id_ruta',  async (req,res) => {
   const { id_ruta } = req.params;
   try {
     const route = await deleteRoute(id_ruta);
@@ -506,13 +506,81 @@ route.delete('/api/routes/:id', authenticateJWT, async (req,res) => {
 
 //Obtener Cargas Por conductor
 
-route.get('/api/loads/:id_conductor', authenticateJWT, async (req,res) => {
+route.get('/api/loads/:id_conductor', async (req,res) => {
   const { id_conductor } = req.params;
   try {
     const values = await getLoadsByDriver(id_conductor);
     return res.status(200).json(values);
   } catch (error) {
     return res.status(500).json({ message: 'Error fetching loads' });
+  }
+});
+
+//obtener rutas
+
+route.get('/api/reports', async (req,res) => {
+  try {
+    const values = await getStateVehicles();
+    return res.status(200).json(values);
+  } catch (error) {
+    return res.status(500).json({ message: 'Error fetching States' });
+  }
+});
+
+//obtener ruta por ID
+
+route.get('/api/reports/:id_estado', async (req,res) => {
+  const { id_estado } = req.params;
+  try {
+    const route = await getStateVehiclesById(id_estado);
+    if (!route) {
+      return res.status(404).json({ message: 'Route not found' });
+    }
+    return res.status(200).json(route);
+  } catch (error) {
+    return res.status(500).json({ message: 'Error fetching State' });
+  }
+});
+
+// crear ruta
+
+route.post('/api/reports', async (req,res) => {
+  const {descripcion, foto, tipo_estado, tipo_reporte} = req.body;
+  try {
+    const route = await createStateVehicle(descripcion, foto, tipo_estado, tipo_reporte);
+    return res.status(201).json({ route });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error creating State' });
+  }
+});
+
+// actualizar estado
+
+route.put('/api/reports/:id_estado', async (req,res) => {
+  const {id_estado, descripcion, foto, tipo_estado, tipo_reporte} = req.body;
+  try {
+    const route = await updateStateVehicle(id_estado, descripcion, foto, tipo_estado, tipo_reporte);
+    if (!route) {
+      return res.status(404).json({ message: 'State not found' });
+    }
+    return res.status(200).json({ message: 'State updated successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error updating State' });
+  }
+});
+
+// eliminar estado
+
+route.delete('/api/reports/:id_estado', async (req,res) => {
+  const { id_estado } = req.params;
+  try {
+    const route = await deleteStateVehicle(id_estado);
+    if (!route) {
+      return res.status(404).json({ message: 'State not found' });
+    }
+    return res.status(200).json({ message: 'State deleted successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error deleting state' });
   }
 });
 

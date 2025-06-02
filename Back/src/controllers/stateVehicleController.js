@@ -17,20 +17,20 @@ const getStateVehiclesById = async(id_estado) => {
     return result;
 }
 
-const createStateVehicle = async(descripcion, foto, tipo_estado) => {
+const createStateVehicle = async(descripcion, foto, tipo_estado, tipo_reporte) => {
     const result = await db.query(`
-        INSERT INTO estado_vehiculos (descripcion, foto, tipo_estado) VALUES  (?, ?, ?)
+        INSERT INTO estado_vehiculos (descripcion, foto, tipo_estado, tipo_reporte) VALUES  (?, ?, ?, ?)
     `,
-    [descripcion, foto, tipo_estado]
+    [descripcion, foto, tipo_estado, tipo_reporte]
     );
     return result;
 }
 
-const updateStateVehicle = async(id_estado, descripcion, foto, tipo_estado) => {
+const updateStateVehicle = async(id_estado, descripcion, foto, tipo_estado, tipo_reporte) => {
     const result = await db.query(`
-        UPDATE estado_vehiculos SET descripcion = ?, foto = ?, tipo_estado = ? WHERE id_estado = ?
+        UPDATE estado_vehiculos SET descripcion = ?, foto = ?, tipo_estado = ?, tipo_reporte WHERE id_estado = ?
     `,
-    [descripcion, foto, tipo_estado, id_estado]
+    [descripcion, foto, tipo_estado, tipo_reporte, id_estado]
     );
     return result;
 }
