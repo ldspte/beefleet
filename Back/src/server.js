@@ -212,10 +212,8 @@ app.use((err, req, res, next) => {
 
 // Iniciar el servidor
 app.listen(3001, () => {
-  console.log('🚀 Server listening on port 3001');
-  console.log('📧 Endpoint de recuperación: http://localhost:3001/forgot-password');
-  
-  const contraseña = 'hola123';
+  console.log('Server listening on port 3001');
+  const contraseña = '12345';
   const hashpassword = bcrypt.hashSync(contraseña, 10);
   console.log('🔑 Hash de prueba:', hashpassword);
 });
