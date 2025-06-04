@@ -6,7 +6,7 @@ const SECRET_KEY = process.env.SECRET_KEY || 'lossimpsom';
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
-const {getDrivers, getDriversById, createDriver, updateDriver, deleteDriver } = require('../controllers/driverController');
+const { getDrivers, getDriversById, createDriver, updateDriver, deleteDriver } = require('../controllers/driverController');
 const {getClients, getClientsById, createClient, updateClient, deleteClient} = require('../controllers/clientController');
 const {getUsers, getUsersById, createUser, updateUser} = require('../controllers/usersController');
 const {getSales, getSalesById, createSale, updateSale, deleteSale} = require('../controllers/saleController');
@@ -15,34 +15,8 @@ const {getVehicles, getVehiclesById, createVehicle, updateVehicle, deleteVehicle
 const {getLoads, getLoadsById, getLoadsByDriver, createLoad, updateLoad, deleteLoad} = require('../controllers/loadController');
 const {getStateVehicles, getStateVehiclesById, createStateVehicle, updateStateVehicle, deleteStateVehicle } = require('../controllers/stateVehicleController');
 
-// Registro de usuarioroute
-// route.post('/api/register', [
-//     body('email_usuario').isString().notEmpty(),
-//     body('contraseña').isLength({ min: 6 })
-//   ], async (req, res) => {
-//     const errors = validationResult(req);
-//     if (!errors.isEmpty()) {
-//       return res.status(400).json({ errors: errors.array() });
-//     }
-  
-//     const { email_usuario, password } = req.body;
-//     const hashedPassword = await bcrypt.hash(password, 10);
-  
-//     try {
-//       await pool.query('INSERT INTO Usuarios (email_usuario, contraseña) VALUES (?, ?)', [email_usuario, hashedPassword]);
-//       res.status(201).send('User  registered');
-//     } catch (error) {
-//       console.error(error);
-//       res.status(500).json({ message: 'Error registering user' });
-//     }
-// });
 // Inicio de sesión Conductor
 
-
-
-// Inicio de sesión Conductor
-
-// Inicio de sesión Conductor
 route.post('/api/logindrivers', [
   body('correo_conductor').isString().notEmpty(),
   body('contraseña').isString().notEmpty()
@@ -52,17 +26,17 @@ route.post('/api/logindrivers', [
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { correo_conductor, contrasena } = req.body;
+  const { correo_conductor, contraseña } = req.body;
   try {
-    const [user] = await db.query('SELECT * FROM conductores WHERE correo_conductor = ?', [correo_conductor]);
-    if (!user.length) {
-      return res.status(401).json({ message: 'Invalid credentials' }); // Devuelve JSON aquí
+    const [user] = await db.query('SELECT * FROM Conductores WHERE correo_conductor = ?', [correo_conductor]);
+    if (!user.length || !(await bcrypt.compare(contraseña, user[0].contraseña))) {
+      return res.status(401).send('Invalid credentials');
     }
     const token = jwt.sign({ id: user[0].id_conductor }, SECRET_KEY, { expiresIn: '3h' });
     res.json({ token , user});
   } catch (error) {
-    console.error('Error en el servidor:', error);
-    res.status(500).json({ message: 'Error logging in', error: error.message }); // Devuelve JSON en caso de error
+    console.error(error);
+    res.status(500).json({ message: 'Error logging in' });
   }
 });
 
@@ -92,30 +66,88 @@ route.post('/api/admin', [
   }
 });
 
+
+
+  // Middleware para proteger rutas
+const authenticateJWT = (req, res, next) => {
+  const token = req.headers['authorization'];
+  if (token) {
+    jwt.verify(token, SECRET_KEY, (err, user) => {
+      if (err) {
+        return res.sendStatus(403);
+      }
+      req.user = user;
+      next();
+    });
+  } else {
+    res.sendStatus(401);
+  }
+};
+  
+  
 // Obtener todos los conductores
 
 route.get('/api/drivers', async (req,res) => {
   try {
-    const conductores = await getDrivers(); // Usar el controlador
-    return res.status(200).json(conductores);
+    const values = await getDrivers();
+    return res.status(200).json(values);
   } catch (error) {
-    console.error('Error fetching drivers:', error);
-    return res.status(500).json({ message: 'Error obteniendo conductores' });
+    return res.status(500).json({ message: 'Error fetching drivers' });
+  }
+})
+
+// crear un conductor
+
+route.post('/api/drivers', authenticateJWT, async (req,res) => {
+  const {tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion } = req.body;
+  try {
+    const driver = await createDriver(tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion);
+    return res.status(201).json({ driver });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error creating driver' });
   }
 });
 
-// Obtener conductor por ID
-route.get('/api/conductores/:id', authenticateJWT, async (req, res) => {
-  const { id } = req.params;
+
+//contraseña por defecto 
+const transporter = nodemailer.createTransport({
+  service: 'gmail', 
+  auth: {
+      user: 'ldspte9807@gmail.com',
+      pass: 'lossimpsom123' 
+  }
+});
+
+route.post('/api/send-password', (req, res) => {
+  const { correo_conductor, contraseña } = req.body;
+
+  const mailOptions = {
+      from: 'ldspte9807@gmail.com',
+      to: correo_conductor,
+      subject: 'Bienvenido a Beeflet',
+      text: `Se ha creado tu cuenta en Beefleet y Tu contraseña es: ${contraseña}`
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+          return res.status(500).send(error.toString());
+      }
+      res.status(200).send('Correo enviado: ' + info.response);
+  });
+});
+
+// Buscar por id conductor
+
+route.get('/api/drivers/:id_conductor', async (req,res) => {
+  const { id_conductor } = req.params;
   try {
-    const conductor = await getDriversById(id); // Usar el controlador
-    if (!conductor) {
-      return res.status(404).json({ message: 'Conductor no encontrado' });
+    const driver = await getDriversById(id_conductor);
+    if (!driver) {
+      return res.status(404).json({ message: 'Driver not found' });
     }
-    return res.status(200).json(conductor);
+    return res.status(200).json(driver);
   } catch (error) {
-    console.error('Error fetching driver:', error);
-    return res.status(500).json({ message: 'Error obteniendo conductor' });
+    return res.status(500).json({ message: 'Error fetching driver' });
   }
 });
 
@@ -125,11 +157,11 @@ route.put('/api/drivers/:id_conductor', async (req,res) => {
   const { id_conductor } = req.params;
   const { tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion } = req.body;
   try {
-    const conductor = await createDriver(req.body); // Usar el controlador
-    return res.status(201).json({ 
-      message: 'Conductor creado exitosamente',
-      conductor 
-    });
+    const driver = await updateDriver(id_conductor, tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion);
+    if (!driver) {
+      return res.status(404).json({ message: 'Driver not found' });
+    }
+    return res.status(200).json({ message: 'Driver updated successfully' });
   } catch (error) {
     return res.status(500).json({ message: 'Error updating driver' });
   }
@@ -151,19 +183,20 @@ route.delete('/api/drivers/:id_conductor', async (req,res) => {
 });
 
 // Login de admin
+
 route.post('/api/loginadmin', [
   body('correo_usuario').isString().notEmpty(),
-  body('contrasena').isString().notEmpty()
+  body('contraseña').isString().notEmpty()
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { correo_usuario, contrasena } = req.body;
+  const { correo_usuario, contraseña } = req.body;
   try {
-    const [user] = await db.query('SELECT * FROM conductores WHERE correo_conductor = ?', [correo_usuario]);
-    if (!user.length || !(await bcrypt.compare(contrasena, user[0].contrasena))) {
+    const [user] = await db.query('SELECT * FROM Conductores WHERE correo_conductor = ?', [correo_usuario]);
+    if (!user.length || !(await bcrypt.compare(contraseña, user[0].contraseña))) {
       return res.status(401).send('Invalid credentials');
     }
     const token = jwt.sign({ id: user[0].id_usuario }, SECRET_KEY, { expiresIn: '1h' });
@@ -223,7 +256,7 @@ route.get('/api/vehicles/:id', authenticateJWT, async(req,res)=>{
 
 // Crear vehiculo
 
-route.post('/api/vehicles',  async (req,res) => {
+route.post('/api/vehicles', authenticateJWT,  async (req,res) => {
   const {placa, modelo, peso, matricula, seguro, estado_vehiculo} = req.body;
   try {
     const vehicle = await createVehicle(placa, modelo, peso, matricula, seguro, estado_vehiculo);
@@ -265,7 +298,7 @@ route.delete('/api/vehicles/:id_vehiculo', authenticateJWT, async (req,res) => {
 
 
 //obtener Clientes
-route.get('/api/clients', async (req,res) => {
+route.get('/api/clients', authenticateJWT, async (req,res) => {
   try {
     const values = await getClients();
     return res.status(200).json(values);
@@ -405,7 +438,7 @@ route.delete('/api/sales/:id_venta', authenticateJWT, async (req,res) => {
 
 //obtener rutas
 
-route.get('/api/routes', async (req,res) => {
+route.get('/api/routes', authenticateJWT, async (req,res) => {
   try {
     const values = await getRoutes();
     return res.status(200).json(values);
@@ -555,7 +588,7 @@ route.delete('/api/reports/:id_estado', async (req,res) => {
 // Registro de usuario
 // route.post('/api/register', [
 //     body('email_usuario').isString().notEmpty(),
-//     body('contrasena').isLength({ min: 6 })
+//     body('contraseña').isLength({ min: 6 })
 //   ], async (req, res) => {
 //     const errors = validationResult(req);
 //     if (!errors.isEmpty()) {
@@ -566,7 +599,7 @@ route.delete('/api/reports/:id_estado', async (req,res) => {
 //     const hashedPassword = await bcrypt.hash(password, 10);
   
 //     try {
-//       await pool.query('INSERT INTO Usuarios (email_usuario, contrasena) VALUES (?, ?)', [email_usuario, hashedPassword]);
+//       await pool.query('INSERT INTO Usuarios (email_usuario, contraseña) VALUES (?, ?)', [email_usuario, hashedPassword]);
 //       res.status(201).send('User  registered');
 //     } catch (error) {
 //       console.error(error);
