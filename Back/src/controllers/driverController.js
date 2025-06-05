@@ -5,24 +5,23 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const sendPasswordEmail = async (correo_conductor, password) => {
-  // Configura el transportador de Nodemailer
   const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com', // Cambia esto por tu servidor SMTP
-    port: 587, // O el puerto que uses
-    secure: false, // true para 465, false para otros puertos
+    host: 'smtp.gmail.com', 
+    port: 587, 
+    secure: false, 
     auth: {
-      user: process.env.MAIL, // Tu correo electrónico
-      pass: process.env.PASSWORD // Tu contraseña de correo
+      user: process.env.MAIL, 
+      pass: process.env.PASSWORD 
     }
   });
 
-  // Configura el contenido del correo
+  
   const mailOptions = {
-    from: 'fabioreggae98@gmail.com', // Remitente
-    to: correo_conductor, // Correo del conductor
-    subject: 'Bienvenido a Beefleet', // Asunto
-    text: `Hola, tu contraseña por defecto es: ${password}`, // Texto del correo
-    html: `<p>Hola, tu contraseña por defecto es: <strong>${password}</strong></p>` // HTML del correo
+    from: '', 
+    to: correo_conductor, 
+    subject: 'Bienvenido a Beefleet', 
+    text: `Hola, tu contraseña por defecto es: ${password}`, 
+    html: `<p>Hola, tu contraseña por defecto es: <strong>${password}</strong></p>` 
   };
 
   // Envía el correo
