@@ -95,28 +95,38 @@ route.post('/api/admin', [
 
   // Middleware para proteger rutas
 const authenticateJWT = (req, res, next) => {
-  const token = req.headers['authorization'];
-  if (token) {
-    jwt.verify(token, SECRET_KEY, (err, user) => {
-      if (err) {
-        return res.sendStatus(403);
-      }
-      req.user = user;
-      next();
-    });
-  } else {
-    res.sendStatus(401);
+  const authHeader = req.headers['authorization'];
+  
+  if (!authHeader) {
+    return res.sendStatus(401);
   }
+  
+  // Extraer token (con o sin "Bearer ")
+  const token = authHeader.startsWith('Bearer ') 
+    ? authHeader.slice(7, authHeader.length) 
+    : authHeader;
+    
+  jwt.verify(token, SECRET_KEY, (err, user) => {
+    if (err) {
+      console.error('JWT verification failed:', err.message);
+      return res.status(403).json({ message: 'Token inválido' });
+    }
+    req.user = user;
+    next();
+  });
 };
   
   
 // Obtener todos los conductores
 
 route.get('/api/drivers', authenticateJWT, async (req,res) => {
+  console.log('Petición recibida para obtener drivers');
   try {
     const values = await getDrivers();
+    console.log('Drivers obtenidos:', values);
     return res.status(200).json(values);
   } catch (error) {
+    console.error('Error en ruta drivers:', error);
     return res.status(500).json({ message: 'Error fetching drivers' });
   }
 })
@@ -194,7 +204,7 @@ route.put('/api/drivers/:id_conductor', authenticateJWT, async (req,res) => {
 
 
 // eliminar conductor
-route.delete('/api/drivers/:id', authenticateJWT, async (req,res) => {
+route.delete('/api/drivers/:id_conductor', authenticateJWT, async (req,res) => {
   const { id_conductor } = req.params;
   try {
     const driver = await deleteDriver(id_conductor);
