@@ -1,6 +1,8 @@
 const {db} = require('../database.js');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
+const dotenv = require('dotenv');
+dotenv.config();
 
 const sendPasswordEmail = async (correo_conductor, password) => {
   // Configura el transportador de Nodemailer
@@ -9,8 +11,8 @@ const sendPasswordEmail = async (correo_conductor, password) => {
     port: 587, // O el puerto que uses
     secure: false, // true para 465, false para otros puertos
     auth: {
-      user: 'fabioreggae98@gmail.com', // Tu correo electrónico
-      pass: 'cquq zyez jhsi jeaj' // Tu contraseña de correo
+      user: process.env.MAIL, // Tu correo electrónico
+      pass: process.env.PASSWORD // Tu contraseña de correo
     }
   });
 
@@ -49,7 +51,7 @@ const getDrivers = async() => {
   const results = await db.query(`
     SELECT * FROM Conductores  
   `)
-   return results.length > 0 ? results[0] : null;
+  return results.length > 0 ? results[0] : null;
 }
 
 const getDriversById = async(id_conductor) => {

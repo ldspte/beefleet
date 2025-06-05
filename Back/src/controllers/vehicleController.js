@@ -2,9 +2,9 @@ const {db} = require('../database.js');
 
 const getVehicles = async() => {
   const results = await db.query(`
-    SELECT * FROM vehiculos  
+    SELECT * FROM Vehiculos  
   `)
-  return results;5
+  return results.length > 0 ? results[0] : null;
 }
 
 const getVehiclesById = async(id_vehiculo) => {
@@ -13,7 +13,7 @@ const getVehiclesById = async(id_vehiculo) => {
   `,
   [id_vehiculo]
   );
-  return result;
+  return result.length > 0 ? result[0] : null;
 }
 
 const createVehicle = async(placa, modelo, peso, matricula, seguro, estado_vehiculo, conductor) => {
@@ -22,7 +22,7 @@ const createVehicle = async(placa, modelo, peso, matricula, seguro, estado_vehic
     `,
     [placa, modelo, peso, matricula, seguro, estado_vehiculo, conductor]
     );
-    return result;
+    return result.length > 0 ? result[0] : null;
 }
 
 const updateVehicle = async(id_vehiculo, placa, modelo, peso, matricula, seguro, estado_vehiculo) => {
