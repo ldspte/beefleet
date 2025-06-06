@@ -33,6 +33,7 @@ route.post('/api/logindrivers', [
       return res.status(401).send('Invalid credentials');
     }
     const token = jwt.sign({ id: user[0].id_conductor }, SECRET_KEY, { expiresIn: '3h' });
+    console.log('inicio')
     res.json({ token , user});
   } catch (error) {
     console.error(error);
@@ -68,26 +69,38 @@ route.post('/api/admin', [
 
 
 
-  // Middleware para proteger rutas
 const authenticateJWT = (req, res, next) => {
-  const token = req.headers['authorization'];
-  if (token) {
+  const authHeader = req.headers['authorization'];
+  
+  console.log('Authorization Header:', authHeader);
+  
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1];
+    
     jwt.verify(token, SECRET_KEY, (err, user) => {
       if (err) {
-        return res.sendStatus(403);
+        console.log('JWT Error:', err.message);
+        return res.status(403).json({ 
+          error: 'Token inválido o expirado',
+          message: err.message 
+        });
       }
       req.user = user;
       next();
     });
   } else {
-    res.sendStatus(401);
+    return res.status(401).json({ 
+      error: 'Token no proporcionado',
+      message: 'Se requiere un token de autorización válido' 
+    });
   }
 };
+
   
   
 // Obtener todos los conductores
 
-route.get('/api/drivers', async (req,res) => {
+route.get('/api/drivers', authenticateJWT, async (req,res) => {
   try {
     const values = await getDrivers();
     return res.status(200).json(values);
@@ -97,7 +110,6 @@ route.get('/api/drivers', async (req,res) => {
 })
 
 // crear un conductor
-
 route.post('/api/drivers', authenticateJWT, async (req,res) => {
   const {tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion } = req.body;
   try {
@@ -138,7 +150,7 @@ route.post('/api/send-password', (req, res) => {
 
 // Buscar por id conductor
 
-route.get('/api/drivers/:id_conductor', async (req,res) => {
+route.get('/api/drivers/:id_conductor', authenticateJWT, async (req,res) => {
   const { id_conductor } = req.params;
   try {
     const driver = await getDriversById(id_conductor);
@@ -153,7 +165,7 @@ route.get('/api/drivers/:id_conductor', async (req,res) => {
 
 //actualizar conductor
 
-route.put('/api/drivers/:id_conductor', async (req,res) => {
+route.put('/api/drivers/:id_conductor', authenticateJWT, async (req,res) => {
   const { id_conductor } = req.params;
   const { tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion } = req.body;
   try {
@@ -169,7 +181,7 @@ route.put('/api/drivers/:id_conductor', async (req,res) => {
 
 
 // eliminar conductor
-route.delete('/api/drivers/:id_conductor', async (req,res) => {
+route.delete('/api/drivers/:id_conductor', authenticateJWT, async (req,res) => {
   const { id_conductor } = req.params;
   try {
     const driver = await deleteDriver(id_conductor);
@@ -239,51 +251,52 @@ route.get('/api/vehicles', authenticateJWT, async (req,res) => {
 })
 
 // Obtener vehiculo por ID 
-
-route.get('/api/vehicles/:id', authenticateJWT, async(req,res)=>{
+route.get('/api/vehicles/:id', authenticateJWT, async (req, res) => {
   try {
-    const id_vehiculo = req.params;
-    const vehiculo = await getVehiclesById(id_vehiculo);
-    if(!vehiculo){
-      return res.status(404).json({ message: 'Vehicles not found' });
+    const { id } = req.params;
+    const vehiculo = await getVehiclesById(id);
+    if (!vehiculo) {
+      return res.status(404).json({ message: 'Vehicle not found' });
     }
     return res.status(200).json(vehiculo);
   } catch (error) {
-    
+    console.error('Error fetching vehicle by ID:', error);
+    return res.status(500).json({ message: 'Error fetching vehicle' });
   }
 })
 
 
-// Crear vehiculo
 
-route.post('/api/vehicles', authenticateJWT,  async (req,res) => {
-  const {placa, modelo, peso, matricula, seguro, estado_vehiculo} = req.body;
+// Crear vehiculo
+route.post('/api/vehicles', authenticateJWT, async (req, res) => {
+  const { placa, marca, modelo, año, color, tipo, capacidad, kilometraje, estado_vehiculo, conductor } = req.body;
   try {
-    const vehicle = await createVehicle(placa, modelo, peso, matricula, seguro, estado_vehiculo);
+    const vehicle = await createVehicle(placa, marca, modelo, año, color, tipo, capacidad, kilometraje, estado_vehiculo, conductor);
     return res.status(201).json({ vehicle });
   } catch (error) {
+    console.error('Error creating vehicle:', error);
     return res.status(500).json({ message: 'Error creating vehicle' });
   }
 });
 
 // Actualizar vehiculo
-
-route.put('/api/vehicles/:id_vehiculo', authenticateJWT, async (req,res) => {
+route.put('/api/vehicles/:id_vehiculo', authenticateJWT, async (req, res) => {
   const { id_vehiculo } = req.params;
-  const {placa, modelo, peso, matricula, seguro, estado_vehiculo} = req.body;
+  const { placa, marca, modelo, año, color, tipo, capacidad, kilometraje, estado_vehiculo, conductor } = req.body;
   try {
-    const vehicle = await updateVehicle(id_vehiculo, placa, modelo, peso, matricula, seguro, estado_vehiculo);
+    const vehicle = await updateVehicle(id_vehiculo, placa, marca, modelo, año, color, tipo, capacidad, kilometraje, estado_vehiculo, conductor);
     if (!vehicle) {
       return res.status(404).json({ message: 'Vehicle not found' });
     }
-    return res.status(200).json({ message: 'Vehicle updated successfully' });
+    return res.status(200).json({ message: 'Vehicle updated successfully', vehicle });
   } catch (error) {
+    console.error('Error updating vehicle:', error);
     return res.status(500).json({ message: 'Error updating vehicle' });
   }
 });
-// eliminar vehiculo
 
-route.delete('/api/vehicles/:id_vehiculo', authenticateJWT, async (req,res) => {
+// eliminar vehiculo
+route.delete('/api/vehicles/:id_vehiculo', authenticateJWT, async (req, res) => {
   const { id_vehiculo } = req.params;
   try {
     const vehicle = await deleteVehicle(id_vehiculo);
@@ -292,10 +305,10 @@ route.delete('/api/vehicles/:id_vehiculo', authenticateJWT, async (req,res) => {
     }
     return res.status(200).json({ message: 'Vehicle deleted successfully' });
   } catch (error) {
+    console.error('Error deleting vehicle:', error);
     return res.status(500).json({ message: 'Error deleting vehicle' });
   }
 });
-
 
 //obtener Clientes
 route.get('/api/clients', authenticateJWT, async (req,res) => {

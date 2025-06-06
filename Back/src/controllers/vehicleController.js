@@ -1,10 +1,10 @@
 const {db} = require('../database.js');
 
 const getVehicles = async() => {
-  const results = await db.query(`
+  const [rows] = await db.query(`
     SELECT * FROM vehiculos  
   `)
-  return results;5
+  return rows;
 }
 
 const getVehiclesById = async(id_vehiculo) => {
