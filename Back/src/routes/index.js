@@ -95,8 +95,6 @@ const authenticateJWT = (req, res, next) => {
     });
   }
 };
-
-  
   
 // Obtener todos los conductores
 
@@ -237,11 +235,6 @@ route.get('/api/admin/:id_usuario', authenticateJWT, async (req,res) => {
   }
 })
 
-
-
-
-//rutas de vehiculos
-
 // Obtener todos los vehiculos
 
 route.get('/api/vehicles', authenticateJWT, async (req,res) => {
@@ -267,8 +260,6 @@ route.get('/api/vehicles/:id', authenticateJWT, async (req, res) => {
     return res.status(500).json({ message: 'Error fetching vehicle' });
   }
 })
-
-
 
 // Crear vehiculo
 route.post('/api/vehicles', authenticateJWT, async (req, res) => {
