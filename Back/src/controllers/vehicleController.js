@@ -1,10 +1,10 @@
 const {db} = require('../database.js');
 
 const getVehicles = async() => {
-  const results = await db.query(`
+  const [rows] = await db.query(`
     SELECT * FROM vehiculos  
   `)
-  return results;5
+  return rows;
 }
 
 const getVehiclesById = async(id_vehiculo) => {
@@ -16,11 +16,11 @@ const getVehiclesById = async(id_vehiculo) => {
   return result;
 }
 
-const createVehicle = async(placa, modelo, peso, matricula, seguro, estado_vehiculo) => {
+const createVehicle = async(placa, modelo, peso, matricula, seguro, estado_vehiculo, conductor) => {
     const result = await db.query(`
-        INSERT INTO vehiculos (placa, modelo, peso, matricula, seguro, estado_vehiculo) VALUES  (?, ?, ?, ?, ?, ?)
+        INSERT INTO vehiculos (placa, modelo, peso, matricula, seguro, estado_vehiculo, conductor) VALUES  (?, ?, ?, ?, ?, ?, ?)
     `,
-    [placa, modelo, peso, matricula, seguro, estado_vehiculo]
+    [placa, modelo, peso, matricula, seguro, estado_vehiculo, conductor]
     );
     return result;
 }
@@ -62,4 +62,3 @@ module.exports = {
   deleteVehicle,
   getVehiclesByDriver
 }
-

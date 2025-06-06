@@ -2,7 +2,7 @@ const {db} = require('../database')
 
 const getRoutes = async() => {    
   const results = await db.query(`
-    SELECT * FROM rutas  
+    SELECT * FROM rutas
   `)
   return results;
 }
