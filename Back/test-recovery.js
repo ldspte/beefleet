@@ -1,10 +1,8 @@
-// test-simple.js - Prueba sin dependencias externas
 const http = require('http');
 
 function makeRequest(hostname, port, path, data) {
   return new Promise((resolve, reject) => {
     const postData = JSON.stringify(data);
-    
     const options = {
       hostname: hostname,
       port: port,

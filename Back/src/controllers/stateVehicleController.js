@@ -5,7 +5,7 @@ const getStateVehicles = async() => {
     const results = await db.query(`
         SELECT * FROM estado_vehiculos  
     `)
-    return results;
+     return results.length > 0 ? results[0] : null;
 }
 
 const getStateVehiclesById = async(id_estado) => {
