@@ -18,7 +18,7 @@ const ReportesScreen = () => {
   // Estados para manejar las diferentes funcionalidades
   const [reportType , setReportType] = useState('');
   // Define reportTypeOptions como un array para usarlo con .map()
-  const reportTypeOptions = ['Falla mecánica', 'Retraso', 'Accidente', 'Problema de carga', 'Otro'];
+  const reportTypeOptions = ['Falla mecánica', 'Retraso', 'Accidente', 'Problema de carga', 'Carga completada', 'En viaje', 'Descarga completada', 'Otro'];
   const [showReportTypeDropdown, setShowReportTypeDropdown] = useState(false);
   const [etapaActual, setEtapaActual] = useState('');
   const [estadoCarga, setEstadoCarga] = useState('');
@@ -103,11 +103,6 @@ const ReportesScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>NOTIFICACIONES</Text>
-        </View>
-        
         {/* Agregar Reporte Section */}
         <View style={styles.reportSection}>
           <Text style={styles.reportSectionTitle}>Agregar reporte</Text>
@@ -179,8 +174,51 @@ const ReportesScreen = () => {
               </Text>
             </View>
           )}
+
+          <Text style={styles.statusSectionTitle}>Etapa actual</Text>
           
-          {/* Botón de enviar */}
+          <View style={styles.statusButtonsContainer}>
+            <TouchableOpacity 
+              style={[
+                styles.statusButton, 
+                etapaActual === 'carga completada' && styles.statusButtonActive
+              ]}
+              onPress={() => setEtapaActual('carga completada')}
+            >
+              <Text style={[
+                styles.statusButtonText,
+                etapaActual === 'carga completada' && styles.statusButtonTextActive
+              ]}>Carga completada</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[
+                styles.statusButton, 
+                etapaActual === 'en viaje' && styles.statusButtonActive
+              ]}
+              onPress={() => setEtapaActual('en viaje')}
+            >
+              <Text style={[
+                styles.statusButtonText,
+                etapaActual === 'en viaje' && styles.statusButtonTextActive
+              ]}>Viajando</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[
+                styles.statusButton, 
+                etapaActual === 'descarga completada' && styles.statusButtonActive
+              ]}
+              onPress={() => setEtapaActual('descarga completada')}
+            >
+              <Text style={[
+                styles.statusButtonText,
+                etapaActual === 'descarga completada' && styles.statusButtonTextActive
+              ]}>Descarga completada</Text>
+            </TouchableOpacity>
+          </View>
+
+                    {/* Botón de enviar */}
           <TouchableOpacity 
             style={styles.sendButton}
             onPress={handleSendReport}
@@ -195,79 +233,6 @@ const ReportesScreen = () => {
               <Text style={styles.confirmationText}>Reporte enviado</Text>
             </View>
           )}
-        </View>
-        
-        {/* Etapa Actual Section */}
-        <View style={styles.statusSection}>
-          <Text style={styles.statusSectionTitle}>Etapa actual</Text>
-          
-          <View style={styles.statusButtonsContainer}>
-            <TouchableOpacity 
-              style={[
-                styles.statusButton, 
-                etapaActual === 'cargando' && styles.statusButtonActive
-              ]}
-              onPress={() => setEtapaActual('cargando')}
-            >
-              <Text style={[
-                styles.statusButtonText,
-                etapaActual === 'cargando' && styles.statusButtonTextActive
-              ]}>Cargando</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={[
-                styles.statusButton, 
-                etapaActual === 'descargando' && styles.statusButtonActive
-              ]}
-              onPress={() => setEtapaActual('descargando')}
-            >
-              <Text style={[
-                styles.statusButtonText,
-                etapaActual === 'descargando' && styles.statusButtonTextActive
-              ]}>Descargando</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={[
-                styles.statusButton, 
-                etapaActual === 'viajando' && styles.statusButtonActive
-              ]}
-              onPress={() => setEtapaActual('viajando')}
-            >
-              <Text style={[
-                styles.statusButtonText,
-                etapaActual === 'viajando' && styles.statusButtonTextActive
-              ]}>Viajando</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        
-        {/* Estado de Carga/Descarga Section */}
-        <View style={styles.cargoStatusSection}>
-          <Text style={styles.statusSectionTitle}>Estado de carga/descarga</Text>
-          
-          <View style={styles.cargoStatusButtonsContainer}>
-            <TouchableOpacity 
-              style={[
-                styles.cargoStatusButton, 
-                estadoCarga === 'carga' && styles.cargoStatusButtonActive
-              ]}
-              onPress={() => setEstadoCarga('carga')}
-            >
-              <Text style={styles.cargoStatusButtonText}>CARGA COMPLETADA</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={[
-                styles.cargoStatusButton, 
-                estadoCarga === 'descarga' && styles.cargoStatusButtonActive
-              ]}
-              onPress={() => setEstadoCarga('descarga')}
-            >
-              <Text style={styles.cargoStatusButtonText}>DESCARGA COMPLETADA</Text>
-            </TouchableOpacity>
-          </View>
         </View>
         
         {/* Botón de Emergencia */}
@@ -496,7 +461,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     padding: 14,
     alignItems: 'center',
-    marginTop: 5,
+    marginTop: 15,
     marginBottom: 10,
   },
   sendButtonText: {
@@ -544,11 +509,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statusButtonActive: {
-    backgroundColor: '#4285F4',
+    backgroundColor: '#FF9500',
   },
   statusButtonText: {
     color: '#666',
     fontWeight: '500',
+    textAlign: 'center',
+    justifyContent: 'center',
   },
   statusButtonTextActive: {
     color: '#fff',

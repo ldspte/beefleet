@@ -1,5 +1,4 @@
-const {db} = require('../database.js');
-
+const {db} = require('../database')
 
 const getRoutes = async() => {    
   const results = await db.query(`

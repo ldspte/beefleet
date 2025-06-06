@@ -6,6 +6,7 @@ const SECRET_KEY = process.env.SECRET_KEY || 'lossimpsom';
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
+const crypto = require('crypto'); 
 const { getDrivers, getDriversById, createDriver, updateDriver, deleteDriver } = require('../controllers/driverController');
 const {getClients, getClientsById, createClient, updateClient, deleteClient} = require('../controllers/clientController');
 const {getUsers, getUsersById, createUser, updateUser} = require('../controllers/usersController');
@@ -14,6 +15,31 @@ const {getRoutes, getRoutesById, createRoute, updateRoute, deleteRoute} = requir
 const {getVehicles, getVehiclesById, createVehicle, updateVehicle, deleteVehicle} = require('../controllers/vehicleController');
 const {getLoads, getLoadsById, getLoadsByDriver, createLoad, updateLoad, deleteLoad} = require('../controllers/loadController');
 const {getStateVehicles, getStateVehiclesById, createStateVehicle, updateStateVehicle, deleteStateVehicle } = require('../controllers/stateVehicleController');
+
+// Registro de usuarioroute
+// route.post('/api/register', [
+//     body('email_usuario').isString().notEmpty(),
+//     body('contraseña').isLength({ min: 6 })
+//   ], async (req, res) => {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//       return res.status(400).json({ errors: errors.array() });
+//     }
+  
+//     const { email_usuario, password } = req.body;
+//     const hashedPassword = await bcrypt.hash(password, 10);
+  
+//     try {
+//       await pool.query('INSERT INTO Usuarios (email_usuario, contraseña) VALUES (?, ?)', [email_usuario, hashedPassword]);
+//       res.status(201).send('User  registered');
+//     } catch (error) {
+//       console.error(error);
+//       res.status(500).json({ message: 'Error registering user' });
+//     }
+// });
+// Inicio de sesión Conductor
+
+
 
 // Inicio de sesión Conductor
 
@@ -517,7 +543,7 @@ route.get('/api/loads/:id_conductor', async (req,res) => {
   }
 });
 
-//obtener rutas
+//obtener reportes
 
 route.get('/api/reports', async (req,res) => {
   try {
@@ -528,7 +554,7 @@ route.get('/api/reports', async (req,res) => {
   }
 });
 
-//obtener ruta por ID
+//obtener reporte por ID
 
 route.get('/api/reports/:id_estado', async (req,res) => {
   const { id_estado } = req.params;
@@ -543,7 +569,7 @@ route.get('/api/reports/:id_estado', async (req,res) => {
   }
 });
 
-// crear ruta
+// crear reporte
 
 route.post('/api/reports', async (req,res) => {
   const {descripcion, foto, tipo_estado, tipo_reporte} = req.body;
@@ -555,7 +581,7 @@ route.post('/api/reports', async (req,res) => {
   }
 });
 
-// actualizar estado
+// actualizar reporte
 
 route.put('/api/reports/:id_estado', async (req,res) => {
   const {id_estado, descripcion, foto, tipo_estado, tipo_reporte} = req.body;
@@ -570,7 +596,7 @@ route.put('/api/reports/:id_estado', async (req,res) => {
   }
 });
 
-// eliminar estado
+// eliminar reporte
 
 route.delete('/api/reports/:id_estado', async (req,res) => {
   const { id_estado } = req.params;
@@ -582,6 +608,75 @@ route.delete('/api/reports/:id_estado', async (req,res) => {
     return res.status(200).json({ message: 'State deleted successfully' });
   } catch (error) {
     return res.status(500).json({ message: 'Error deleting state' });
+  }
+});
+
+
+//obtener cargas
+
+route.get('/api/loads', async (req,res) => {
+  try {
+    const values = await getLoads();
+    return res.status(200).json(values);
+  } catch (error) {
+    return res.status(500).json({ message: 'Error fetching Loads' });
+  }
+});
+
+//obtener carga por ID
+
+route.get('/api/loads/:id_carga', async (req,res) => {
+  const { id_carga } = req.params;
+  try {
+    const route = await getLoadsById(id_carga);
+    if (!route) {
+      return res.status(404).json({ message: 'Load not found' });
+    }
+    return res.status(200).json(route);
+  } catch (error) {
+    return res.status(500).json({ message: 'Error fetching Load' });
+  }
+});
+
+// crear reporte
+
+route.post('/api/loads', async (req,res) => {
+  const {descripcion, peso, foto_carga, fecha_inicio, fecha_fin, vehiculo, cliente, conductor} = req.body;
+  try {
+    const route = await createLoad(descripcion, peso, foto_carga, fecha_inicio, fecha_fin, vehiculo, cliente, conductor);
+    return res.status(201).json({ route });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error creating Load' });
+  }
+});
+
+// actualizar carga
+
+route.put('/api/loads/:id_carga', async (req,res) => {
+  const {id_carga, descripcion, peso, foto_carga, fecha_inicio, fecha_fin, vehiculo, cliente, conductor} = req.body;
+  try {
+    const route = await updateLoad(id_carga, descripcion, peso, foto_carga, fecha_inicio, fecha_fin, vehiculo, cliente, conductor);
+    if (!route) {
+      return res.status(404).json({ message: 'Load not found' });
+    }
+    return res.status(200).json({ message: 'Load updated successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error updating Load' });
+  }
+});
+
+// eliminar carga
+
+route.delete('/apiloads/:id_carga', async (req,res) => {
+  const { id_carga } = req.params;
+  try {
+    const route = await deleteLoad(id_carga);
+    if (!route) {
+      return res.status(404).json({ message: 'load not found' });
+    }
+    return res.status(200).json({ message: 'load deleted successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error deleting load' });
   }
 });
 
@@ -607,6 +702,201 @@ route.delete('/api/reports/:id_estado', async (req,res) => {
 //       res.status(500).json({ message: 'Error registering user' });
 //     }
 // });
+
+
+// Configurar Gmail con tu App Password - NUEVO
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com', 
+  port: 587, 
+  secure: false, 
+  auth: {
+    user: process.env.MAIL, 
+    pass: process.env.PASSWORD 
+  }
+});
+
+// Verificar conexión con Gmail - NUEVO
+transporter.verify((error, success) => {
+  if (error) {
+    console.log('❌ Error configurando Gmail:', error);
+  } else {
+    console.log('✅ Gmail configurado correctamente');
+  }
+});
+
+// Almacenar tokens temporalmente - NUEVO (en producción usar BD)
+const resetTokens = new Map();
+
+
+// NUEVA RUTA para recuperar contraseña
+route.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  
+  console.log('📧 Solicitud de recuperación para:', email);
+  
+  try {
+    // Aquí deberías verificar si el usuario existe en tu BD
+    // Por ahora simulamos que existe
+    const usuarioExiste = true; // Reemplaza con tu lógica de BD
+    
+    if (!usuarioExiste) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'No encontramos una cuenta con ese correo electrónico' 
+      });
+    }
+    
+    // Generar token único
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const tokenExpiry = Date.now() + 3600000; // 1 hora
+    
+    // Guardar token
+    resetTokens.set(resetToken, {
+      email: email.toLowerCase(),
+      expires: tokenExpiry,
+      used: false
+    });
+    
+    // URL para restablecer
+    const resetLink = `http://localhost:3001/reset-password/${resetToken}`;
+    
+    // Configurar email
+    const mailOptions = {
+      from: '"Mi App Móvil" <michelleandrea217@gmail.com>',
+      to: email,
+      subject: '🔐 Restablecer contraseña - Beefleet',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9f9f9; padding: 20px;">
+          <div style="background-color: #ffffff; padding: 30px; border-radius: 10px;">
+            
+            <div style="text-align: center; margin-bottom: 30px;">
+              <h1 style="color: #FB8500; margin: 0; font-size: 28px;">🔐 Restablecer Contraseña</h1>
+            </div>
+            
+            <p style="color: #333; font-size: 16px; line-height: 1.6;">
+              Hola,<br><br>
+              Recibimos una solicitud para restablecer la contraseña de tu cuenta.
+            </p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${resetLink}" 
+                 style="background-color: #FB8500; color: white; padding: 15px 30px; 
+                        text-decoration: none; border-radius: 25px; font-weight: bold; 
+                        font-size: 16px; display: inline-block;">
+                ✨ Restablecer mi contraseña
+              </a>
+            </div>
+            
+            <p style="color: #666; font-size: 14px;">
+              O copia este enlace: ${resetLink}
+            </p>
+            
+            <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0;">
+              <p style="color: #856404; margin: 0; font-size: 14px;">
+                ⚠️ <strong>Importante:</strong> Este enlace expira en 1 hora.
+              </p>
+            </div>
+            
+            <p style="color: #666; font-size: 14px;">
+              Si no solicitaste esto, ignora este correo.
+            </p>
+            
+          </div>
+        </div>
+      `
+    };
+    
+    // Enviar email
+    await transporter.sendMail(mailOptions);
+    
+    console.log('✅ Email enviado a:', email);
+    
+    res.json({ 
+      success: true, 
+      message: 'Correo de recuperación enviado exitosamente' 
+    });
+    
+  } catch (error) {
+    console.error('❌ Error enviando email:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error al enviar el correo' 
+    });
+  }
+});
+
+// NUEVA RUTA para manejar el enlace (cuando hacen click)
+route.get('/reset-password/:token', (req, res) => {
+  const { token } = req.params;
+  const tokenData = resetTokens.get(token);
+  
+  if (!tokenData || Date.now() > tokenData.expires || tokenData.used) {
+    return res.send(`
+      <html>
+        <body style="font-family: Arial; text-align: center; padding: 50px;">
+          <h2 style="color: #e74c3c;">❌ Enlace inválido o expirado</h2>
+          <p>Este enlace no es válido, ya fue usado o expiró.</p>
+        </body>
+      </html>
+    `);
+  }
+  
+  // Mostrar formulario para nueva contraseña
+  res.send(`
+    <html>
+      <head>
+        <title>Restablecer Contraseña</title>
+        <style>
+          body { font-family: Arial; max-width: 400px; margin: 50px auto; padding: 20px; }
+          input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }
+          button { background-color: #FB8500; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; width: 100%; }
+        </style>
+      </head>
+      <body>
+        <h2 style="color: #FB8500; text-align: center;">🔐 Nueva Contraseña</h2>
+        <form action="/reset-password/${token}" method="POST">
+          <input type="password" name="password" placeholder="Nueva contraseña" required minlength="6">
+          <input type="password" name="confirmPassword" placeholder="Confirmar contraseña" required minlength="6">
+          <button type="submit">Actualizar contraseña</button>
+        </form>
+      </body>
+    </html>
+  `);
+});
+
+// NUEVA RUTA para procesar la nueva contraseña
+route.post('/reset-password/:token', (req, res) => {
+  const { token } = req.params;
+  const { password, confirmPassword } = req.body;
+  
+  const tokenData = resetTokens.get(token);
+  
+  if (!tokenData || Date.now() > tokenData.expires || tokenData.used) {
+    return res.send('<h2>❌ Error: Enlace inválido o expirado</h2>');
+  }
+  
+  if (password !== confirmPassword) {
+    return res.send('<h2>❌ Error: Las contraseñas no coinciden</h2>');
+  }
+  
+  // Marcar token como usado
+  tokenData.used = true;
+  resetTokens.set(token, tokenData);
+  
+  // Aquí actualizarías la contraseña en tu base de datos
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  console.log(`🔑 Nueva contraseña para ${tokenData.email}:`, hashedPassword);
+  
+  res.send(`
+    <html>
+      <body style="font-family: Arial; text-align: center; padding: 50px;">
+        <h2 style="color: #27ae60;">✅ ¡Contraseña actualizada!</h2>
+        <p>Tu contraseña ha sido actualizada exitosamente.</p>
+        <p>Ya puedes iniciar sesión en la app.</p>
+      </body>
+    </html>
+  `);
+});
 
 
 module.exports = route;
