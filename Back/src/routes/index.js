@@ -274,7 +274,7 @@ route.get('/api/vehicles/:id_vehiculo', async(req,res)=>{
 route.post('/api/vehicles', async (req,res) => {
   const {placa, modelo, peso, matricula, seguro, estado_vehiculo, conductor} = req.body;
   try {
-    const vehicle = await createVehicle(placa, modelo, peso, matricula, seguro, estado_vehiculo, conductor);
+    const vehicle = await createVehicle(req.body);
     return res.status(201).json({ vehicle });
   } catch (error) {
     console.error('Error creating vehicle:', error);
@@ -288,7 +288,7 @@ route.put('/api/vehicles/:id_vehiculo', async (req,res) => {
   const { id_vehiculo } = req.params;
   const { placa, marca, modelo, año, color, tipo, capacidad, kilometraje, estado_vehiculo, conductor } = req.body;
   try {
-    const vehicle = await updateVehicle(id_vehiculo, placa, marca, modelo, año, color, tipo, capacidad, kilometraje, estado_vehiculo, conductor);
+    const vehicle = await updateVehicle(id_vehiculo, req.dody);
     if (!vehicle) {
       return res.status(404).json({ message: 'Vehicle not found' });
     }
