@@ -67,8 +67,6 @@ route.post('/api/admin', [
   }
 });
 
-
-
 const authenticateJWT = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   
@@ -108,7 +106,7 @@ route.get('/api/drivers', authenticateJWT, async (req,res) => {
     console.error('Error en ruta drivers:', error);
     return res.status(500).json({ message: 'Error fetching drivers' });
   }
-})
+});
 
 // crear un conductor
 route.post('/api/drivers', authenticateJWT, async (req,res) => {
@@ -305,75 +303,131 @@ route.delete('/api/vehicles/:id_vehiculo', authenticateJWT, async (req, res) => 
 });
 
 //obtener Clientes
-route.get('/api/clients', authenticateJWT, async (req,res) => {
+route.get('/api/clients', authenticateJWT, async (req, res) => {
+  console.log('=== GET /api/clients route called ===');
+  console.log('User from JWT:', req.user);
+  
   try {
-    const values = await getClients();
-    return res.status(200).json(values);
+    console.log('Calling getClients controller...');
+    const clients = await getClients();
+    
+    console.log('Controller returned:', clients);
+    console.log('Clients type:', typeof clients);
+    console.log('Is array:', Array.isArray(clients));
+    console.log('Clients length:', clients?.length);
+    
+    // Ensure we always return an array
+    const clientsArray = Array.isArray(clients) ? clients : [];
+    
+    console.log('Sending response with', clientsArray.length, 'clients');
+    
+    res.status(200).json(clientsArray);
   } catch (error) {
-    return res.status(500).json({ message: 'Error fetching clients' });
+    console.error('=== ERROR in GET /api/clients ===');
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    
+    res.status(500).json({ 
+      message: 'Error fetching clients',
+      error: error.message 
+    });
   }
 });
 
-
 // obtener cliente por ID
-route.get('/api/clients/:id_cliente', authenticateJWT, async (req,res) => {
+route.get('/api/clients/:id_cliente', authenticateJWT, async (req, res) => {
   const { id_cliente } = req.params;
+  console.log('=== GET /api/clients/:id route called with id:', id_cliente);
+  
   try {
     const client = await getClientsById(id_cliente);
-    if (!client) {
+    console.log('Found client:', client);
+    
+    if (!client || client.length === 0) {
       return res.status(404).json({ message: 'Client not found' });
     }
-    return res.status(200).json(client);
+    
+    res.status(200).json(client[0]);
   } catch (error) {
-    return res.status(500).json({ message: 'Error fetching client' });
+    console.error('Error fetching client by ID:', error);
+    res.status(500).json({ message: 'Error fetching client' });
   }
 });
 
 // crear cliente
-
-route.post('/api/clients', authenticateJWT, async (req,res) => {
-  const {tipo_documento, documento, nombre_cliente, apellido_cliente, direccion, ciudad, telefono, empresa} = req.body;
+route.post('/api/clients', authenticateJWT, async (req, res) => {
+  console.log('=== POST /api/clients route called ===');
+  console.log('Request body:', req.body);
+  
+  const { nit, direccion, ciudad, telefono, empresa } = req.body;
+  
+  if (!nit || !direccion || !ciudad || !telefono || !empresa) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
+  
   try {
-    const client = await createClient(tipo_documento, documento, nombre_cliente, apellido_cliente, direccion, ciudad, telefono, empresa);
-    return res.status(201).json({ client });
+    const result = await createClient(nit, direccion, ciudad, telefono, empresa);
+    console.log('Client created successfully:', result);
+    
+    res.status(201).json({ 
+      message: 'Client created successfully',
+      client_id: result.insertId 
+    });
   } catch (error) {
-    return res.status(500).json({ message: 'Error creating client' });
+    console.error('Error creating client:', error);
+    res.status(500).json({ message: 'Error creating client' });
   }
 });
+
 // actualizar cliente
-
-route.put('/api/clients/:id_cliente', authenticateJWT, async (req,res) => {
+route.put('/api/clients/:id_cliente', authenticateJWT, async (req, res) => {
   const { id_cliente } = req.params;
-  const {tipo_documento, documento, nombre_cliente, apellido_cliente, direccion, ciudad, telefono, empresa} = req.body;
+  const { nit, direccion, ciudad, telefono, empresa } = req.body;
+  
+  console.log('=== PUT /api/clients/:id route called ===');
+  console.log('ID:', id_cliente);
+  console.log('Body:', req.body);
+  
+  if (!nit || !direccion || !ciudad || !telefono || !empresa) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
+  
   try {
-    const client = await updateClient(id_cliente, tipo_documento, documento, nombre_cliente, apellido_cliente, direccion, ciudad, telefono, empresa);
-    if (!client) {
+    const existingClient = await getClientsById(id_cliente);
+    if (!existingClient || existingClient.length === 0) {
       return res.status(404).json({ message: 'Client not found' });
     }
-    return res.status(200).json({ message: 'Client updated successfully' });
+    
+    const result = await updateClient(id_cliente, nit, direccion, ciudad, telefono, empresa);
+    res.status(200).json({ message: 'Client updated successfully' });
   } catch (error) {
-    return res.status(500).json({ message: 'Error updating client' });
+    console.error('Error updating client:', error);
+    res.status(500).json({ message: 'Error updating client' });
   }
 });
+
 // eliminar cliente
-
-route.delete('/api/clients/:id_cliente', authenticateJWT, async (req,res) => {
+route.delete('/api/clients/:id_cliente', authenticateJWT, async (req, res) => {
   const { id_cliente } = req.params;
+  console.log('=== DELETE /api/clients/:id route called with id:', id_cliente);
+  
   try {
-    const client = await deleteClient(id_cliente);
-    if (!client) {
+    const existingClient = await getClientsById(id_cliente);
+    if (!existingClient || existingClient.length === 0) {
       return res.status(404).json({ message: 'Client not found' });
     }
-    return res.status(200).json({ message: 'Client deleted successfully' });
+    
+    const result = await deleteClient(id_cliente);
+    res.status(200).json({ message: 'Client deleted successfully' });
   } catch (error) {
-    return res.status(500).json({ message: 'Error deleting client' });
+    console.error('Error deleting client:', error);
+    res.status(500).json({ message: 'Error deleting client' });
   }
 });
-
 
 //obtener ventas
 
-route.get('api/sales', authenticateJWT, async (req,res) => {
+route.get('/api/sales', authenticateJWT, async (req, res) => {
   try {
     const values = await getSales();
     return res.status(200).json(values);
