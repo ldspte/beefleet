@@ -251,8 +251,8 @@ route.get('/api/vehicles',  async (req,res) => {
 
 route.get('/api/vehicles/:id_vehiculo', async(req,res)=>{
   try {
-    const { id } = req.params;
-    const vehiculo = await getVehiclesById(id);
+    const { id_vehiculo } = req.params;
+    const vehiculo = await getVehiclesById(id_vehiculo);
     if (!vehiculo) {
       return res.status(404).json({ message: 'Vehicle not found' });
     }
@@ -264,24 +264,41 @@ route.get('/api/vehicles/:id_vehiculo', async(req,res)=>{
 })
 
 // Crear vehiculo
-route.post('/api/vehicles', authenticateJWT, async (req, res) => {
-  const { placa, marca, modelo, año, color, tipo, capacidad, kilometraje, estado_vehiculo, conductor } = req.body;
+route.post('/api/vehicles', authenticateJWT,async (req, res) => {
+  console.log('Body recibido:', req.body);
+  
   try {
+    if (!req.body.placa || !req.body.modelo || !req.body.marca) {
+      return res.status(400).json({ 
+        message: 'Faltan campos requeridos',
+        required: ['placa', 'modelo', 'marca']
+      }); 
+    }
+
     const vehicle = await createVehicle(req.body);
-    return res.status(201).json({ vehicle });
+    return res.status(201).json({
+      success: true,
+      vehicle: vehicle
+    });
   } catch (error) {
-    console.error('Error creating vehicle:', error);
-    return res.status(500).json({ message: 'Error creating vehicle' });
+    console.error('Error completo:', error);
+    return res.status(500).json({ 
+      success: false,
+      message: error.message || 'Error al crear vehículo',
+      error: error.toString()
+    });
   }
 });
-
 // Actualizar vehiculo
 
-route.put('/api/vehicles/:id_vehiculo', async (req,res) => {
+route.put('/api/vehicles/:id_vehiculo', authenticateJWT, async (req,res) => {
   const { id_vehiculo } = req.params;
-  const { placa, marca, modelo, año, color, tipo, capacidad, kilometraje, estado_vehiculo, conductor } = req.body;
+   const { 
+  placa, modelo, peso, matricula, seguro, estado_vehiculo, 
+  conductor, marca, color, capacidad, tipo, kilometraje 
+  } = req.body;
   try {
-    const vehicle = await updateVehicle(id_vehiculo, req.dody);
+    const vehicle = await updateVehicle(id_vehiculo, req.body);
     if (!vehicle) {
       return res.status(404).json({ message: 'Vehicle not found' });
     }
