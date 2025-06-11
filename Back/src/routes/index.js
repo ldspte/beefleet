@@ -446,6 +446,260 @@ route.delete('/api/clients/:id_cliente', authenticateJWT, async (req, res) => {
   }
 });
 
+// Obtener todas las cargas
+route.get('/api/loads', authenticateJWT, async (req, res) => {
+  try {
+    const cargas = await getLoads();
+    
+    // Asegurar que siempre se devuelva un array
+    const cargasArray = Array.isArray(cargas) ? cargas : [];
+    
+    return res.status(200).json(cargasArray);
+  } catch (error) {
+    console.error('Error fetching cargas:', error);
+    return res.status(500).json({ 
+      message: 'Error fetching cargas',
+      error: error.message 
+    });
+  }
+});
+
+// Obtener carga por ID
+route.get('/api/loads/:id_carga', authenticateJWT, async (req, res) => {
+  const { id_carga } = req.params;
+  
+  // Validar que el ID sea un número
+  if (!id_carga || isNaN(id_carga)) {
+    return res.status(400).json({ message: 'ID de carga inválido' });
+  }
+  
+  try {
+    const carga = await getLoadsById(id_carga);
+    
+    if (!carga || (Array.isArray(carga) && carga.length === 0)) {
+      return res.status(404).json({ message: 'Carga no encontrada' });
+    }
+    
+    // Si es un array, devolver el primer elemento, si no, devolver el objeto
+    const cargaData = Array.isArray(carga) ? carga[0] : carga;
+    
+    return res.status(200).json(cargaData);
+  } catch (error) {
+    console.error('Error fetching carga:', error);
+    return res.status(500).json({ 
+      message: 'Error fetching carga',
+      error: error.message 
+    });
+  }
+});
+
+// Crear nueva carga
+route.post('/api/loads', authenticateJWT, async (req, res) => {
+  const { 
+    descripcion, 
+    peso, 
+    foto_carga, 
+    fecha_inicio, 
+    fecha_fin, 
+    vehiculo, 
+    cliente, 
+    conductor 
+  } = req.body;
+  
+  // Validación de campos requeridos
+  if (!descripcion || !peso || !fecha_inicio || !fecha_fin || !cliente) {
+    return res.status(400).json({ 
+      message: 'Faltan campos requeridos: descripcion, peso, fecha_inicio, fecha_fin, cliente' 
+    });
+  }
+  
+  // Validar fechas
+  const fechaInicio = new Date(fecha_inicio);
+  const fechaFin = new Date(fecha_fin);
+  
+  if (fechaInicio >= fechaFin) {
+    return res.status(400).json({ 
+      message: 'La fecha de inicio debe ser anterior a la fecha de fin' 
+    });
+  }
+  
+  try {
+    // Convertir valores vacíos a null
+    const cargaData = {
+      descripcion: descripcion.trim(),
+      peso: peso.trim(),
+      foto_carga: foto_carga ? foto_carga.trim() : null,
+      fecha_inicio,
+      fecha_fin,
+      vehiculo: vehiculo ? parseInt(vehiculo) : null,
+      cliente: parseInt(cliente),
+      conductor: conductor ? parseInt(conductor) : null
+    };
+    
+    const result = await createLoad(
+      cargaData.descripcion,
+      cargaData.peso,
+      cargaData.foto_carga,
+      cargaData.fecha_inicio,
+      cargaData.fecha_fin,
+      cargaData.vehiculo,
+      cargaData.cliente,
+      cargaData.conductor
+    );
+    
+    return res.status(201).json({
+      message: 'Carga creada exitosamente',
+      id_carga: result.insertId || result.id
+    });
+  } catch (error) {
+    console.error('Error creating carga:', error);
+    
+    // Manejar errores específicos de base de datos
+    if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+      return res.status(400).json({ 
+        message: 'Cliente, vehículo o conductor no válido' 
+      });
+    }
+    
+    return res.status(500).json({ 
+      message: 'Error creating carga',
+      error: error.message 
+    });
+  }
+});
+
+// Actualizar carga
+route.put('/api/loads/:id_carga', authenticateJWT, async (req, res) => {
+  const { id_carga } = req.params;
+  const { 
+    descripcion, 
+    peso, 
+    foto_carga, 
+    fecha_inicio, 
+    fecha_fin, 
+    vehiculo, 
+    cliente, 
+    conductor 
+  } = req.body;
+  
+  // Validar que el ID sea un número
+  if (!id_carga || isNaN(id_carga)) {
+    return res.status(400).json({ message: 'ID de carga inválido' });
+  }
+  
+  // Validación de campos requeridos
+  if (!descripcion || !peso || !fecha_inicio || !fecha_fin || !cliente) {
+    return res.status(400).json({ 
+      message: 'Faltan campos requeridos: descripcion, peso, fecha_inicio, fecha_fin, cliente' 
+    });
+  }
+  
+  // Validar fechas
+  const fechaInicio = new Date(fecha_inicio);
+  const fechaFin = new Date(fecha_fin);
+  
+  if (fechaInicio >= fechaFin) {
+    return res.status(400).json({ 
+      message: 'La fecha de inicio debe ser anterior a la fecha de fin' 
+    });
+  }
+  
+  try {
+    // Verificar si la carga existe
+    const existingCarga = await getLoadsById(id_carga);
+    if (!existingCarga || (Array.isArray(existingCarga) && existingCarga.length === 0)) {
+      return res.status(404).json({ message: 'Carga no encontrada' });
+    }
+    
+    // Preparar datos para actualización
+    const cargaData = {
+      descripcion: descripcion.trim(),
+      peso: peso.trim(),
+      foto_carga: foto_carga ? foto_carga.trim() : null,
+      fecha_inicio,
+      fecha_fin,
+      vehiculo: vehiculo ? parseInt(vehiculo) : null,
+      cliente: parseInt(cliente),
+      conductor: conductor ? parseInt(conductor) : null
+    };
+    
+    await updateLoad(
+      id_carga,
+      cargaData.descripcion,
+      cargaData.peso,
+      cargaData.foto_carga,
+      cargaData.fecha_inicio,
+      cargaData.fecha_fin,
+      cargaData.vehiculo,
+      cargaData.cliente,
+      cargaData.conductor
+    );
+    
+    return res.status(200).json({ message: 'Carga actualizada exitosamente' });
+  } catch (error) {
+    console.error('Error updating carga:', error);
+    
+    // Manejar errores específicos de base de datos
+    if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+      return res.status(400).json({ 
+        message: 'Cliente, vehículo o conductor no válido' 
+      });
+    }
+    
+    return res.status(500).json({ 
+      message: 'Error updating carga',
+      error: error.message 
+    });
+  }
+});
+
+// Eliminar carga
+route.delete('/api/loads/:id_carga', authenticateJWT, async (req, res) => {
+  const { id_carga } = req.params;
+  
+  // Validar que el ID sea un número
+  if (!id_carga || isNaN(id_carga)) {
+    return res.status(400).json({ message: 'ID de carga inválido' });
+  }
+  
+  try {
+    // Verificar si la carga existe
+    const existingCarga = await getLoadsById(id_carga);
+    if (!existingCarga || (Array.isArray(existingCarga) && existingCarga.length === 0)) {
+      return res.status(404).json({ message: 'Carga no encontrada' });
+    }
+    
+    await deleteLoad(id_carga);
+    return res.status(200).json({ message: 'Carga eliminada exitosamente' });
+  } catch (error) {
+    console.error('Error deleting carga:', error);
+    
+    // Manejar errores de integridad referencial
+    if (error.code === 'ER_ROW_IS_REFERENCED_2') {
+      return res.status(400).json({ 
+        message: 'No se puede eliminar la carga porque está siendo referenciada por otros registros' 
+      });
+    }
+    
+    return res.status(500).json({ 
+      message: 'Error deleting carga',
+      error: error.message 
+    });
+  }
+});
+
+// Obtener cargas por conductor
+route.get('/api/loads/driver/:id_conductor', authenticateJWT, async (req, res) => {
+  const { id_conductor } = req.params;
+  try {
+    const cargas = await getLoadsByDriver(id_conductor);
+    return res.status(200).json(cargas);
+  } catch (error) {
+    console.error('Error fetching cargas by driver:', error);
+    return res.status(500).json({ message: 'Error fetching cargas by driver' });
+  }
+});
+
 //obtener ventas
 
 route.get('/api/sales', authenticateJWT, async (req, res) => {
@@ -474,9 +728,13 @@ route.get('api/sales/:id_venta',  async (req,res) => {
 
 
 // crear venta
+<<<<<<< HEAD
 
 
 route.post('/api/sales', async (req,res) => {
+=======
+route.post('/api/sales', authenticateJWT, async (req,res) => {
+>>>>>>> ebbda78c986f11a8c9573ce24f3f1c2e99989f78
   const {fecha, valor, descripcion, carga} = req.body;
   try {
     const sale = await createSale(fecha, valor, descripcion, carga);
@@ -488,8 +746,12 @@ route.post('/api/sales', async (req,res) => {
 
 
 //actualizar venta
+<<<<<<< HEAD
 
 route.put('/api/sales/:id_venta',  async (req,res) => {
+=======
+route.put('/api/sales/:id_venta', authenticateJWT, async (req,res) => {
+>>>>>>> ebbda78c986f11a8c9573ce24f3f1c2e99989f78
   const { id_venta } = req.params;
   const {fecha, valor, descripcion, carga} = req.body;
   try {
@@ -517,6 +779,17 @@ route.delete('/api/sales/:id_venta', async (req,res) => {
   }
 });
 
+// Obtener cargas
+route.get('/api/loads', authenticateJWT, async (req, res) => {
+  try {
+    const cargas = await getLoads();
+    // Asegúrate de devolver un array
+    res.status(200).json(Array.isArray(cargas) ? cargas : []);
+  } catch (error) {
+    console.error('Error fetching cargas:', error);
+    res.status(500).json({ message: 'Error fetching cargas' });
+  }
+});
 
 //obtener rutas
 
@@ -586,8 +859,8 @@ route.delete('/api/routes/:id_ruta',  async (req,res) => {
   }
 });
 
-//Obtener Cargas Por conductor
 
+<<<<<<< HEAD
 route.get('/api/loads/:id_conductor', async (req,res) => {
   const { id_conductor } = req.params;
   try {
@@ -599,6 +872,9 @@ route.get('/api/loads/:id_conductor', async (req,res) => {
 });
 
 //obtener reportes
+=======
+//obtener reporte
+>>>>>>> ebbda78c986f11a8c9573ce24f3f1c2e99989f78
 
 route.get('/api/reports', async (req,res) => {
   try {
