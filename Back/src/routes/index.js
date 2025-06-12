@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto'); 
-const { getDrivers, getDriversById, createDriver, updateDriver, deleteDriver } = require('../controllers/driverController');
+const { getDrivers, getDriversById, createDriver, updateDriver, deleteDriver, newpasswordDriver } = require('../controllers/driverController');
 const {getClients, getClientsById, createClient, updateClient, deleteClient} = require('../controllers/clientController');
 const {getUsers, getUsersById, createUser, updateUser} = require('../controllers/usersController');
 const {getSales, getSalesById, createSale, updateSale, deleteSale} = require('../controllers/saleController');
@@ -638,7 +638,7 @@ route.get('/api/loads/:id_carga', async (req,res) => {
   }
 });
 
-// crear reporte
+// crear carga
 
 route.post('/api/loads', async (req,res) => {
   const {descripcion, peso, foto_carga, fecha_inicio, fecha_fin, vehiculo, cliente, conductor} = req.body;
@@ -667,7 +667,7 @@ route.put('/api/loads/:id_carga', async (req,res) => {
 
 // eliminar carga
 
-route.delete('/apiloads/:id_carga', async (req,res) => {
+route.delete('/api/loads/:id_carga', async (req,res) => {
   const { id_carga } = req.params;
   try {
     const route = await deleteLoad(id_carga);
@@ -840,6 +840,7 @@ route.get('/reset-password/:token', (req, res) => {
       </html>
     `);
   }
+  console.log(tokenData);
   
   // Mostrar formulario para nueva contraseña
   res.send(`
@@ -865,7 +866,8 @@ route.get('/reset-password/:token', (req, res) => {
 });
 
 // NUEVA RUTA para procesar la nueva contraseña
-route.post('/reset-password/:token', (req, res) => {
+route.post('/reset-password/:token', async (req, res) => {
+ 
   const { token } = req.params;
   const { password, confirmPassword } = req.body;
   
@@ -882,20 +884,31 @@ route.post('/reset-password/:token', (req, res) => {
   // Marcar token como usado
   tokenData.used = true;
   resetTokens.set(token, tokenData);
+  try {
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    const correo_conductor = tokenData.correo_conductor;
   
-  // Aquí actualizarías la contraseña en tu base de datos
-  const hashedPassword = bcrypt.hashSync(password, 10);
-  console.log(`🔑 Nueva contraseña para ${tokenData.email}:`, hashedPassword);
+    const result = await newpasswordDriver(correo_conductor, hashedPassword);
   
-  res.send(`
-    <html>
-      <body style="font-family: Arial; text-align: center; padding: 50px;">
-        <h2 style="color: #27ae60;">✅ ¡Contraseña actualizada!</h2>
-        <p>Tu contraseña ha sido actualizada exitosamente.</p>
-        <p>Ya puedes iniciar sesión en la app.</p>
-      </body>
-    </html>
-  `);
+    console.log(`🔑 Nueva contraseña para ${tokenData.correo_conductor}:`, hashedPassword);
+    if (result.affectedRows === 0) {
+      return res.status(404).send('<h2>❌ Error: Usuario no encontrado</h2>');
+    }
+  
+    res.send(`
+      <html>
+        <body style="font-family: Arial; text-align: center; padding: 50px;">
+          <h2 style="color: #27ae60;">✅ ¡Contraseña actualizada!</h2>
+          <p>Tu contraseña ha sido actualizada exitosamente.</p>
+          <p>Ya puedes iniciar sesión en la app.</p>
+        </body>
+      </html>
+    `);
+    
+  } catch (error) {
+    console.error("Error al actualizar la contraseña:", error);
+    return res.status(500).send('<h2>❌ Error interno al actualizar la contraseña</h2>');
+  }
 });
 
 

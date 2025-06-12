@@ -46,7 +46,6 @@ const updateUser = async(id_usuario, nombre_usuario, apellido_usuario, email_usu
 
 
 
-
 module.exports = {
     getUsers,
     getUsersById,

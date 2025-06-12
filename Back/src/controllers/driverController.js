@@ -93,6 +93,14 @@ const deleteDriver = async(id_conductor) => {
   return result;
 }
 
+const newpasswordDriver = async(email_conductor, contraseña) => {
+  const [result] = await db.query(
+    'UPDATE Conductores SET contraseña = ? WHERE correo_conductor = ?',
+    [contraseña, email_conductor]
+  );
+  return result;
+}
+
 
 
 module.exports = {
@@ -100,5 +108,6 @@ module.exports = {
   getDriversById,
   createDriver,
   updateDriver,
-  deleteDriver
+  deleteDriver,
+  newpasswordDriver
 }
