@@ -428,7 +428,7 @@ route.put('/api/clients/:id_cliente', authenticateJWT, async (req, res) => {
 });
 
 // eliminar cliente
-route.delete('/api/clients/:id_cliente', authenticateJWT, async (req, res) => {
+route.delete('/api/clients/:id_cliente', async (req, res) => {
   const { id_cliente } = req.params;
   console.log('=== DELETE /api/clients/:id route called with id:', id_cliente);
   
@@ -446,274 +446,20 @@ route.delete('/api/clients/:id_cliente', authenticateJWT, async (req, res) => {
   }
 });
 
-// Obtener todas las cargas
-route.get('/api/loads', authenticateJWT, async (req, res) => {
-  try {
-    const cargas = await getLoads();
-    
-    // Asegurar que siempre se devuelva un array
-    const cargasArray = Array.isArray(cargas) ? cargas : [];
-    
-    return res.status(200).json(cargasArray);
-  } catch (error) {
-    console.error('Error fetching cargas:', error);
-    return res.status(500).json({ 
-      message: 'Error fetching cargas',
-      error: error.message 
-    });
-  }
-});
 
-// Obtener carga por ID
-route.get('/api/loads/:id_carga', authenticateJWT, async (req, res) => {
-  const { id_carga } = req.params;
-  
-  // Validar que el ID sea un número
-  if (!id_carga || isNaN(id_carga)) {
-    return res.status(400).json({ message: 'ID de carga inválido' });
-  }
-  
-  try {
-    const carga = await getLoadsById(id_carga);
-    
-    if (!carga || (Array.isArray(carga) && carga.length === 0)) {
-      return res.status(404).json({ message: 'Carga no encontrada' });
-    }
-    
-    // Si es un array, devolver el primer elemento, si no, devolver el objeto
-    const cargaData = Array.isArray(carga) ? carga[0] : carga;
-    
-    return res.status(200).json(cargaData);
-  } catch (error) {
-    console.error('Error fetching carga:', error);
-    return res.status(500).json({ 
-      message: 'Error fetching carga',
-      error: error.message 
-    });
-  }
-});
-
-// Crear nueva carga
-route.post('/api/loads', authenticateJWT, async (req, res) => {
-  const { 
-    descripcion, 
-    peso, 
-    foto_carga, 
-    fecha_inicio, 
-    fecha_fin, 
-    vehiculo, 
-    cliente, 
-    conductor 
-  } = req.body;
-  
-  // Validación de campos requeridos
-  if (!descripcion || !peso || !fecha_inicio || !fecha_fin || !cliente) {
-    return res.status(400).json({ 
-      message: 'Faltan campos requeridos: descripcion, peso, fecha_inicio, fecha_fin, cliente' 
-    });
-  }
-  
-  // Validar fechas
-  const fechaInicio = new Date(fecha_inicio);
-  const fechaFin = new Date(fecha_fin);
-  
-  if (fechaInicio >= fechaFin) {
-    return res.status(400).json({ 
-      message: 'La fecha de inicio debe ser anterior a la fecha de fin' 
-    });
-  }
-  
-  try {
-    // Convertir valores vacíos a null
-    const cargaData = {
-      descripcion: descripcion.trim(),
-      peso: peso.trim(),
-      foto_carga: foto_carga ? foto_carga.trim() : null,
-      fecha_inicio,
-      fecha_fin,
-      vehiculo: vehiculo ? parseInt(vehiculo) : null,
-      cliente: parseInt(cliente),
-      conductor: conductor ? parseInt(conductor) : null
-    };
-    
-    const result = await createLoad(
-      cargaData.descripcion,
-      cargaData.peso,
-      cargaData.foto_carga,
-      cargaData.fecha_inicio,
-      cargaData.fecha_fin,
-      cargaData.vehiculo,
-      cargaData.cliente,
-      cargaData.conductor
-    );
-    
-    return res.status(201).json({
-      message: 'Carga creada exitosamente',
-      id_carga: result.insertId || result.id
-    });
-  } catch (error) {
-    console.error('Error creating carga:', error);
-    
-    // Manejar errores específicos de base de datos
-    if (error.code === 'ER_NO_REFERENCED_ROW_2') {
-      return res.status(400).json({ 
-        message: 'Cliente, vehículo o conductor no válido' 
-      });
-    }
-    
-    return res.status(500).json({ 
-      message: 'Error creating carga',
-      error: error.message 
-    });
-  }
-});
-
-// Actualizar carga
-route.put('/api/loads/:id_carga', authenticateJWT, async (req, res) => {
-  const { id_carga } = req.params;
-  const { 
-    descripcion, 
-    peso, 
-    foto_carga, 
-    fecha_inicio, 
-    fecha_fin, 
-    vehiculo, 
-    cliente, 
-    conductor 
-  } = req.body;
-  
-  // Validar que el ID sea un número
-  if (!id_carga || isNaN(id_carga)) {
-    return res.status(400).json({ message: 'ID de carga inválido' });
-  }
-  
-  // Validación de campos requeridos
-  if (!descripcion || !peso || !fecha_inicio || !fecha_fin || !cliente) {
-    return res.status(400).json({ 
-      message: 'Faltan campos requeridos: descripcion, peso, fecha_inicio, fecha_fin, cliente' 
-    });
-  }
-  
-  // Validar fechas
-  const fechaInicio = new Date(fecha_inicio);
-  const fechaFin = new Date(fecha_fin);
-  
-  if (fechaInicio >= fechaFin) {
-    return res.status(400).json({ 
-      message: 'La fecha de inicio debe ser anterior a la fecha de fin' 
-    });
-  }
-  
-  try {
-    // Verificar si la carga existe
-    const existingCarga = await getLoadsById(id_carga);
-    if (!existingCarga || (Array.isArray(existingCarga) && existingCarga.length === 0)) {
-      return res.status(404).json({ message: 'Carga no encontrada' });
-    }
-    
-    // Preparar datos para actualización
-    const cargaData = {
-      descripcion: descripcion.trim(),
-      peso: peso.trim(),
-      foto_carga: foto_carga ? foto_carga.trim() : null,
-      fecha_inicio,
-      fecha_fin,
-      vehiculo: vehiculo ? parseInt(vehiculo) : null,
-      cliente: parseInt(cliente),
-      conductor: conductor ? parseInt(conductor) : null
-    };
-    
-    await updateLoad(
-      id_carga,
-      cargaData.descripcion,
-      cargaData.peso,
-      cargaData.foto_carga,
-      cargaData.fecha_inicio,
-      cargaData.fecha_fin,
-      cargaData.vehiculo,
-      cargaData.cliente,
-      cargaData.conductor
-    );
-    
-    return res.status(200).json({ message: 'Carga actualizada exitosamente' });
-  } catch (error) {
-    console.error('Error updating carga:', error);
-    
-    // Manejar errores específicos de base de datos
-    if (error.code === 'ER_NO_REFERENCED_ROW_2') {
-      return res.status(400).json({ 
-        message: 'Cliente, vehículo o conductor no válido' 
-      });
-    }
-    
-    return res.status(500).json({ 
-      message: 'Error updating carga',
-      error: error.message 
-    });
-  }
-});
-
-// Eliminar carga
-route.delete('/api/loads/:id_carga', authenticateJWT, async (req, res) => {
-  const { id_carga } = req.params;
-  
-  // Validar que el ID sea un número
-  if (!id_carga || isNaN(id_carga)) {
-    return res.status(400).json({ message: 'ID de carga inválido' });
-  }
-  
-  try {
-    // Verificar si la carga existe
-    const existingCarga = await getLoadsById(id_carga);
-    if (!existingCarga || (Array.isArray(existingCarga) && existingCarga.length === 0)) {
-      return res.status(404).json({ message: 'Carga no encontrada' });
-    }
-    
-    await deleteLoad(id_carga);
-    return res.status(200).json({ message: 'Carga eliminada exitosamente' });
-  } catch (error) {
-    console.error('Error deleting carga:', error);
-    
-    // Manejar errores de integridad referencial
-    if (error.code === 'ER_ROW_IS_REFERENCED_2') {
-      return res.status(400).json({ 
-        message: 'No se puede eliminar la carga porque está siendo referenciada por otros registros' 
-      });
-    }
-    
-    return res.status(500).json({ 
-      message: 'Error deleting carga',
-      error: error.message 
-    });
-  }
-});
-
-// Obtener cargas por conductor
-route.get('/api/loads/driver/:id_conductor', authenticateJWT, async (req, res) => {
-  const { id_conductor } = req.params;
-  try {
-    const cargas = await getLoadsByDriver(id_conductor);
-    return res.status(200).json(cargas);
-  } catch (error) {
-    console.error('Error fetching cargas by driver:', error);
-    return res.status(500).json({ message: 'Error fetching cargas by driver' });
-  }
-});
-
-//obtener ventas
-
+// Obtener todas las ventas
 route.get('/api/sales', authenticateJWT, async (req, res) => {
   try {
     const values = await getSales();
     return res.status(200).json(values);
   } catch (error) {
+    console.error('Error fetching sales:', error);
     return res.status(500).json({ message: 'Error fetching sales' });
   }
 });
 
-//obtener Venta por ID 
-
-route.get('api/sales/:id_venta',  async (req,res) => {
+// Obtener venta por ID (CORREGIDO: agregada barra diagonal y middleware)
+route.get('/api/sales/:id_venta', authenticateJWT, async (req, res) => {
   const { id_venta } = req.params;
   try {
     const sale = await getSalesById(id_venta);
@@ -722,51 +468,57 @@ route.get('api/sales/:id_venta',  async (req,res) => {
     }
     return res.status(200).json(sale);
   } catch (error) {
+    console.error('Error fetching sale:', error);
     return res.status(500).json({ message: 'Error fetching sale' });
   }
 });
 
+// Crear venta (CORREGIDO: agregado middleware)
+route.post('/api/sales', authenticateJWT, async (req, res) => {
+  const { fecha, valor, descripcion, carga } = req.body;
+  
+  // Validación básica
+  if (!fecha || !valor || !descripcion || !carga) {
+    return res.status(400).json({ 
+      message: 'Todos los campos son obligatorios: fecha, valor, descripcion, carga' 
+    });
+  }
 
-// crear venta
-<<<<<<< HEAD
-
-
-route.post('/api/sales', async (req,res) => {
-=======
-route.post('/api/sales', authenticateJWT, async (req,res) => {
->>>>>>> ebbda78c986f11a8c9573ce24f3f1c2e99989f78
-  const {fecha, valor, descripcion, carga} = req.body;
   try {
     const sale = await createSale(fecha, valor, descripcion, carga);
     return res.status(201).json({ sale });
   } catch (error) {
+    console.error('Error creating sale:', error);
     return res.status(500).json({ message: 'Error creating sale' });
   }
 });
 
-
-//actualizar venta
-<<<<<<< HEAD
-
-route.put('/api/sales/:id_venta',  async (req,res) => {
-=======
-route.put('/api/sales/:id_venta', authenticateJWT, async (req,res) => {
->>>>>>> ebbda78c986f11a8c9573ce24f3f1c2e99989f78
+// Actualizar venta (CORREGIDO: agregado middleware)
+route.put('/api/sales/:id_venta', authenticateJWT, async (req, res) => {
   const { id_venta } = req.params;
-  const {fecha, valor, descripcion, carga} = req.body;
+  const { fecha, valor, descripcion, carga } = req.body;
+  
+  // Validación básica
+  if (!fecha || !valor || !descripcion || !carga) {
+    return res.status(400).json({ 
+      message: 'Todos los campos son obligatorios: fecha, valor, descripcion, carga' 
+    });
+  }
+
   try {
     const sale = await updateSale(id_venta, fecha, valor, descripcion, carga);
     if (!sale) {
       return res.status(404).json({ message: 'Sale not found' });
     }
-    return res.status(200).json({ message: 'Sale updated successfully' });
+    return res.status(200).json({ message: 'Sale updated successfully', sale });
   } catch (error) {
+    console.error('Error updating sale:', error);
     return res.status(500).json({ message: 'Error updating sale' });
   }
 });
 
-// eliminar venta
-route.delete('/api/sales/:id_venta', async (req,res) => {
+// Eliminar venta (CORREGIDO: agregado middleware)
+route.delete('/api/sales/:id_venta', authenticateJWT, async (req, res) => {
   const { id_venta } = req.params;
   try {
     const sale = await deleteSale(id_venta);
@@ -775,106 +527,269 @@ route.delete('/api/sales/:id_venta', async (req,res) => {
     }
     return res.status(200).json({ message: 'Sale deleted successfully' });
   } catch (error) {
+    console.error('Error deleting sale:', error);
     return res.status(500).json({ message: 'Error deleting sale' });
   }
 });
 
-// Obtener cargas
+// ==================== MIDDLEWARE DE DEBUG ====================
+// Agregar este middleware antes de las rutas para debug
+route.use((req, res, next) => {
+  console.log(`📍 ${req.method} ${req.path}`);
+  console.log('📦 Body:', req.body);
+  console.log('🔑 Headers:', req.headers.authorization ? 'Token presente' : 'Sin token');
+  next();
+});
+
+// ==================== RUTAS DE VENTAS ====================
+
+// 1. Obtener todas las ventas
+route.get('/api/sales', authenticateJWT, async (req, res) => {
+  try {
+    console.log('🔍 Obteniendo todas las ventas...');
+    const values = await getSales();
+    console.log('✅ Ventas obtenidas:', values.length, 'registros');
+    return res.status(200).json(values);
+  } catch (error) {
+    console.error('❌ Error fetching sales:', error);
+    return res.status(500).json({ 
+      message: 'Error fetching sales',
+      error: error.message 
+    });
+  }
+});
+
+// 2. Obtener venta por ID
+route.get('/api/sales/:id_venta', authenticateJWT, async (req, res) => {
+  const { id_venta } = req.params;
+  try {
+    console.log(`🔍 Obteniendo venta con ID: ${id_venta}`);
+    const sale = await getSalesById(id_venta);
+    
+    if (!sale || sale.length === 0) {
+      console.log('❌ Venta no encontrada');
+      return res.status(404).json({ message: 'Sale not found' });
+    }
+    
+    console.log('✅ Venta encontrada:', sale);
+    return res.status(200).json(sale[0]); // Devolver solo el primer elemento si es un array
+  } catch (error) {
+    console.error('❌ Error fetching sale:', error);
+    return res.status(500).json({ 
+      message: 'Error fetching sale',
+      error: error.message 
+    });
+  }
+});
+
+// 3. Crear nueva venta
+route.post('/api/sales', authenticateJWT, async (req, res) => {
+  const { fecha, valor, descripcion, carga } = req.body;
+  
+  console.log('📝 Creando nueva venta:', { fecha, valor, descripcion, carga });
+  
+  // Validación básica
+  if (!fecha || !valor || !descripcion || !carga) {
+    console.log('❌ Datos incompletos para crear venta');
+    return res.status(400).json({
+      message: 'Todos los campos son obligatorios: fecha, valor, descripcion, carga'
+    });
+  }
+
+  try {
+    const result = await createSale(fecha, valor, descripcion, carga);
+    console.log('✅ Venta creada exitosamente:', result);
+    
+    return res.status(201).json({ 
+      message: 'Venta creada exitosamente',
+      sale: result 
+    });
+  } catch (error) {
+    console.error('❌ Error creating sale:', error);
+    return res.status(500).json({ 
+      message: 'Error creating sale',
+      error: error.message 
+    });
+  }
+});
+
+// 4. Actualizar venta
+route.put('/api/sales/:id_venta', authenticateJWT, async (req, res) => {
+  const { id_venta } = req.params;
+  const { fecha, valor, descripcion, carga } = req.body;
+  
+  console.log(`📝 Actualizando venta ID: ${id_venta}`, { fecha, valor, descripcion, carga });
+  
+  // Validación básica
+  if (!fecha || !valor || !descripcion || !carga) {
+    console.log('❌ Datos incompletos para actualizar venta');
+    return res.status(400).json({
+      message: 'Todos los campos son obligatorios: fecha, valor, descripcion, carga'
+    });
+  }
+
+  try {
+    // Verificar si la venta existe primero
+    const existingSale = await getSalesById(id_venta);
+    if (!existingSale || existingSale.length === 0) {
+      console.log('❌ Venta no encontrada para actualizar');
+      return res.status(404).json({ message: 'Sale not found' });
+    }
+
+    const result = await updateSale(id_venta, fecha, valor, descripcion, carga);
+    console.log('✅ Venta actualizada exitosamente:', result);
+    
+    return res.status(200).json({ 
+      message: 'Sale updated successfully', 
+      sale: result 
+    });
+  } catch (error) {
+    console.error('❌ Error updating sale:', error);
+    return res.status(500).json({ 
+      message: 'Error updating sale',
+      error: error.message 
+    });
+  }
+});
+
+// 5. Eliminar venta
+route.delete('/api/sales/:id_venta', authenticateJWT, async (req, res) => {
+  const { id_venta } = req.params;
+  
+  console.log(`🗑️ Eliminando venta ID: ${id_venta}`);
+  
+  try {
+    // Verificar si la venta existe primero
+    const existingSale = await getSalesById(id_venta);
+    if (!existingSale || existingSale.length === 0) {
+      console.log('❌ Venta no encontrada para eliminar');
+      return res.status(404).json({ message: 'Sale not found' });
+    }
+
+    const result = await deleteSale(id_venta);
+    console.log('✅ Venta eliminada exitosamente:', result);
+    
+    return res.status(200).json({ 
+      message: 'Sale deleted successfully' 
+    });
+  } catch (error) {
+    console.error('❌ Error deleting sale:', error);
+    return res.status(500).json({ 
+      message: 'Error deleting sale',
+      error: error.message 
+    });
+  }
+});
+
+// ==================== RUTAS PARA CARGAS ====================
+
+// 6. Obtener todas las cargas para el dropdown
 route.get('/api/loads', authenticateJWT, async (req, res) => {
   try {
-    const cargas = await getLoads();
-    // Asegúrate de devolver un array
-    res.status(200).json(Array.isArray(cargas) ? cargas : []);
+    console.log('🔍 Obteniendo todas las cargas...');
+    const loads = await getLoads(); // <- AHORA USA LA FUNCIÓN REAL
+    console.log('✅ Cargas obtenidas:', loads.length, 'registros');
+    return res.status(200).json(loads);
   } catch (error) {
-    console.error('Error fetching cargas:', error);
-    res.status(500).json({ message: 'Error fetching cargas' });
+    console.error('❌ Error fetching loads:', error);
+    return res.status(500).json({ 
+      message: 'Error fetching loads',
+      error: error.message 
+    });
   }
 });
 
-//obtener rutas
-
-route.get('/api/routes', authenticateJWT, async (req,res) => {
+// 7. Obtener carga por ID
+route.get('/api/loads/:id_carga', authenticateJWT, async (req, res) => {
+  const { id_carga } = req.params;
   try {
-    const values = await getRoutes();
-    return res.status(200).json(values);
-  } catch (error) {
-    return res.status(500).json({ message: 'Error fetching routes' });
-  }
-});
-
-//obtener ruta por ID
-
-route.get('/api/routes/:id_ruta', async (req,res) => {
-  const { id_ruta } = req.params;
-  try {
-    const route = await getRoutesById(id_ruta);
-    if (!route) {
-      return res.status(404).json({ message: 'Route not found' });
+    console.log(`🔍 Obteniendo carga con ID: ${id_carga}`);
+    const load = await getLoadById(id_carga);
+    
+    if (!load || load.length === 0) {
+      console.log('❌ Carga no encontrada');
+      return res.status(404).json({ message: 'Load not found' });
     }
-    return res.status(200).json(route);
+    
+    console.log('✅ Carga encontrada:', load);
+    return res.status(200).json(load[0]);
   } catch (error) {
-    return res.status(500).json({ message: 'Error fetching route' });
+    console.error('❌ Error fetching load:', error);
+    return res.status(500).json({ 
+      message: 'Error fetching load',
+      error: error.message 
+    });
   }
 });
 
-// crear ruta
-
-route.post('/api/routes', async (req,res) => {
-  const {origen, destino, distancia, carga} = req.body;
-  try {
-    const route = await createRoute(origen, destino, distancia, carga);
-    return res.status(201).json({ route });
-  } catch (error) {
-    return res.status(500).json({ message: 'Error creating route' });
-  }
-});
-
-// actualizar ruta
-
-route.put('/api/routes/:id_ruta', async (req,res) => {
-  const {id_ruta, origen, destino, distancia, carga} = req.body;
-  try {
-    const route = await updateRoute(id_ruta, origen, destino, distancia, carga);
-    if (!route) {
-      return res.status(404).json({ message: 'Route not found' });
-    }
-    return res.status(200).json({ message: 'Route updated successfully' });
-  } catch (error) {
-    return res.status(500).json({ message: 'Error updating route' });
-  }
-});
-
-// eliminar ruta
-
-route.delete('/api/routes/:id_ruta',  async (req,res) => {
-  const { id_ruta } = req.params;
-  try {
-    const route = await deleteRoute(id_ruta);
-    if (!route) {
-      return res.status(404).json({ message: 'Route not found' });
-    }
-    return res.status(200).json({ message: 'Route deleted successfully' });
-  } catch (error) {
-    return res.status(500).json({ message: 'Error deleting route' });
-  }
+// ==================== MIDDLEWARE DE ERROR (ÚLTIMO) ====================
+route.use((error, req, res, next) => {
+  console.error('💥 Error no manejado:', error);
+  res.status(500).json({
+    message: 'Internal server error',
+    error: error.message
+  });
 });
 
 
-<<<<<<< HEAD
-route.get('/api/loads/:id_conductor', async (req,res) => {
+// 7. OBTENER CARGAS POR CONDUCTOR
+route.get('/api/loads/:id_conductor', authenticateJWT, async (req, res) => {
   const { id_conductor } = req.params;
+  
+  // Validar que id_conductor sea un número
+  if (!id_conductor || isNaN(parseInt(id_conductor))) {
+    return res.status(400).json({ message: 'ID de conductor inválido' });
+  }
+  
   try {
-    const values = await getLoadsByDriver(id_conductor);
+    console.log(`🔍 Obteniendo cargas para conductor: ${id_conductor}`);
+    const values = await getLoadsByDriver(parseInt(id_conductor));
+    console.log('✅ Cargas obtenidas:', values);
+    
+    if (!Array.isArray(values)) {
+      console.warn('⚠️ getLoadsByDriver() no devolvió un array:', values);
+      return res.status(200).json([]);
+    }
+    
     return res.status(200).json(values);
   } catch (error) {
-    return res.status(500).json({ message: 'Error fetching loads' });
+    console.error('❌ Error fetching loads:', error);
+    return res.status(500).json({ 
+      message: 'Error fetching loads',
+      error: error.message 
+    });
+  }
+});
+
+
+// Obtener todas las cargas (para el dropdown del formulario)
+route.get('/api/routes', authenticateJWT, async (req, res) => {
+  try {
+    console.log('🔍 Obteniendo rutas...');
+    const values = await getRoutes();
+    
+    // 🔍 LOGS DE DEBUG ADICIONALES
+    console.log('✅ Tipo de values:', typeof values);
+    console.log('✅ Es array?:', Array.isArray(values));
+    console.log('✅ Longitud:', values?.length);
+    console.log('✅ Primer elemento:', values?.[0]);
+    
+    if (!Array.isArray(values)) {
+      console.warn('⚠️ getRoutes() no devolvió un array:', values);
+      return res.status(200).json([]);
+    }
+    
+    return res.status(200).json(values);
+  } catch (error) {
+    console.error('❌ Error fetching routes:', error);
+    return res.status(500).json({ 
+      message: 'Error fetching routes',
+      error: error.message 
+    });
   }
 });
 
 //obtener reportes
-=======
-//obtener reporte
->>>>>>> ebbda78c986f11a8c9573ce24f3f1c2e99989f78
 
 route.get('/api/reports', async (req,res) => {
   try {
@@ -998,7 +913,7 @@ route.put('/api/loads/:id_carga', async (req,res) => {
 
 // eliminar carga
 
-route.delete('/apiloads/:id_carga', async (req,res) => {
+route.delete('/api/loads/:id_carga', async (req,res) => {
   const { id_carga } = req.params;
   try {
     const route = await deleteLoad(id_carga);
