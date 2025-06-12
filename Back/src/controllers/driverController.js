@@ -1,6 +1,8 @@
 const {db} = require('../database.js');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
+const dotenv = require('dotenv');
+dotenv.config();
 
 const sendPasswordEmail = async (correo_conductor, password) => {
   // Configura el transportador de Nodemailer

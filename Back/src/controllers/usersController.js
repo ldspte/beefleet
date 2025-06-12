@@ -26,20 +26,20 @@ const getUsersById = async(id_usuario) => {
   return result.length > 0 ? result[0] : null;
 }
 
-const createUser = async(nombre_usuario, apellido_usuario, correo_usuario) => {
+const createUser = async(nombre_usuario, apellido_usuario, email_usuario) => {
     const password = generatePassword();
     const hashedPassword = await bcrypt.hash(password, 10);
     const [result] = await db.query(
-      'INSERT INTO Usuarios (nombre_usuario, apellido_usuario, correo_usuario, contraseña) VALUES (?, ?, ?, ?)',
-      [nombre_usuario, apellido_usuario, correo_usuario, hashedPassword]
+      'INSERT INTO Usuarios (nombre_usuario, apellido_usuario, email_usuario) VALUES (?, ?, ?, ?)',
+      [nombre_usuario, apellido_usuario, email_usuario, hashedPassword]
     );
     return result.insertId;
 }
 
-const updateUser = async(id_usuario, nombre_usuario, apellido_usuario, correo_usuario) => {
+const updateUser = async(id_usuario, nombre_usuario, apellido_usuario, email_usuario) => {
     const [result] = await db.query(
-      'UPDATE Usuarios SET nombre_usuario = ?, apellido_usuario = ?, correo_usuario = ? WHERE id_usuario = ?',
-      [nombre_usuario, apellido_usuario, correo_usuario, id_usuario]
+      'UPDATE Usuarios SET nombre_usuario = ?, apellido_usuario = ?, email_usuario = ? WHERE id_usuario = ?',
+      [nombre_usuario, apellido_usuario, email_usuario, id_usuario]
     );
     return result.affectedRows > 0;
 }

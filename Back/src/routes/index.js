@@ -6,7 +6,6 @@ const SECRET_KEY = process.env.SECRET_KEY || 'lossimpsom';
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
-const crypto = require('crypto'); 
 const { getDrivers, getDriversById, createDriver, updateDriver, deleteDriver } = require('../controllers/driverController');
 const {getClients, getClientsById, createClient, updateClient, deleteClient} = require('../controllers/clientController');
 const {getUsers, getUsersById, createUser, updateUser} = require('../controllers/usersController');
@@ -110,45 +109,43 @@ route.get('/api/drivers', authenticateJWT, async (req,res) => {
 });
 
 // crear un conductor
-
-route.post('/api/drivers',  async (req,res) => {
-  const {tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion,  tipo_licencia, fecha_vencimiento, experiencia, estado} = req.body;
+route.post('/api/drivers', authenticateJWT, async (req,res) => {
+  const {tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion } = req.body;
   try {
-    const driver = await createDriver(tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion,  tipo_licencia, fecha_vencimiento, experiencia, estado);
+    const driver = await createDriver(tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion);
     return res.status(201).json({ driver });
   } catch (error) {
-    console.error('Error creating driver:', error); // Log del error
-    return res.status(500).json({ message: 'Error creating driver', error: error.message });
+    return res.status(500).json({ message: 'Error creating driver' });
   }
 });
 
 
 //contraseña por defecto 
-// const transporter = nodemailer.createTransport({
-//   service: 'gmail', 
-//   auth: {
-//       user: 'ldspte9807@gmail.com',
-//       pass: 'lossimpsom123' 
-//   }
-// });
+const transporter = nodemailer.createTransport({
+  service: 'gmail', 
+  auth: {
+      user: 'ldspte9807@gmail.com',
+      pass: 'lossimpsom123' 
+  }
+});
 
-// route.post('/api/send-password', (req, res) => {
-//   const { correo_conductor, contraseña } = req.body;
+route.post('/api/send-password', (req, res) => {
+  const { correo_conductor, contraseña } = req.body;
 
-//   const mailOptions = {
-//       from: 'ldspte9807@gmail.com',
-//       to: correo_conductor,
-//       subject: 'Bienvenido a Beeflet',
-//       text: `Se ha creado tu cuenta en Beefleet y Tu contraseña es: ${contraseña}`
-//   };
+  const mailOptions = {
+      from: 'ldspte9807@gmail.com',
+      to: correo_conductor,
+      subject: 'Bienvenido a Beeflet',
+      text: `Se ha creado tu cuenta en Beefleet y Tu contraseña es: ${contraseña}`
+  };
 
-//   transporter.sendMail(mailOptions, (error, info) => {
-//       if (error) {
-//           return res.status(500).send(error.toString());
-//       }
-//       res.status(200).send('Correo enviado: ' + info.response);
-//   });
-// });
+  transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+          return res.status(500).send(error.toString());
+      }
+      res.status(200).send('Correo enviado: ' + info.response);
+  });
+});
 
 // Buscar por id conductor
 
@@ -221,194 +218,24 @@ route.post('/api/loginadmin', [
   }
 });
 
-// obtener Usuarios
-route.get('/api/users', authenticateJWT, async (req, res) => {
-  console.log('=== GET /api/users route called ===');
-  console.log('User from JWT:', req.user);
-  
-  try {
-    console.log('Calling getUsers controller...');
-    const users = await getUsers();
-    
-    console.log('Controller returned:', users);
-    console.log('Users type:', typeof users);
-    console.log('Is array:', Array.isArray(users));
-    console.log('Users length:', users?.length);
-    
-    // Ensure we always return an array
-    const usersArray = Array.isArray(users) ? users : [];
-    
-    console.log('Sending response with', usersArray.length, 'users');
-    
-    res.status(200).json(usersArray);
-  } catch (error) {
-    console.error('=== ERROR in GET /api/users ===');
-    console.error('Error message:', error.message);
-    console.error('Error stack:', error.stack);
-    
-    res.status(500).json({ 
-      message: 'Error fetching users',
-      error: error.message 
-    });
-  }
-});
+//obtener Usuario por id
 
-// obtener usuario por ID
-route.get('/api/users/:id_usuario', authenticateJWT, async (req, res) => {
+route.get('/api/admin/:id_usuario', authenticateJWT, async (req,res) => {
   const { id_usuario } = req.params;
-  console.log('=== GET /api/users/:id route called with id:', id_usuario);
-  
   try {
-    const user = await getUsersById(id_usuario);
-    console.log('Found user:', user);
-    
+    const user = await getDriversById(id_usuario);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'Driver not found' });
     }
-    
-    // Remover la contraseña de la respuesta por seguridad
-    const { contraseña, ...userWithoutPassword } = user;
-    
-    res.status(200).json(userWithoutPassword);
+    return res.status(200).json(user);
   } catch (error) {
-    console.error('Error fetching user by ID:', error);
-    res.status(500).json({ message: 'Error fetching user' });
+    return res.status(500).json({ message: 'Error fetching driver' });
   }
-});
-
-// crear usuario
-route.post('/api/users', authenticateJWT, async (req, res) => {
-  console.log('=== POST /api/users route called ===');
-  console.log('Request body:', req.body);
-  
-  const { nombre_usuario, apellido_usuario, correo_usuario_usuario } = req.body;
-  
-  if (!nombre_usuario || !apellido_usuario || !correo_usuario) {
-    return res.status(400).json({ message: 'All fields are required (nombre_usuario, apellido_usuario, correo_usuario)' });
-  }
-
-  // Validar formato de correo
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(correo_usuario)) {
-    return res.status(400).json({ message: 'Invalid email format' });
-  }
-  
-  try {
-    const userId = await createUser(nombre_usuario, apellido_usuario, correo_usuario);
-    console.log('User created successfully with ID:', userId);
-    
-    res.status(201).json({ 
-      message: 'User created successfully',
-      user_id: userId,
-      note: 'A temporary password has been generated for this user'
-    });
-  } catch (error) {
-    console.error('Error creating user:', error);
-    
-    // Manejar error de email duplicado si existe constraint en la BD
-    if (error.code === 'ER_DUP_ENTRY') {
-      return res.status(409).json({ message: 'Email already exists' });
-    }
-    
-    res.status(500).json({ message: 'Error creating user' });
-  }
-});
-
-// actualizar usuario
-route.put('/api/users/:id_usuario', authenticateJWT, async (req, res) => {
-  const { id_usuario } = req.params;
-  const { nombre_usuario, apellido_usuario, correo_usuario } = req.body;
-  
-  console.log('=== PUT /api/users/:id route called ===');
-  console.log('ID:', id_usuario);
-  console.log('Body:', req.body);
-  
-  if (!nombre_usuario || !apellido_usuario || !correo_usuario) {
-    return res.status(400).json({ message: 'All fields are required (nombre_usuario, apellido_usuario, correo_usuario)' });
-  }
-
-  // Validar formato de correo
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(correo_usuario)) {
-    return res.status(400).json({ message: 'Invalid email format' });
-  }
-
-  try {
-    const existingUser = await getUsersById(id_usuario);
-    if (!existingUser) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    const updated = await updateUser(id_usuario, nombre_usuario, apellido_usuario, correo_usuario);
-
-    if (updated) {
-      res.status(200).json({ message: 'User updated successfully' });
-    } else {
-      res.status(400).json({ message: 'No changes were made' });
-    }
-  } catch (error) {
-    console.error('Error updating user:', error);
-    
-    // Manejar error de email duplicado si existe constraint en la BD
-    if (error.code === 'ER_DUP_ENTRY') {
-      return res.status(409).json({ message: 'Email already exists' });
-    }
-    
-    res.status(500).json({ message: 'Error updating user' });
-  }
-});
-
-// Ruta adicional para cambiar contraseña
-route.patch('/api/users/:id_usuario/password', authenticateJWT, async (req, res) => {
-  const { id_usuario } = req.params;
-  const { current_password, new_password } = req.body;
-  
-  console.log('=== PATCH /api/users/:id/password route called ===');
-  console.log('ID:', id_usuario);
-  
-  if (!current_password || !new_password) {
-    return res.status(400).json({ message: 'Current password and new password are required' });
-  }
-
-  if (new_password.length < 6) {
-    return res.status(400).json({ message: 'New password must be at least 6 characters long' });
-  }
-  
-  try {
-    const existingUser = await getUsersById(id_usuario);
-    if (!existingUser) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-    
-    // Verificar contraseña actual
-    const isCurrentPasswordValid = await bcrypt.compare(current_password, existingUser.contraseña);
-    if (!isCurrentPasswordValid) {
-      return res.status(401).json({ message: 'Current password is incorrect' });
-    }
-    
-    // Hash nueva contraseña
-    const hashedNewPassword = await bcrypt.hash(new_password, 10);
-    
-    // Actualizar contraseña en base de datos
-    const [result] = await db.query(
-      'UPDATE Usuarios SET contraseña = ? WHERE id_usuario = ?',
-      [hashedNewPassword, id_usuario]
-    );
-    
-    if (result.affectedRows > 0) {
-      res.status(200).json({ message: 'Password updated successfully' });
-    } else {
-      res.status(400).json({ message: 'Failed to update password' });
-    }
-  } catch (error) {
-    console.error('Error updating password:', error);
-    res.status(500).json({ message: 'Error updating password' });
-  }
-});
+})
 
 // Obtener todos los vehiculos
 
-route.get('/api/vehicles',  async (req,res) => {
+route.get('/api/vehicles', authenticateJWT, async (req,res) => {
   try {
     const values = await getVehicles();
     return res.status(200).json(values);
@@ -418,11 +245,10 @@ route.get('/api/vehicles',  async (req,res) => {
 })
 
 // Obtener vehiculo por ID 
-
-route.get('/api/vehicles/:id_vehiculo', async(req,res)=>{
+route.get('/api/vehicles/:id', authenticateJWT, async (req, res) => {
   try {
-    const { id_vehiculo } = req.params;
-    const vehiculo = await getVehiclesById(id_vehiculo);
+    const { id } = req.params;
+    const vehiculo = await getVehiclesById(id);
     if (!vehiculo) {
       return res.status(404).json({ message: 'Vehicle not found' });
     }
@@ -434,41 +260,23 @@ route.get('/api/vehicles/:id_vehiculo', async(req,res)=>{
 })
 
 // Crear vehiculo
-route.post('/api/vehicles', authenticateJWT,async (req, res) => {
-  console.log('Body recibido:', req.body);
-  
+route.post('/api/vehicles', authenticateJWT, async (req, res) => {
+  const { placa, marca, modelo, año, color, tipo, capacidad, kilometraje, estado_vehiculo, conductor } = req.body;
   try {
-    if (!req.body.placa || !req.body.modelo || !req.body.marca) {
-      return res.status(400).json({ 
-        message: 'Faltan campos requeridos',
-        required: ['placa', 'modelo', 'marca']
-      }); 
-    }
-
-    const vehicle = await createVehicle(req.body);
-    return res.status(201).json({
-      success: true,
-      vehicle: vehicle
-    });
+    const vehicle = await createVehicle(placa, marca, modelo, año, color, tipo, capacidad, kilometraje, estado_vehiculo, conductor);
+    return res.status(201).json({ vehicle });
   } catch (error) {
-    console.error('Error completo:', error);
-    return res.status(500).json({ 
-      success: false,
-      message: error.message || 'Error al crear vehículo',
-      error: error.toString()
-    });
+    console.error('Error creating vehicle:', error);
+    return res.status(500).json({ message: 'Error creating vehicle' });
   }
 });
-// Actualizar vehiculo
 
-route.put('/api/vehicles/:id_vehiculo', authenticateJWT, async (req,res) => {
+// Actualizar vehiculo
+route.put('/api/vehicles/:id_vehiculo', authenticateJWT, async (req, res) => {
   const { id_vehiculo } = req.params;
-   const { 
-  placa, modelo, peso, matricula, seguro, estado_vehiculo, 
-  conductor, marca, color, capacidad, tipo, kilometraje 
-  } = req.body;
+  const { placa, marca, modelo, año, color, tipo, capacidad, kilometraje, estado_vehiculo, conductor } = req.body;
   try {
-    const vehicle = await updateVehicle(id_vehiculo, req.body);
+    const vehicle = await updateVehicle(id_vehiculo, placa, marca, modelo, año, color, tipo, capacidad, kilometraje, estado_vehiculo, conductor);
     if (!vehicle) {
       return res.status(404).json({ message: 'Vehicle not found' });
     }
@@ -479,7 +287,8 @@ route.put('/api/vehicles/:id_vehiculo', authenticateJWT, async (req,res) => {
   }
 });
 
-route.delete('/api/vehicles/:id_vehiculo', async (req,res) => {
+// eliminar vehiculo
+route.delete('/api/vehicles/:id_vehiculo', authenticateJWT, async (req, res) => {
   const { id_vehiculo } = req.params;
   try {
     const vehicle = await deleteVehicle(id_vehiculo);
@@ -598,7 +407,7 @@ route.put('/api/clients/:id_cliente', authenticateJWT, async (req, res) => {
 });
 
 // eliminar cliente
-route.delete('/api/clients/:id_cliente', async (req, res) => {
+route.delete('/api/clients/:id_cliente', authenticateJWT, async (req, res) => {
   const { id_cliente } = req.params;
   console.log('=== DELETE /api/clients/:id route called with id:', id_cliente);
   
@@ -616,20 +425,274 @@ route.delete('/api/clients/:id_cliente', async (req, res) => {
   }
 });
 
+// Obtener todas las cargas
+route.get('/api/loads', authenticateJWT, async (req, res) => {
+  try {
+    const cargas = await getLoads();
+    
+    // Asegurar que siempre se devuelva un array
+    const cargasArray = Array.isArray(cargas) ? cargas : [];
+    
+    return res.status(200).json(cargasArray);
+  } catch (error) {
+    console.error('Error fetching cargas:', error);
+    return res.status(500).json({ 
+      message: 'Error fetching cargas',
+      error: error.message 
+    });
+  }
+});
 
-// Obtener todas las ventas
+// Obtener carga por ID
+route.get('/api/loads/:id_carga', authenticateJWT, async (req, res) => {
+  const { id_carga } = req.params;
+  
+  // Validar que el ID sea un número
+  if (!id_carga || isNaN(id_carga)) {
+    return res.status(400).json({ message: 'ID de carga inválido' });
+  }
+  
+  try {
+    const carga = await getLoadsById(id_carga);
+    
+    if (!carga || (Array.isArray(carga) && carga.length === 0)) {
+      return res.status(404).json({ message: 'Carga no encontrada' });
+    }
+    
+    // Si es un array, devolver el primer elemento, si no, devolver el objeto
+    const cargaData = Array.isArray(carga) ? carga[0] : carga;
+    
+    return res.status(200).json(cargaData);
+  } catch (error) {
+    console.error('Error fetching carga:', error);
+    return res.status(500).json({ 
+      message: 'Error fetching carga',
+      error: error.message 
+    });
+  }
+});
+
+// Crear nueva carga
+route.post('/api/loads', authenticateJWT, async (req, res) => {
+  const { 
+    descripcion, 
+    peso, 
+    foto_carga, 
+    fecha_inicio, 
+    fecha_fin, 
+    vehiculo, 
+    cliente, 
+    conductor 
+  } = req.body;
+  
+  // Validación de campos requeridos
+  if (!descripcion || !peso || !fecha_inicio || !fecha_fin || !cliente) {
+    return res.status(400).json({ 
+      message: 'Faltan campos requeridos: descripcion, peso, fecha_inicio, fecha_fin, cliente' 
+    });
+  }
+  
+  // Validar fechas
+  const fechaInicio = new Date(fecha_inicio);
+  const fechaFin = new Date(fecha_fin);
+  
+  if (fechaInicio >= fechaFin) {
+    return res.status(400).json({ 
+      message: 'La fecha de inicio debe ser anterior a la fecha de fin' 
+    });
+  }
+  
+  try {
+    // Convertir valores vacíos a null
+    const cargaData = {
+      descripcion: descripcion.trim(),
+      peso: peso.trim(),
+      foto_carga: foto_carga ? foto_carga.trim() : null,
+      fecha_inicio,
+      fecha_fin,
+      vehiculo: vehiculo ? parseInt(vehiculo) : null,
+      cliente: parseInt(cliente),
+      conductor: conductor ? parseInt(conductor) : null
+    };
+    
+    const result = await createLoad(
+      cargaData.descripcion,
+      cargaData.peso,
+      cargaData.foto_carga,
+      cargaData.fecha_inicio,
+      cargaData.fecha_fin,
+      cargaData.vehiculo,
+      cargaData.cliente,
+      cargaData.conductor
+    );
+    
+    return res.status(201).json({
+      message: 'Carga creada exitosamente',
+      id_carga: result.insertId || result.id
+    });
+  } catch (error) {
+    console.error('Error creating carga:', error);
+    
+    // Manejar errores específicos de base de datos
+    if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+      return res.status(400).json({ 
+        message: 'Cliente, vehículo o conductor no válido' 
+      });
+    }
+    
+    return res.status(500).json({ 
+      message: 'Error creating carga',
+      error: error.message 
+    });
+  }
+});
+
+// Actualizar carga
+route.put('/api/loads/:id_carga', authenticateJWT, async (req, res) => {
+  const { id_carga } = req.params;
+  const { 
+    descripcion, 
+    peso, 
+    foto_carga, 
+    fecha_inicio, 
+    fecha_fin, 
+    vehiculo, 
+    cliente, 
+    conductor 
+  } = req.body;
+  
+  // Validar que el ID sea un número
+  if (!id_carga || isNaN(id_carga)) {
+    return res.status(400).json({ message: 'ID de carga inválido' });
+  }
+  
+  // Validación de campos requeridos
+  if (!descripcion || !peso || !fecha_inicio || !fecha_fin || !cliente) {
+    return res.status(400).json({ 
+      message: 'Faltan campos requeridos: descripcion, peso, fecha_inicio, fecha_fin, cliente' 
+    });
+  }
+  
+  // Validar fechas
+  const fechaInicio = new Date(fecha_inicio);
+  const fechaFin = new Date(fecha_fin);
+  
+  if (fechaInicio >= fechaFin) {
+    return res.status(400).json({ 
+      message: 'La fecha de inicio debe ser anterior a la fecha de fin' 
+    });
+  }
+  
+  try {
+    // Verificar si la carga existe
+    const existingCarga = await getLoadsById(id_carga);
+    if (!existingCarga || (Array.isArray(existingCarga) && existingCarga.length === 0)) {
+      return res.status(404).json({ message: 'Carga no encontrada' });
+    }
+    
+    // Preparar datos para actualización
+    const cargaData = {
+      descripcion: descripcion.trim(),
+      peso: peso.trim(),
+      foto_carga: foto_carga ? foto_carga.trim() : null,
+      fecha_inicio,
+      fecha_fin,
+      vehiculo: vehiculo ? parseInt(vehiculo) : null,
+      cliente: parseInt(cliente),
+      conductor: conductor ? parseInt(conductor) : null
+    };
+    
+    await updateLoad(
+      id_carga,
+      cargaData.descripcion,
+      cargaData.peso,
+      cargaData.foto_carga,
+      cargaData.fecha_inicio,
+      cargaData.fecha_fin,
+      cargaData.vehiculo,
+      cargaData.cliente,
+      cargaData.conductor
+    );
+    
+    return res.status(200).json({ message: 'Carga actualizada exitosamente' });
+  } catch (error) {
+    console.error('Error updating carga:', error);
+    
+    // Manejar errores específicos de base de datos
+    if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+      return res.status(400).json({ 
+        message: 'Cliente, vehículo o conductor no válido' 
+      });
+    }
+    
+    return res.status(500).json({ 
+      message: 'Error updating carga',
+      error: error.message 
+    });
+  }
+});
+
+// Eliminar carga
+route.delete('/api/loads/:id_carga', authenticateJWT, async (req, res) => {
+  const { id_carga } = req.params;
+  
+  // Validar que el ID sea un número
+  if (!id_carga || isNaN(id_carga)) {
+    return res.status(400).json({ message: 'ID de carga inválido' });
+  }
+  
+  try {
+    // Verificar si la carga existe
+    const existingCarga = await getLoadsById(id_carga);
+    if (!existingCarga || (Array.isArray(existingCarga) && existingCarga.length === 0)) {
+      return res.status(404).json({ message: 'Carga no encontrada' });
+    }
+    
+    await deleteLoad(id_carga);
+    return res.status(200).json({ message: 'Carga eliminada exitosamente' });
+  } catch (error) {
+    console.error('Error deleting carga:', error);
+    
+    // Manejar errores de integridad referencial
+    if (error.code === 'ER_ROW_IS_REFERENCED_2') {
+      return res.status(400).json({ 
+        message: 'No se puede eliminar la carga porque está siendo referenciada por otros registros' 
+      });
+    }
+    
+    return res.status(500).json({ 
+      message: 'Error deleting carga',
+      error: error.message 
+    });
+  }
+});
+
+// Obtener cargas por conductor
+route.get('/api/loads/driver/:id_conductor', authenticateJWT, async (req, res) => {
+  const { id_conductor } = req.params;
+  try {
+    const cargas = await getLoadsByDriver(id_conductor);
+    return res.status(200).json(cargas);
+  } catch (error) {
+    console.error('Error fetching cargas by driver:', error);
+    return res.status(500).json({ message: 'Error fetching cargas by driver' });
+  }
+});
+
+//obtener ventas
+
 route.get('/api/sales', authenticateJWT, async (req, res) => {
   try {
     const values = await getSales();
     return res.status(200).json(values);
   } catch (error) {
-    console.error('Error fetching sales:', error);
     return res.status(500).json({ message: 'Error fetching sales' });
   }
 });
 
-// Obtener venta por ID (CORREGIDO: agregada barra diagonal y middleware)
-route.get('/api/sales/:id_venta', authenticateJWT, async (req, res) => {
+//obtener Venta por ID 
+
+route.get('api/sales/:id_venta', authenticateJWT, async (req,res) => {
   const { id_venta } = req.params;
   try {
     const sale = await getSalesById(id_venta);
@@ -638,57 +701,40 @@ route.get('/api/sales/:id_venta', authenticateJWT, async (req, res) => {
     }
     return res.status(200).json(sale);
   } catch (error) {
-    console.error('Error fetching sale:', error);
     return res.status(500).json({ message: 'Error fetching sale' });
   }
 });
 
-// Crear venta (CORREGIDO: agregado middleware)
-route.post('/api/sales', authenticateJWT, async (req, res) => {
-  const { fecha, valor, descripcion, carga } = req.body;
-  
-  // Validación básica
-  if (!fecha || !valor || !descripcion || !carga) {
-    return res.status(400).json({ 
-      message: 'Todos los campos son obligatorios: fecha, valor, descripcion, carga' 
-    });
-  }
 
+// crear venta
+route.post('/api/sales', authenticateJWT, async (req,res) => {
+  const {fecha, valor, descripcion, carga} = req.body;
   try {
     const sale = await createSale(fecha, valor, descripcion, carga);
     return res.status(201).json({ sale });
   } catch (error) {
-    console.error('Error creating sale:', error);
     return res.status(500).json({ message: 'Error creating sale' });
   }
 });
 
-// Actualizar venta (CORREGIDO: agregado middleware)
-route.put('/api/sales/:id_venta', authenticateJWT, async (req, res) => {
-  const { id_venta } = req.params;
-  const { fecha, valor, descripcion, carga } = req.body;
-  
-  // Validación básica
-  if (!fecha || !valor || !descripcion || !carga) {
-    return res.status(400).json({ 
-      message: 'Todos los campos son obligatorios: fecha, valor, descripcion, carga' 
-    });
-  }
 
+//actualizar venta
+route.put('/api/sales/:id_venta', authenticateJWT, async (req,res) => {
+  const { id_venta } = req.params;
+  const {fecha, valor, descripcion, carga} = req.body;
   try {
     const sale = await updateSale(id_venta, fecha, valor, descripcion, carga);
     if (!sale) {
       return res.status(404).json({ message: 'Sale not found' });
     }
-    return res.status(200).json({ message: 'Sale updated successfully', sale });
+    return res.status(200).json({ message: 'Sale updated successfully' });
   } catch (error) {
-    console.error('Error updating sale:', error);
     return res.status(500).json({ message: 'Error updating sale' });
   }
 });
 
-// Eliminar venta (CORREGIDO: agregado middleware)
-route.delete('/api/sales/:id_venta', authenticateJWT, async (req, res) => {
+// eliminar venta
+route.delete('/api/sales/:id_venta', authenticateJWT, async (req,res) => {
   const { id_venta } = req.params;
   try {
     const sale = await deleteSale(id_venta);
@@ -697,269 +743,92 @@ route.delete('/api/sales/:id_venta', authenticateJWT, async (req, res) => {
     }
     return res.status(200).json({ message: 'Sale deleted successfully' });
   } catch (error) {
-    console.error('Error deleting sale:', error);
     return res.status(500).json({ message: 'Error deleting sale' });
   }
 });
 
-// ==================== MIDDLEWARE DE DEBUG ====================
-// Agregar este middleware antes de las rutas para debug
-route.use((req, res, next) => {
-  console.log(`📍 ${req.method} ${req.path}`);
-  console.log('📦 Body:', req.body);
-  console.log('🔑 Headers:', req.headers.authorization ? 'Token presente' : 'Sin token');
-  next();
-});
-
-// ==================== RUTAS DE VENTAS ====================
-
-// 1. Obtener todas las ventas
-route.get('/api/sales', authenticateJWT, async (req, res) => {
-  try {
-    console.log('🔍 Obteniendo todas las ventas...');
-    const values = await getSales();
-    console.log('✅ Ventas obtenidas:', values.length, 'registros');
-    return res.status(200).json(values);
-  } catch (error) {
-    console.error('❌ Error fetching sales:', error);
-    return res.status(500).json({ 
-      message: 'Error fetching sales',
-      error: error.message 
-    });
-  }
-});
-
-// 2. Obtener venta por ID
-route.get('/api/sales/:id_venta', authenticateJWT, async (req, res) => {
-  const { id_venta } = req.params;
-  try {
-    console.log(`🔍 Obteniendo venta con ID: ${id_venta}`);
-    const sale = await getSalesById(id_venta);
-    
-    if (!sale || sale.length === 0) {
-      console.log('❌ Venta no encontrada');
-      return res.status(404).json({ message: 'Sale not found' });
-    }
-    
-    console.log('✅ Venta encontrada:', sale);
-    return res.status(200).json(sale[0]); // Devolver solo el primer elemento si es un array
-  } catch (error) {
-    console.error('❌ Error fetching sale:', error);
-    return res.status(500).json({ 
-      message: 'Error fetching sale',
-      error: error.message 
-    });
-  }
-});
-
-// 3. Crear nueva venta
-route.post('/api/sales', authenticateJWT, async (req, res) => {
-  const { fecha, valor, descripcion, carga } = req.body;
-  
-  console.log('📝 Creando nueva venta:', { fecha, valor, descripcion, carga });
-  
-  // Validación básica
-  if (!fecha || !valor || !descripcion || !carga) {
-    console.log('❌ Datos incompletos para crear venta');
-    return res.status(400).json({
-      message: 'Todos los campos son obligatorios: fecha, valor, descripcion, carga'
-    });
-  }
-
-  try {
-    const result = await createSale(fecha, valor, descripcion, carga);
-    console.log('✅ Venta creada exitosamente:', result);
-    
-    return res.status(201).json({ 
-      message: 'Venta creada exitosamente',
-      sale: result 
-    });
-  } catch (error) {
-    console.error('❌ Error creating sale:', error);
-    return res.status(500).json({ 
-      message: 'Error creating sale',
-      error: error.message 
-    });
-  }
-});
-
-// 4. Actualizar venta
-route.put('/api/sales/:id_venta', authenticateJWT, async (req, res) => {
-  const { id_venta } = req.params;
-  const { fecha, valor, descripcion, carga } = req.body;
-  
-  console.log(`📝 Actualizando venta ID: ${id_venta}`, { fecha, valor, descripcion, carga });
-  
-  // Validación básica
-  if (!fecha || !valor || !descripcion || !carga) {
-    console.log('❌ Datos incompletos para actualizar venta');
-    return res.status(400).json({
-      message: 'Todos los campos son obligatorios: fecha, valor, descripcion, carga'
-    });
-  }
-
-  try {
-    // Verificar si la venta existe primero
-    const existingSale = await getSalesById(id_venta);
-    if (!existingSale || existingSale.length === 0) {
-      console.log('❌ Venta no encontrada para actualizar');
-      return res.status(404).json({ message: 'Sale not found' });
-    }
-
-    const result = await updateSale(id_venta, fecha, valor, descripcion, carga);
-    console.log('✅ Venta actualizada exitosamente:', result);
-    
-    return res.status(200).json({ 
-      message: 'Sale updated successfully', 
-      sale: result 
-    });
-  } catch (error) {
-    console.error('❌ Error updating sale:', error);
-    return res.status(500).json({ 
-      message: 'Error updating sale',
-      error: error.message 
-    });
-  }
-});
-
-// 5. Eliminar venta
-route.delete('/api/sales/:id_venta', authenticateJWT, async (req, res) => {
-  const { id_venta } = req.params;
-  
-  console.log(`🗑️ Eliminando venta ID: ${id_venta}`);
-  
-  try {
-    // Verificar si la venta existe primero
-    const existingSale = await getSalesById(id_venta);
-    if (!existingSale || existingSale.length === 0) {
-      console.log('❌ Venta no encontrada para eliminar');
-      return res.status(404).json({ message: 'Sale not found' });
-    }
-
-    const result = await deleteSale(id_venta);
-    console.log('✅ Venta eliminada exitosamente:', result);
-    
-    return res.status(200).json({ 
-      message: 'Sale deleted successfully' 
-    });
-  } catch (error) {
-    console.error('❌ Error deleting sale:', error);
-    return res.status(500).json({ 
-      message: 'Error deleting sale',
-      error: error.message 
-    });
-  }
-});
-
-// ==================== RUTAS PARA CARGAS ====================
-
-// 6. Obtener todas las cargas para el dropdown
+// Obtener cargas
 route.get('/api/loads', authenticateJWT, async (req, res) => {
   try {
-    console.log('🔍 Obteniendo todas las cargas...');
-    const loads = await getLoads(); // <- AHORA USA LA FUNCIÓN REAL
-    console.log('✅ Cargas obtenidas:', loads.length, 'registros');
-    return res.status(200).json(loads);
+    const cargas = await getLoads();
+    // Asegúrate de devolver un array
+    res.status(200).json(Array.isArray(cargas) ? cargas : []);
   } catch (error) {
-    console.error('❌ Error fetching loads:', error);
-    return res.status(500).json({ 
-      message: 'Error fetching loads',
-      error: error.message 
-    });
+    console.error('Error fetching cargas:', error);
+    res.status(500).json({ message: 'Error fetching cargas' });
   }
 });
 
-// 7. Obtener carga por ID
-route.get('/api/loads/:id_carga', authenticateJWT, async (req, res) => {
-  const { id_carga } = req.params;
+//obtener rutas
+
+route.get('/api/routes', authenticateJWT, async (req,res) => {
   try {
-    console.log(`🔍 Obteniendo carga con ID: ${id_carga}`);
-    const load = await getLoadById(id_carga);
-    
-    if (!load || load.length === 0) {
-      console.log('❌ Carga no encontrada');
-      return res.status(404).json({ message: 'Load not found' });
-    }
-    
-    console.log('✅ Carga encontrada:', load);
-    return res.status(200).json(load[0]);
-  } catch (error) {
-    console.error('❌ Error fetching load:', error);
-    return res.status(500).json({ 
-      message: 'Error fetching load',
-      error: error.message 
-    });
-  }
-});
-
-// ==================== MIDDLEWARE DE ERROR (ÚLTIMO) ====================
-route.use((error, req, res, next) => {
-  console.error('💥 Error no manejado:', error);
-  res.status(500).json({
-    message: 'Internal server error',
-    error: error.message
-  });
-});
-
-
-// 7. OBTENER CARGAS POR CONDUCTOR
-route.get('/api/loads/:id_conductor', authenticateJWT, async (req, res) => {
-  const { id_conductor } = req.params;
-  
-  // Validar que id_conductor sea un número
-  if (!id_conductor || isNaN(parseInt(id_conductor))) {
-    return res.status(400).json({ message: 'ID de conductor inválido' });
-  }
-  
-  try {
-    console.log(`🔍 Obteniendo cargas para conductor: ${id_conductor}`);
-    const values = await getLoadsByDriver(parseInt(id_conductor));
-    console.log('✅ Cargas obtenidas:', values);
-    
-    if (!Array.isArray(values)) {
-      console.warn('⚠️ getLoadsByDriver() no devolvió un array:', values);
-      return res.status(200).json([]);
-    }
-    
-    return res.status(200).json(values);
-  } catch (error) {
-    console.error('❌ Error fetching loads:', error);
-    return res.status(500).json({ 
-      message: 'Error fetching loads',
-      error: error.message 
-    });
-  }
-});
-
-
-// Obtener todas las cargas (para el dropdown del formulario)
-route.get('/api/routes', authenticateJWT, async (req, res) => {
-  try {
-    console.log('🔍 Obteniendo rutas...');
     const values = await getRoutes();
-    
-    // 🔍 LOGS DE DEBUG ADICIONALES
-    console.log('✅ Tipo de values:', typeof values);
-    console.log('✅ Es array?:', Array.isArray(values));
-    console.log('✅ Longitud:', values?.length);
-    console.log('✅ Primer elemento:', values?.[0]);
-    
-    if (!Array.isArray(values)) {
-      console.warn('⚠️ getRoutes() no devolvió un array:', values);
-      return res.status(200).json([]);
-    }
-    
     return res.status(200).json(values);
   } catch (error) {
-    console.error('❌ Error fetching routes:', error);
-    return res.status(500).json({ 
-      message: 'Error fetching routes',
-      error: error.message 
-    });
+    return res.status(500).json({ message: 'Error fetching routes' });
   }
 });
 
-//obtener reportes
+//obtener ruta por ID
+
+route.get('/api/routes/:id_ruta', authenticateJWT, async (req,res) => {
+  const { id_ruta } = req.params;
+  try {
+    const route = await getRoutesById(id_ruta);
+    if (!route) {
+      return res.status(404).json({ message: 'Route not found' });
+    }
+    return res.status(200).json(route);
+  } catch (error) {
+    return res.status(500).json({ message: 'Error fetching route' });
+  }
+});
+
+// crear ruta
+
+route.post('/api/routes', async (req,res) => {
+  const {origen, destino, distancia, carga} = req.body;
+  try {
+    const route = await createRoute(origen, destino, distancia, carga);
+    return res.status(201).json({ route });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error creating route' });
+  }
+});
+
+// actualizar ruta
+
+route.put('/api/routes/:id_ruta', authenticateJWT, async (req,res) => {
+  const {id_ruta, origen, destino, distancia, carga} = req.body;
+  try {
+    const route = await updateRoute(id_ruta, origen, destino, distancia, carga);
+    if (!route) {
+      return res.status(404).json({ message: 'Route not found' });
+    }
+    return res.status(200).json({ message: 'Route updated successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error updating route' });
+  }
+});
+
+// eliminar ruta
+
+route.delete('/api/routes/:id_ruta',  async (req,res) => {
+  const { id_ruta } = req.params;
+  try {
+    const route = await deleteRoute(id_ruta);
+    if (!route) {
+      return res.status(404).json({ message: 'Route not found' });
+    }
+    return res.status(200).json({ message: 'Route deleted successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error deleting route' });
+  }
+});
+
+
+//obtener reporte
 
 route.get('/api/reports', async (req,res) => {
   try {
@@ -1028,268 +897,27 @@ route.delete('/api/reports/:id_estado', async (req,res) => {
 });
 
 
-//obtener cargas
-
-route.get('/api/loads', async (req,res) => {
-  try {
-    const values = await getLoads();
-    return res.status(200).json(values);
-  } catch (error) {
-    return res.status(500).json({ message: 'Error fetching Loads' });
-  }
-});
-
-//obtener carga por ID
-
-route.get('/api/loads/:id_carga', async (req,res) => {
-  const { id_carga } = req.params;
-  try {
-    const route = await getLoadsById(id_carga);
-    if (!route) {
-      return res.status(404).json({ message: 'Load not found' });
-    }
-    return res.status(200).json(route);
-  } catch (error) {
-    return res.status(500).json({ message: 'Error fetching Load' });
-  }
-});
-
-// crear reporte
-
-route.post('/api/loads', async (req,res) => {
-  const {descripcion, peso, foto_carga, fecha_inicio, fecha_fin, vehiculo, cliente, conductor} = req.body;
-  try {
-    const route = await createLoad(descripcion, peso, foto_carga, fecha_inicio, fecha_fin, vehiculo, cliente, conductor);
-    return res.status(201).json({ route });
-  } catch (error) {
-    return res.status(500).json({ message: 'Error creating Load' });
-  }
-});
-
-// actualizar carga
-
-route.put('/api/loads/:id_carga', async (req,res) => {
-  const {id_carga, descripcion, peso, foto_carga, fecha_inicio, fecha_fin, vehiculo, cliente, conductor} = req.body;
-  try {
-    const route = await updateLoad(id_carga, descripcion, peso, foto_carga, fecha_inicio, fecha_fin, vehiculo, cliente, conductor);
-    if (!route) {
-      return res.status(404).json({ message: 'Load not found' });
-    }
-    return res.status(200).json({ message: 'Load updated successfully' });
-  } catch (error) {
-    return res.status(500).json({ message: 'Error updating Load' });
-  }
-});
-
-// eliminar carga
-
-route.delete('/api/loads/:id_carga', async (req,res) => {
-  const { id_carga } = req.params;
-  try {
-    const route = await deleteLoad(id_carga);
-    if (!route) {
-      return res.status(404).json({ message: 'load not found' });
-    }
-    return res.status(200).json({ message: 'load deleted successfully' });
-  } catch (error) {
-    return res.status(500).json({ message: 'Error deleting load' });
-  }
-});
-
-
-// Configurar Gmail con tu App Password - NUEVO
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com', 
-  port: 587, 
-  secure: false, 
-  auth: {
-    user: process.env.MAIL, 
-    pass: process.env.PASSWORD 
-  }
-});
-
-// Verificar conexión con Gmail - NUEVO
-transporter.verify((error, success) => {
-  if (error) {
-    console.log('❌ Error configurando Gmail:', error);
-  } else {
-    console.log('✅ Gmail configurado correctamente');
-  }
-});
-
-// Almacenar tokens temporalmente - NUEVO (en producción usar BD)
-const resetTokens = new Map();
-
-
-// NUEVA RUTA para recuperar contraseña
-route.post('/forgot-password', async (req, res) => {
-  const { email } = req.body;
+// Registro de usuario
+// route.post('/api/register', [
+//     body('email_usuario').isString().notEmpty(),
+//     body('contraseña').isLength({ min: 6 })
+//   ], async (req, res) => {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//       return res.status(400).json({ errors: errors.array() });
+//     }
   
-  console.log('📧 Solicitud de recuperación para:', email);
+//     const { email_usuario, password } = req.body;
+//     const hashedPassword = await bcrypt.hash(password, 10);
   
-  try {
-    // Aquí deberías verificar si el usuario existe en tu BD
-    // Por ahora simulamos que existe
-    const usuarioExiste = true; // Reemplaza con tu lógica de BD
-    
-    if (!usuarioExiste) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'No encontramos una cuenta con ese correo electrónico' 
-      });
-    }
-    
-    // Generar token único
-    const resetToken = crypto.randomBytes(32).toString('hex');
-    const tokenExpiry = Date.now() + 3600000; // 1 hora
-    
-    // Guardar token
-    resetTokens.set(resetToken, {
-      email: email.toLowerCase(),
-      expires: tokenExpiry,
-      used: false
-    });
-    
-    // URL para restablecer
-    const resetLink = `http://localhost:3001/reset-password/${resetToken}`;
-    
-    // Configurar email
-    const mailOptions = {
-      from: '"Mi App Móvil" <michelleandrea217@gmail.com>',
-      to: email,
-      subject: '🔐 Restablecer contraseña - Beefleet',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9f9f9; padding: 20px;">
-          <div style="background-color: #ffffff; padding: 30px; border-radius: 10px;">
-            
-            <div style="text-align: center; margin-bottom: 30px;">
-              <h1 style="color: #FB8500; margin: 0; font-size: 28px;">🔐 Restablecer Contraseña</h1>
-            </div>
-            
-            <p style="color: #333; font-size: 16px; line-height: 1.6;">
-              Hola,<br><br>
-              Recibimos una solicitud para restablecer la contraseña de tu cuenta.
-            </p>
-            
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${resetLink}" 
-                 style="background-color: #FB8500; color: white; padding: 15px 30px; 
-                        text-decoration: none; border-radius: 25px; font-weight: bold; 
-                        font-size: 16px; display: inline-block;">
-                ✨ Restablecer mi contraseña
-              </a>
-            </div>
-            
-            <p style="color: #666; font-size: 14px;">
-              O copia este enlace: ${resetLink}
-            </p>
-            
-            <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0;">
-              <p style="color: #856404; margin: 0; font-size: 14px;">
-                ⚠️ <strong>Importante:</strong> Este enlace expira en 1 hora.
-              </p>
-            </div>
-            
-            <p style="color: #666; font-size: 14px;">
-              Si no solicitaste esto, ignora este correo.
-            </p>
-            
-          </div>
-        </div>
-      `
-    };
-    
-    // Enviar email
-    await transporter.sendMail(mailOptions);
-    
-    console.log('✅ Email enviado a:', email);
-    
-    res.json({ 
-      success: true, 
-      message: 'Correo de recuperación enviado exitosamente' 
-    });
-    
-  } catch (error) {
-    console.error('❌ Error enviando email:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Error al enviar el correo' 
-    });
-  }
-});
-
-// NUEVA RUTA para manejar el enlace (cuando hacen click)
-route.get('/reset-password/:token', (req, res) => {
-  const { token } = req.params;
-  const tokenData = resetTokens.get(token);
-  
-  if (!tokenData || Date.now() > tokenData.expires || tokenData.used) {
-    return res.send(`
-      <html>
-        <body style="font-family: Arial; text-align: center; padding: 50px;">
-          <h2 style="color: #e74c3c;">❌ Enlace inválido o expirado</h2>
-          <p>Este enlace no es válido, ya fue usado o expiró.</p>
-        </body>
-      </html>
-    `);
-  }
-  
-  // Mostrar formulario para nueva contraseña
-  res.send(`
-    <html>
-      <head>
-        <title>Restablecer Contraseña</title>
-        <style>
-          body { font-family: Arial; max-width: 400px; margin: 50px auto; padding: 20px; }
-          input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }
-          button { background-color: #FB8500; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; width: 100%; }
-        </style>
-      </head>
-      <body>
-        <h2 style="color: #FB8500; text-align: center;">🔐 Nueva Contraseña</h2>
-        <form action="/reset-password/${token}" method="POST">
-          <input type="password" name="password" placeholder="Nueva contraseña" required minlength="6">
-          <input type="password" name="confirmPassword" placeholder="Confirmar contraseña" required minlength="6">
-          <button type="submit">Actualizar contraseña</button>
-        </form>
-      </body>
-    </html>
-  `);
-});
-
-// NUEVA RUTA para procesar la nueva contraseña
-route.post('/reset-password/:token', (req, res) => {
-  const { token } = req.params;
-  const { password, confirmPassword } = req.body;
-  
-  const tokenData = resetTokens.get(token);
-  
-  if (!tokenData || Date.now() > tokenData.expires || tokenData.used) {
-    return res.send('<h2>❌ Error: Enlace inválido o expirado</h2>');
-  }
-  
-  if (password !== confirmPassword) {
-    return res.send('<h2>❌ Error: Las contraseñas no coinciden</h2>');
-  }
-  
-  // Marcar token como usado
-  tokenData.used = true;
-  resetTokens.set(token, tokenData);
-  
-  // Aquí actualizarías la contraseña en tu base de datos
-  const hashedPassword = bcrypt.hashSync(password, 10);
-  console.log(`🔑 Nueva contraseña para ${tokenData.email}:`, hashedPassword);
-  
-  res.send(`
-    <html>
-      <body style="font-family: Arial; text-align: center; padding: 50px;">
-        <h2 style="color: #27ae60;">✅ ¡Contraseña actualizada!</h2>
-        <p>Tu contraseña ha sido actualizada exitosamente.</p>
-        <p>Ya puedes iniciar sesión en la app.</p>
-      </body>
-    </html>
-  `);
-});
+//     try {
+//       await pool.query('INSERT INTO Usuarios (email_usuario, contraseña) VALUES (?, ?)', [email_usuario, hashedPassword]);
+//       res.status(201).send('User  registered');
+//     } catch (error) {
+//       console.error(error);
+//       res.status(500).json({ message: 'Error registering user' });
+//     }
+// });
 
 
 module.exports = route;
