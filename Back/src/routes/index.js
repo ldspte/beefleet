@@ -484,6 +484,9 @@ route.post('/api/sales', authenticateJWT, async (req, res) => {
     });
   }
 
+// crear venta
+route.post('/api/sales', authenticateJWT, async (req,res) => {
+  const {fecha, valor, descripcion, carga} = req.body;
   try {
     const sale = await createSale(fecha, valor, descripcion, carga);
     return res.status(201).json({ sale });
@@ -493,8 +496,9 @@ route.post('/api/sales', authenticateJWT, async (req, res) => {
   }
 });
 
-// Actualizar venta (CORREGIDO: agregado middleware)
-route.put('/api/sales/:id_venta', authenticateJWT, async (req, res) => {
+
+//actualizar venta
+route.put('/api/sales/:id_venta', authenticateJWT, async (req,res) => {
   const { id_venta } = req.params;
   const { fecha, valor, descripcion, carga } = req.body;
   
@@ -732,64 +736,7 @@ route.use((error, req, res, next) => {
 });
 
 
-// 7. OBTENER CARGAS POR CONDUCTOR
-route.get('/api/loads/:id_conductor', authenticateJWT, async (req, res) => {
-  const { id_conductor } = req.params;
-  
-  // Validar que id_conductor sea un número
-  if (!id_conductor || isNaN(parseInt(id_conductor))) {
-    return res.status(400).json({ message: 'ID de conductor inválido' });
-  }
-  
-  try {
-    console.log(`🔍 Obteniendo cargas para conductor: ${id_conductor}`);
-    const values = await getLoadsByDriver(parseInt(id_conductor));
-    console.log('✅ Cargas obtenidas:', values);
-    
-    if (!Array.isArray(values)) {
-      console.warn('⚠️ getLoadsByDriver() no devolvió un array:', values);
-      return res.status(200).json([]);
-    }
-    
-    return res.status(200).json(values);
-  } catch (error) {
-    console.error('❌ Error fetching loads:', error);
-    return res.status(500).json({ 
-      message: 'Error fetching loads',
-      error: error.message 
-    });
-  }
-});
-
-
-// Obtener todas las cargas (para el dropdown del formulario)
-route.get('/api/routes', authenticateJWT, async (req, res) => {
-  try {
-    console.log('🔍 Obteniendo rutas...');
-    const values = await getRoutes();
-    
-    // 🔍 LOGS DE DEBUG ADICIONALES
-    console.log('✅ Tipo de values:', typeof values);
-    console.log('✅ Es array?:', Array.isArray(values));
-    console.log('✅ Longitud:', values?.length);
-    console.log('✅ Primer elemento:', values?.[0]);
-    
-    if (!Array.isArray(values)) {
-      console.warn('⚠️ getRoutes() no devolvió un array:', values);
-      return res.status(200).json([]);
-    }
-    
-    return res.status(200).json(values);
-  } catch (error) {
-    console.error('❌ Error fetching routes:', error);
-    return res.status(500).json({ 
-      message: 'Error fetching routes',
-      error: error.message 
-    });
-  }
-});
-
-//obtener reportes
+//obtener reporte
 
 route.get('/api/reports', async (req,res) => {
   try {
@@ -1143,6 +1090,5 @@ route.post('/reset-password/:token', (req, res) => {
     </html>
   `);
 });
-
 
 module.exports = route;
