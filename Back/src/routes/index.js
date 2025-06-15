@@ -56,7 +56,7 @@ route.post('/api/admin', [
 
   const { correo_usuario, contraseña } = req.body;
   try {
-    const [user] = await db.query('SELECT * FROM usuarios WHERE correo_usuario = ?', [correo_usuario]);
+    const [user] = await db.query('SELECT * FROM usuarios WHERE email_usuario = ?', [correo_usuario]);
     if (!user.length || !(await bcrypt.compare(contraseña, user[0].contraseña))) {
       return res.status(401).send('Invalid credentials');
     }
@@ -110,8 +110,12 @@ route.get('/api/drivers', authenticateJWT, async (req,res) => {
 });
 
 // crear un conductor
+<<<<<<< HEAD
 
 route.post('/api/drivers',  async (req,res) => {
+=======
+route.post('/api/drivers', authenticateJWT, async (req,res) => {
+>>>>>>> 8994068219d7fab710e9e0a2d15ab71c5b4c86f7
   const {tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion,  tipo_licencia, fecha_vencimiento, experiencia, estado} = req.body;
   try {
     const driver = await createDriver(tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion,  tipo_licencia, fecha_vencimiento, experiencia, estado);
@@ -121,6 +125,7 @@ route.post('/api/drivers',  async (req,res) => {
     return res.status(500).json({ message: 'Error creating driver', error: error.message });
   }
 });
+
 
 
 //contraseña por defecto 
@@ -136,7 +141,11 @@ route.post('/api/drivers',  async (req,res) => {
 //   const { correo_conductor, contraseña } = req.body;
 
 //   const mailOptions = {
+<<<<<<< HEAD
 //       from: 'ldspte9807@gmail.com',
+=======
+//       from: 'michelleoa1516@gmail.com',
+>>>>>>> 8994068219d7fab710e9e0a2d15ab71c5b4c86f7
 //       to: correo_conductor,
 //       subject: 'Bienvenido a Beeflet',
 //       text: `Se ha creado tu cuenta en Beefleet y Tu contraseña es: ${contraseña}`
@@ -167,17 +176,69 @@ route.get('/api/drivers/:id_conductor', authenticateJWT, async (req,res) => {
 
 //actualizar conductor
 
-route.put('/api/drivers/:id_conductor', authenticateJWT, async (req,res) => {
+route.put('/api/drivers/:id_conductor', authenticateJWT, async (req, res) => {
   const { id_conductor } = req.params;
-  const { tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion } = req.body;
+  const {
+    tipo_documento,
+    documento,
+    nombre_conductor,
+    apellido_conductor,
+    correo_conductor,
+    foto,
+    telefono,
+    ciudad,
+    direccion,
+    tipo_licencia,
+    fecha_vencimiento,
+    experiencia,
+    estado
+  } = req.body;
+
   try {
-    const driver = await updateDriver(id_conductor, tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion);
-    if (!driver) {
-      return res.status(404).json({ message: 'Driver not found' });
+    console.log('🔄 Actualizando conductor ID:', id_conductor);
+    console.log('📝 Datos recibidos:', req.body);
+
+    // Validar que el ID sea válido
+    if (!id_conductor) {
+      return res.status(400).json({ message: 'ID del conductor es requerido' });
     }
-    return res.status(200).json({ message: 'Driver updated successfully' });
+
+    // Llamar a updateDriver con todos los parámetros individuales
+    const driver = await updateDriver(
+      id_conductor, 
+      tipo_documento, 
+      documento, 
+      nombre_conductor, 
+      apellido_conductor, 
+      correo_conductor, 
+      foto, 
+      telefono, 
+      ciudad, 
+      direccion, 
+      tipo_licencia, 
+      fecha_vencimiento, 
+      experiencia, 
+      estado
+    );
+
+    if (!driver) {
+      return res.status(404).json({ message: 'Conductor no encontrado' });
+    }
+
+    console.log('✅ Conductor actualizado exitosamente');
+    return res.status(200).json({
+      message: 'Conductor actualizado exitosamente',
+      driver: driver
+    });
+
   } catch (error) {
-    return res.status(500).json({ message: 'Error updating driver' });
+    console.error('❌ Error al actualizar conductor:', error);
+    console.error('📋 Stack trace:', error.stack);
+    
+    return res.status(500).json({
+      message: 'Error interno del servidor al actualizar el conductor',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 
@@ -192,7 +253,8 @@ route.delete('/api/drivers/:id_conductor', authenticateJWT, async (req,res) => {
     }
     return res.status(200).json({ message: 'Driver deleted successfully' });
   } catch (error) {
-    return res.status(500).json({ message: 'Error deleting driver' });
+    console.error('Error deleting driver:', error);
+    return res.status(500).json({ message: 'Error eliminando conductor' });
   }
 });
 
@@ -632,6 +694,12 @@ route.put('/api/sales/:id_venta', authenticateJWT, async (req, res) => {
     });
   }
 
+<<<<<<< HEAD
+=======
+route.put('/api/routes/:id_ruta', authenticateJWT, async (req,res) => {
+  const { id_ruta } = req.params; // ✅ Obtener ID de params
+  const { origen, destino, distancia, carga } = req.body; // ✅ Datos del body
+>>>>>>> 8994068219d7fab710e9e0a2d15ab71c5b4c86f7
   try {
     // Verificar si la venta existe primero
     const existingSale = await getSalesById(id_venta);
@@ -648,11 +716,16 @@ route.put('/api/sales/:id_venta', authenticateJWT, async (req, res) => {
       sale: result 
     });
   } catch (error) {
+<<<<<<< HEAD
     console.error('❌ Error updating sale:', error);
     return res.status(500).json({ 
       message: 'Error updating sale',
       error: error.message 
     });
+=======
+    console.error('Error updating route:', error);
+    return res.status(500).json({ message: 'Error updating route' });
+>>>>>>> 8994068219d7fab710e9e0a2d15ab71c5b4c86f7
   }
 });
 

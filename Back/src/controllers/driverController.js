@@ -1,5 +1,37 @@
 const {db} = require('../database.js');
+const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer');
+const dotenv = require('dotenv');
+dotenv.config();
 
+const sendPasswordEmail = async (correo_conductor, password) => {
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com', 
+    port: 587, 
+    secure: false, 
+    auth: {
+      user: process.env.MAIL, 
+      pass: process.env.PASSWORD 
+    }
+  });
+
+  
+  const mailOptions = {
+    from: '@Beefleet.com', 
+    to: correo_conductor, 
+    subject: 'Bienvenido a Beefleet', 
+    text: `Hola, tu contraseña por defecto es: ${password}`, 
+    html: `<p>Hola, tu contraseña por defecto es: <strong>${password}</strong></p>` 
+  };
+
+  // Envía el correo
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Correo enviado exitosamente');
+  } catch (error) {
+    console.error('Error al enviar el correo:', error);
+  }
+};
 
 function generatePassword(longitud=10) {
   const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+[]{}|;:,.<>?';
@@ -14,9 +46,9 @@ function generatePassword(longitud=10) {
 
 const getDrivers = async() => {
   const results = await db.query(`
-    SELECT * FROM conductores  
+    SELECT * FROM Conductores  
   `)
-  return results;
+  return results.length > 0 ? results[0] : null;
 }
 
 const getDriversById = async(id_conductor) => {
@@ -28,34 +60,75 @@ const getDriversById = async(id_conductor) => {
   return result.length > 0 ? result[0] : null;
 }
 
-const createDriver = async(tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion, tipo_licencia, fecha_vencimiento, experiencia) => {
+const createDriver = async(tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion,  tipo_licencia, fecha_vencimiento, experiencia, estado) => {
   const password = generatePassword();
   const hashedPassword = '123' /* await bcrypt.hash(password, 10);*/
   console.log('inicio')
   const result = await db.query(`
-    INSERT INTO conductores (tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion, tipo_licencia, fecha_vencimiento, experiencia, contraseña) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO conductores (tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, contraseña, direccion, tipo_licencia, fecha_vencimiento, experiencia, estado) VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `,
-     [tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion, tipo_licencia, fecha_vencimiento, experiencia, hashedPassword]
+  [tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, hashedPassword, direccion, tipo_licencia, fecha_vencimiento, experiencia, estado]
   );
+  await sendPasswordEmail(correo_conductor, password);
   return result;
 }
 
 
-const updateDriver = async(id_conductor, tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion) => {
-  const result = await db.query(`
-    UPDATE conductores SET tipo_documento = ?, documento = ?, nombre_conductor = ?, apellido_conductor = ?, correo_conductor = ?, foto = ?, telefono = ?, ciudad = ? , direccion = ? WHERE id_conductor = ?
-  `,
-  [tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion, id_conductor]
-  );
-  return result;
-}
+const updateDriver = async(id_conductor, tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion, tipo_licencia, fecha_vencimiento, experiencia, estado) => {
+  try {
+    console.log('🔄 updateDriver - Parámetros recibidos:', {
+      id_conductor, tipo_documento, documento, nombre_conductor, apellido_conductor, 
+      correo_conductor, foto, telefono, ciudad, direccion, tipo_licencia, 
+      fecha_vencimiento, experiencia, estado
+    });
+
+    const result = await db.query(`
+      UPDATE Conductores SET 
+        tipo_documento = ?, 
+        documento = ?, 
+        nombre_conductor = ?, 
+        apellido_conductor = ?, 
+        correo_conductor = ?, 
+        foto = ?, 
+        telefono = ?, 
+        ciudad = ?, 
+        direccion = ?, 
+        tipo_licencia = ?, 
+        fecha_vencimiento = ?, 
+        experiencia = ?, 
+        estado = ? 
+      WHERE id_conductor = ?
+    `, [tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion, tipo_licencia, fecha_vencimiento, experiencia, estado, id_conductor]);
+
+    console.log('✅ updateDriver - Resultado:', result);
+    
+    if (result.affectedRows === 0) {
+      return null; // No se encontró el conductor
+    }
+
+    // Obtener el conductor actualizado
+    const [updatedDriver] = await db.query('SELECT * FROM Conductores WHERE id_conductor = ?', [id_conductor]);
+    return updatedDriver[0];
+
+  } catch (error) {
+    console.error('❌ Error en updateDriver:', error);
+    throw error;
+  }
+};
 
 const deleteDriver = async(id) => {
   const result = await db.query(`
-    DELETE FROM conductores WHERE id_conductor = ?
+    DELETE FROM Conductores WHERE id_conductor = ?
   `,
-  [id]
+  [id_conductor]
+  );
+  return result;
+}
+
+const newpasswordDriver = async(email_conductor, contraseña) => {
+  const [result] = await db.query(
+    'UPDATE Conductores SET contraseña = ? WHERE correo_conductor = ?',
+    [contraseña, email_conductor]
   );
   return result;
 }
@@ -67,5 +140,6 @@ module.exports = {
   getDriversById,
   createDriver,
   updateDriver,
-  deleteDriver
+  deleteDriver,
+  newpasswordDriver
 }

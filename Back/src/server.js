@@ -1,5 +1,8 @@
 const express = require('express'); // Asegúrate de importar express
 const cors = require('cors');
+const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer'); // NUEVO
+const crypto = require('crypto');         // NUEVO
 const app = express();
 const bcrypt = require('bcryptjs');
 
