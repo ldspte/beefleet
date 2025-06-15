@@ -3,7 +3,6 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer'); // NUEVO
 const crypto = require('crypto');         // NUEVO
-
 const app = express();
 const route = require('./routes/index');
 
