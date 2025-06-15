@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto'); 
-const { getDrivers, getDriversById, createDriver, updateDriver, deleteDriver, newpasswordDriver } = require('../controllers/driverController');
+const { getDrivers, getDriversById, createDriver, updateDriver, deleteDriver, newpasswordDriver, activeDriver } = require('../controllers/driverController');
 const {getClients, getClientsById, createClient, updateClient, deleteClient} = require('../controllers/clientController');
 const {getUsers, getUsersById, createUser, updateUser} = require('../controllers/usersController');
 const {getSales, getSalesById, createSale, updateSale, deleteSale} = require('../controllers/saleController');
@@ -80,7 +80,7 @@ route.post('/api/admin', [
 
   const { correo_usuario, contraseña } = req.body;
   try {
-    const [user] = await db.query('SELECT * FROM usuarios WHERE correo_usuario = ?', [correo_usuario]);
+    const [user] = await db.query('SELECT * FROM Usuarios WHERE correo_usuario = ?', [correo_usuario]);
     if (!user.length || !(await bcrypt.compare(contraseña, user[0].contraseña))) {
       return res.status(401).send('Invalid credentials');
     }
@@ -181,10 +181,10 @@ route.get('/api/drivers/:id_conductor', async (req,res) => {
 //actualizar conductor
 
 route.put('/api/drivers/:id_conductor', async (req,res) => {
-  const { id_conductor } = req.params;
-  const { tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion } = req.body;
+  const {id_conductor} = req.params
+  const { tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion,  tipo_licencia, fecha_vencimiento, experiencia, estado} = req.body;
   try {
-    const driver = await updateDriver(id_conductor, tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion);
+    const driver = await updateDriver(id_conductor, tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion,  tipo_licencia, fecha_vencimiento, experiencia, estado);
     if (!driver) {
       return res.status(404).json({ message: 'Driver not found' });
     }
@@ -206,31 +206,6 @@ route.delete('/api/drivers/:id_conductor', async (req,res) => {
     return res.status(200).json({ message: 'Driver deleted successfully' });
   } catch (error) {
     return res.status(500).json({ message: 'Error deleting driver' });
-  }
-});
-
-// Login de admin
-
-route.post('/api/loginadmin', [
-  body('correo_usuario').isString().notEmpty(),
-  body('contraseña').isString().notEmpty()
-], async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const { correo_usuario, contraseña } = req.body;
-  try {
-    const [user] = await db.query('SELECT * FROM Conductores WHERE correo_conductor = ?', [correo_usuario]);
-    if (!user.length || !(await bcrypt.compare(contraseña, user[0].contraseña))) {
-      return res.status(401).send('Invalid credentials');
-    }
-    const token = jwt.sign({ id: user[0].id_usuario }, SECRET_KEY, { expiresIn: '1h' });
-    res.json({ token });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error logging in' });
   }
 });
 
@@ -261,7 +236,16 @@ route.get('/api/vehicles',  async (req,res) => {
     const values = await getVehicles();
     return res.status(200).json(values);
   } catch (error) {
-    return res.status(500).json({ message: 'Error fetching drivers' });
+    return res.status(500).json({ message: 'Error fetching Vehicles' });
+  }
+})
+
+route.get('/api/vehicles/drivers', async (req, res) => {
+  try {
+    const values = await activeDriver();
+    return res.status(200).json(values);
+  } catch (error) {
+    return res.status(500).json({message: 'Error fetching Drivers'})
   }
 })
 
@@ -283,11 +267,22 @@ route.get('/api/vehicles/:id_vehiculo', async(req,res)=>{
 
 // Crear vehiculo
 
-route.post('/api/vehicles', async (req,res) => {
-  const {placa, modelo, peso, matricula, seguro, estado_vehiculo, conductor} = req.body;
+route.post('/api/vehicles', async (req, res) => {
+  const { placa, modelo, peso, matricula, seguro, estado_vehiculo, conductor } = req.body;
+  
   try {
+    // Crear el vehículo
     const vehicle = await createVehicle(placa, modelo, peso, matricula, seguro, estado_vehiculo, conductor);
-    return res.status(201).json({ vehicle });
+    
+    // Cambiar el estado del conductor
+    const estadoConductor = 'Asignado'; // Define el nuevo estado que deseas asignar
+    const updateResult = await updateDriver(conductor.id_conductor, conductor.tipo_documento, conductor.documento, conductor.nombre_conductor, conductor.apellido_conductor, conductor.correo_conductor, conductor.foto, conductor.telefono, conductor.ciudad, conductor.direccion, conductor.tipo_licencia, conductor.fecha_vencimiento, conductor.experiencia, estadoConductor);
+    
+    if (updateResult.affectedRows > 0) {
+      return res.status(200).json({ vehicle });
+    } else {
+      return res.status(500).json({ message: 'Error updating driver status' });
+    }
   } catch (error) {
     return res.status(500).json({ message: 'Error creating vehicle' });
   }

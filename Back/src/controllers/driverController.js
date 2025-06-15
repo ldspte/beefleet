@@ -75,11 +75,11 @@ const createDriver = async(tipo_documento, documento, nombre_conductor, apellido
 }
 
 
-const updateDriver = async(id_conductor, tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion) => {
+const updateDriver = async(id_conductor, tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion,  tipo_licencia, fecha_vencimiento, experiencia, estado) => {
   const result = await db.query(`
-    UPDATE Conductores SET tipo_documento = ?, documento = ?, nombre_conductor = ?, apellido_conductor = ?, correo_conductor = ?, foto = ?, telefono = ?, ciudad = ? , direccion = ? , tipo_licencia = ?, fecha_vencimiento = ?, experiencia = ?  WHERE id_conductor = ?
+    UPDATE Conductores SET tipo_documento = ?, documento = ?, nombre_conductor = ?, apellido_conductor = ?, correo_conductor = ?, foto = ?, telefono = ?, ciudad = ? , direccion = ? , tipo_licencia = ?, fecha_vencimiento = ?, experiencia = ?, estado = ?  WHERE id_conductor = ?
   `,
-  [tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion, tipo_licencia, fecha_vencimiento, experiencia, id_conductor]
+  [tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion,  tipo_licencia, fecha_vencimiento, experiencia, estado, id_conductor]
   );
   return result;
 }
@@ -101,6 +101,13 @@ const newpasswordDriver = async(email_conductor, contraseña) => {
   return result;
 }
 
+const activeDriver = async() =>{
+  const [result] = await db.query(
+    'SELECT * FROM conductores WHERE estado = Activo'
+  )
+  return results.length > 0 ? results[0] : null;
+}
+
 
 
 module.exports = {
@@ -109,5 +116,6 @@ module.exports = {
   createDriver,
   updateDriver,
   deleteDriver,
-  newpasswordDriver
+  newpasswordDriver,
+  activeDriver
 }
