@@ -16,7 +16,7 @@ const sendPasswordEmail = async (correo_conductor, password, nombre_conductor, a
   });
 
   const mailOptions = {
-    from: '', 
+    from: 'beefleet25@gmail.com', 
     to: correo_conductor, 
     subject: 'Bienvenido a Beefleet', 
     text: `Hola ${nombre_conductor} ${apellido_conductor}, tu contraseña por defecto es: ${password}`, 
