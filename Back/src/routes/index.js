@@ -125,7 +125,7 @@ route.get('/api/drivers', async (req,res) => {
 
 // crear un conductor
 
-route.post('/api/drivers', authenticateJWT, async (req,res) => {
+route.post('/api/drivers', async (req,res) => {
   const {tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion, tipo_licencia, fecha_vencimiento, experiencia, contraseña, estado } = req.body;
   try {
     const driver = await createDriver(tipo_documento, documento, nombre_conductor, apellido_conductor, correo_conductor, foto, telefono, ciudad, direccion, tipo_licencia, fecha_vencimiento, experiencia, contraseña, estado);
