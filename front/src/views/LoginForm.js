@@ -13,7 +13,7 @@ const LoginForm = ({ navigation }) => {
         console.log(email, password);
         if (email && password) {
             try {
-                const response = await fetch('http://localhost:3001/api/logindrivers/', {
+                const response = await fetch('http://localhost:3001/api/logindrivers', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

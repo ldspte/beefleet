@@ -101,8 +101,16 @@ const newpasswordDriver = async(email_conductor, contraseña) => {
   return result;
 }
 
-const activeDriver = async() =>{
+const updateStateDriver = async( estadoConductor ,id_conductor) =>{
   const [result] = await db.query(
+    'UPDATE Conductores SET estado = ? WHERE id_conductor = ?',
+    [estadoConductor, id_conductor]
+  );
+  return result;
+}
+
+const activeDriver = async() =>{
+  const [results] = await db.query(
     'SELECT * FROM conductores WHERE estado = Activo'
   )
   return results.length > 0 ? results[0] : null;
@@ -117,5 +125,6 @@ module.exports = {
   updateDriver,
   deleteDriver,
   newpasswordDriver,
-  activeDriver
+  activeDriver,
+  updateStateDriver
 }

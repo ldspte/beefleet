@@ -7,14 +7,15 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto'); 
-const { getDrivers, getDriversById, createDriver, updateDriver, deleteDriver, newpasswordDriver, activeDriver } = require('../controllers/driverController');
+const { getDrivers, getDriversById, createDriver, updateDriver, deleteDriver, newpasswordDriver, activeDriver, updateStateDriver } = require('../controllers/driverController');
 const {getClients, getClientsById, createClient, updateClient, deleteClient} = require('../controllers/clientController');
 const {getUsers, getUsersById, createUser, updateUser} = require('../controllers/usersController');
 const {getSales, getSalesById, createSale, updateSale, deleteSale} = require('../controllers/saleController');
 const {getRoutes, getRoutesById, createRoute, updateRoute, deleteRoute} = require('../controllers/routeController');
-const {getVehicles, getVehiclesById, createVehicle, updateVehicle, deleteVehicle} = require('../controllers/vehicleController');
+const {getVehicles, getVehiclesById, createVehicle, updateVehicle, deleteVehicle, getDriverByVehicle} = require('../controllers/vehicleController');
 const {getLoads, getLoadsById, getLoadsByDriver, createLoad, updateLoad, deleteLoad} = require('../controllers/loadController');
 const {getStateVehicles, getStateVehiclesById, createStateVehicle, updateStateVehicle, deleteStateVehicle } = require('../controllers/stateVehicleController');
+const { error } = require('console');
 
 // Registro de usuarioroute
 // route.post('/api/register', [
@@ -240,6 +241,8 @@ route.get('/api/vehicles',  async (req,res) => {
   }
 })
 
+//Obtener los conductores activos
+
 route.get('/api/vehicles/drivers', async (req, res) => {
   try {
     const values = await activeDriver();
@@ -253,7 +256,7 @@ route.get('/api/vehicles/drivers', async (req, res) => {
 
 route.get('/api/vehicles/:id_vehiculo', async(req,res)=>{
   try {
-    const id_vehiculo = req.params;
+    const {id_vehiculo} = req.params;
     const vehiculo = await getVehiclesById(id_vehiculo);
     if(!vehiculo){
       return res.status(404).json({ message: 'Vehicles not found' });
@@ -268,41 +271,66 @@ route.get('/api/vehicles/:id_vehiculo', async(req,res)=>{
 // Crear vehiculo
 
 route.post('/api/vehicles', async (req, res) => {
-  const { placa, modelo, peso, matricula, seguro, estado_vehiculo, conductor } = req.body;
+  const { placa, marca, modelo, kilometraje, color, capacidad, tipo, conductor, estado_vehiculo } = req.body;
   
   try {
-    // Crear el vehículo
-    const vehicle = await createVehicle(placa, modelo, peso, matricula, seguro, estado_vehiculo, conductor);
-    
-    // Cambiar el estado del conductor
-    const estadoConductor = 'Asignado'; // Define el nuevo estado que deseas asignar
-    const updateResult = await updateDriver(conductor.id_conductor, conductor.tipo_documento, conductor.documento, conductor.nombre_conductor, conductor.apellido_conductor, conductor.correo_conductor, conductor.foto, conductor.telefono, conductor.ciudad, conductor.direccion, conductor.tipo_licencia, conductor.fecha_vencimiento, conductor.experiencia, estadoConductor);
-    
+    const vehicle = await createVehicle(placa, marca, modelo, kilometraje, color, capacidad, tipo, conductor, estado_vehiculo);
+    const estadoConductor = 'En ruta';
+    const updateResult = await updateStateDriver(estadoConductor, conductor);
     if (updateResult.affectedRows > 0) {
       return res.status(200).json({ vehicle });
     } else {
       return res.status(500).json({ message: 'Error updating driver status' });
     }
   } catch (error) {
-    return res.status(500).json({ message: 'Error creating vehicle' });
+    return res.status(500).json({ message: 'Error creating vehicle', error });
   }
 });
 
 // Actualizar vehiculo
 
-route.put('/api/vehicles/:id_vehiculo', async (req,res) => {
+route.put('/api/vehicles/:id_vehiculo', async (req, res) => {
   const { id_vehiculo } = req.params;
-  const {placa, modelo, peso, matricula, seguro, estado_vehiculo} = req.body;
+  const { placa, marca, modelo, kilometraje, color, capacidad, tipo, conductor, estado_vehiculo } = req.body;
+
   try {
-    const vehicle = await updateVehicle(id_vehiculo, placa, modelo, peso, matricula, seguro, estado_vehiculo);
+    // Obtener el conductor actual del vehículo
+    const lastDriver = await getDriverByVehicle(id_vehiculo);
+    
+    // Actualizar el vehículo
+    const vehicle = await updateVehicle(id_vehiculo, placa, marca, modelo, kilometraje, color, capacidad, tipo, conductor, estado_vehiculo);
+    
+    // Verificar si el vehículo fue actualizado
     if (!vehicle) {
       return res.status(404).json({ message: 'Vehicle not found' });
     }
-    return res.status(200).json({ message: 'Vehicle updated successfully' });
+
+    // Si el conductor ha cambiado, actualizar los estados de los conductores
+    if (lastDriver !== conductor) {
+      const estadoActivo = 'Activo';
+      const estadoEnruta = 'En Ruta';
+
+      // Actualizar estado del conductor anterior
+      const updateLastDriver = await updateStateDriver(estadoActivo, lastDriver);
+      console.log(lastDriver);
+      // Actualizar estado del nuevo conductor
+      const updateDriver = await updateStateDriver(estadoEnruta, conductor);
+
+      // Verificar si ambos estados fueron actualizados correctamente
+      if (updateLastDriver.affectedRows > 0 && updateDriver.affectedRows > 0) {
+        return res.status(200).json({ message: 'Vehicle and driver statuses updated successfully', vehicle });
+      } else {
+        return res.status(500).json({ message: 'Error updating driver statuses'});
+      }
+    }
+
+    // Si no hay cambio de conductor, solo devolver el mensaje de éxito
+    return res.status(200).json({ message: 'Vehicle updated successfully', vehicle });
   } catch (error) {
-    return res.status(500).json({ message: 'Error updating vehicle' });
+    return res.status(500).json({ message: 'Error updating vehicle', error });
   }
 });
+
 // eliminar vehiculo
 
 route.delete('/api/vehicles/:id_vehiculo', async (req,res) => {
@@ -570,6 +598,7 @@ route.post('/api/reports', async (req,res) => {
   const {descripcion, foto, tipo_estado, tipo_reporte} = req.body;
   try {
     const route = await createStateVehicle(descripcion, foto, tipo_estado, tipo_reporte);
+    const reporte = await updateVehicle() 
     return res.status(201).json({ route });
   } catch (error) {
     return res.status(500).json({ message: 'Error creating State' });

@@ -9,27 +9,27 @@ const getVehicles = async() => {
 
 const getVehiclesById = async(id_vehiculo) => {
   const result = await db.query(`
-    SELECT * FROM vehiculos WHERE id_vehiculo = ?
+    SELECT * FROM Vehiculos WHERE id_vehiculo = ?
   `,
   [id_vehiculo]
   );
   return result.length > 0 ? result[0] : null;
 }
 
-const createVehicle = async(placa, modelo, peso, matricula, seguro, estado_vehiculo, conductor) => {
+const createVehicle = async(placa, marca, modelo, kilometraje, color, capacidad, tipo, conductor, estado_vehiculo ) => {
     const result = await db.query(`
-        INSERT INTO vehiculos (placa, modelo, peso, matricula, seguro, estado_vehiculo, conductor) VALUES  (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO vehiculos (placa, marca, modelo, kilometraje, color, capacidad, tipo, conductor, estado_vehiculo ) VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
-    [placa, modelo, peso, matricula, seguro, estado_vehiculo, conductor]
+    [placa, marca, modelo, kilometraje, color, capacidad, tipo, conductor, estado_vehiculo ]
     );
     return result.length > 0 ? result[0] : null;
 }
 
-const updateVehicle = async(id_vehiculo, placa, modelo, peso, matricula, seguro, estado_vehiculo) => {
+const updateVehicle = async(id_vehiculo, placa, marca, modelo, kilometraje, color, capacidad, tipo, conductor, estado_vehiculo ) => {
     const result = await db.query(`
-        UPDATE vehiculos SET placa = ?, modelo = ?, peso = ?, matricula = ?, seguro = ?, estado_vehiculo = ? WHERE id_vehiculo = ?
+        UPDATE vehiculos SET placa = ?, marca = ?, modelo = ?, kilometraje = ?, color = ?, capacidad = ?, tipo = ?, conductor = ?, estado_vehiculo = ?  WHERE id_vehiculo = ?
     `,
-    [placa, modelo, peso, matricula, seguro, estado_vehiculo, id_vehiculo]
+    [placa, marca, modelo, kilometraje, color, capacidad, tipo, conductor, estado_vehiculo , id_vehiculo]
     );
     return result;
 }
@@ -43,14 +43,17 @@ const deleteVehicle = async(id_vehiculo) => {
     return result;
 }
 
-const getVehiclesByDriver = async(id_conductor) => {
+const getDriverByVehicle = async (id_vehiculo) => {
     const result = await db.query(`
-        SELECT * FROM vehiculos WHERE id_conductor = ?
-    `,
-    [id_conductor]
-    );
-    return result;
-  }
+        SELECT conductor FROM Vehiculos WHERE id_vehiculo = ?
+    `, [id_vehiculo]);
+    console.log(result);
+    if (result.length > 0) {
+        return result; 
+    } else {
+        return null; 
+    }
+}
 
 
 
@@ -60,6 +63,6 @@ module.exports = {
   createVehicle,
   updateVehicle,
   deleteVehicle,
-  getVehiclesByDriver
+  getDriverByVehicle
 }
 
