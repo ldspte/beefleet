@@ -210,23 +210,58 @@ route.delete('/api/drivers/:id_conductor', async (req,res) => {
   }
 });
 
-//obtener Usuario por id
-
-route.get('/api/admin/:id_usuario',  async (req,res) => {
-  const { id_usuario } = req.params;
+// GET /api/usuarios/:id
+// En tu archivo de rutas (routes)
+route.get('/usuarios/:id', async (req, res) => {
   try {
-    const user = await getDriversById(id_usuario);
-    if (!user) {
-      return res.status(404).json({ message: 'Driver not found' });
+    const userId = req.params.id;
+    
+    if (!userId) {
+      return res.status(400).json({
+        error: 'ID de usuario requerido'
+      });
     }
-    return res.status(200).json(user);
+
+    const user = await getUsersById(userId);
+    
+    // Debug: ver qué estructura tiene user
+    console.log('Usuario obtenido del controlador:', user);
+    console.log('Tipo de user:', typeof user);
+    console.log('Es array?', Array.isArray(user));
+    
+    if (!user) {
+      return res.status(404).json({
+        error: 'Usuario no encontrado'
+      });
+    }
+
+    // Manejar diferentes estructuras posibles
+    let userData = user;
+    
+    // Si es un array, tomar el primer elemento
+    if (Array.isArray(user) && user.length > 0) {
+      userData = user[0];
+    }
+    
+    // Si hay estructura anidada de mysql2 [rows, fields]
+    if (userData && Array.isArray(userData) && userData.length > 0) {
+      userData = userData[0];
+    }
+
+    // No devolver información sensible como passwords
+    const { password_usuario, ...userDataClean } = userData;
+    
+    console.log('Datos a enviar al frontend:', userDataClean); // Debug
+    
+    res.json(userDataClean);
+    
   } catch (error) {
-    return res.status(500).json({ message: 'Error fetching driver' });
+    console.error('Error en GET /api/usuarios/:id:', error);
+    res.status(500).json({
+      error: 'Error interno del servidor'
+    });
   }
-})
-
-
-
+});
 
 //rutas de vehiculos
 
