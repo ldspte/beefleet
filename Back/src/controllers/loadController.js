@@ -17,21 +17,21 @@ const getLoadsById = async(id_carga) => {
     return results.length > 0 ? results[0] : null;
 }
 
-const createLoad = async( descripcion, peso, foto_carga, fecha_inicio, fecha_fin, vehiculo, cliente, conductor) => {
+const createLoad = async( descripcion, peso, foto_carga, fecha_inicio, fecha_fin, vehiculo, cliente, estado) => {
     const result = await db.query(`
-        INSERT INTO cargas ( descripcion, peso, foto_carga, fecha_inicio, fecha_fin, vehiculo, cliente, conductor) VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO cargas ( descripcion, peso, foto_carga, fecha_inicio, fecha_fin, vehiculo, cliente, estado) VALUES  (?, ?, ?, ?, ?, ?, ?, ?)
     `,
-    [descripcion, peso, foto_carga, fecha_inicio, fecha_fin, vehiculo, cliente, conductor]
+    [descripcion, peso, foto_carga, fecha_inicio, fecha_fin, vehiculo, cliente, estado]
     );
     return result;
 }
 
 
-const updateLoad = async(id_carga, descripcion, peso, foto_carga, fecha_inicio, fecha_fin, vehiculo, cliente, conductor) => {
+const updateLoad = async(id_carga, descripcion, peso, foto_carga, fecha_inicio, fecha_fin, vehiculo, cliente, estado) => {
     const result = await db.query(`
-        UPDATE cargas SET descripcion = ?, peso = ?, foto_carga = ?, fecha_inicio = ?, fecha_fin = ?, vehiculo = ?, cliente = ?, conductor = ? WHERE id_carga = ?
+        UPDATE cargas SET descripcion = ?, peso = ?, foto_carga = ?, fecha_inicio = ?, fecha_fin = ?, vehiculo = ?, cliente = ?, estado = ? WHERE id_carga = ?
     `,
-    [descripcion, peso, foto_carga, fecha_inicio, fecha_fin, vehiculo, cliente, conductor, id_carga]
+    [descripcion, peso, foto_carga, fecha_inicio, fecha_fin, vehiculo, cliente, estado, id_carga]
     );
     return result;
 }

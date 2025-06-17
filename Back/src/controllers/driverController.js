@@ -176,7 +176,7 @@ const newpasswordDriver = async(email_conductor, contraseña) => {
   return result;
 }
 
-const updateStateDriver = async( estadoConductor ,id_conductor) =>{
+const updateStateDriver = async( estadoConductor , id_conductor) =>{
   const [result] = await db.query(
     'UPDATE Conductores SET estado = ? WHERE id_conductor = ?',
     [estadoConductor, id_conductor]
