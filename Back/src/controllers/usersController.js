@@ -11,10 +11,10 @@ function generatePassword(longitud=10) {
 }
 
 const getUsers = async() => {
-    const [files] = await db.query(
+    const [result] = await db.query(
       'SELECT * FROM Usuarios'
     );
-    return files;
+    return result.length > 0 ? result[0] : null;
 }
 
 const getUsersById = async(id_usuario) => {
