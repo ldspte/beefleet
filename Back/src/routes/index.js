@@ -375,9 +375,9 @@ route.get('/api/clients/:id_cliente', async (req,res) => {
 // crear cliente
 
 route.post('/api/clients', async (req,res) => {
-  const {tipo_documento, documento, nombre_cliente, apellido_cliente, direccion, ciudad, telefono, empresa} = req.body;
+  const {nit, direccion, ciudad, telefono, empresa} = req.body;
   try {
-    const client = await createClient(tipo_documento, documento, nombre_cliente, apellido_cliente, direccion, ciudad, telefono, empresa);
+    const client = await createClient(nit, direccion, ciudad, telefono, empresa);
     return res.status(201).json({ client });
   } catch (error) {
     return res.status(500).json({ message: 'Error creating client' });
@@ -387,9 +387,9 @@ route.post('/api/clients', async (req,res) => {
 
 route.put('/api/clients/:id_cliente', async (req,res) => {
   const { id_cliente } = req.params;
-  const {tipo_documento, documento, nombre_cliente, apellido_cliente, direccion, ciudad, telefono, empresa} = req.body;
+  const {nit, direccion, ciudad, telefono, empresa} = req.body;
   try {
-    const client = await updateClient(id_cliente, tipo_documento, documento, nombre_cliente, apellido_cliente, direccion, ciudad, telefono, empresa);
+    const client = await updateClient(id_cliente, nit, direccion, ciudad, telefono, empresa);
     if (!client) {
       return res.status(404).json({ message: 'Client not found' });
     }
@@ -934,6 +934,80 @@ route.post('/reset-password/:token', async (req, res) => {
     return res.status(500).send('<h2>❌ Error interno al actualizar la contraseña</h2>');
   }
 });
+
+
+
+//Obtener Usuario
+
+route.get('/api/admin', async (req,res) => {
+  try {
+    const values = await getUsers();
+    return res.status(200).json(values);
+  } catch (error) {
+    return res.status(500).json({ message: 'Error fetching User' });
+  }
+});
+
+//obtener Usuario por ID
+
+route.get('/api/admin/:id_usuario', async (req,res) => {
+  const { id_usuario } = req.params;
+  try {
+    const route = await getUsersById(id_usuario);
+    if (!route) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    return res.status(200).json(route);
+  } catch (error) {
+    return res.status(500).json({ message: 'Error fetching User' });
+  }
+});
+
+// crear Usuario
+
+route.post('/api/admin', async (req,res) => {
+  const {nombre_usuario, apellido_usuario, correo_usuario} = req.body;
+  try {
+    const route = await createUser(nombre_usuario, apellido_usuario, correo_usuario);
+    return res.status(201).json({ route });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error creating User' });
+  }
+});
+
+// actualizar Usuario
+
+route.put('/api/admin/:id_usuario', async (req,res) => {
+  const {id_usuario} = req.params;
+  const{ nombre_usuario, apellido_usuario, correo_usuario} = req.body;
+  try {
+    const route = await updateUser(nombre_usuario, apellido_usuario, correo_usuario, id_usuario);
+    if (!route) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    return res.status(200).json({ message: 'User updated successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error updating User' });
+  }
+});
+
+// eliminar Usuario
+
+// route.delete('/api/admin/:id_usuario', async (req,res) => {
+//   const { id_usuario } = req.params;
+//   try {
+//     const route = await deleteUser(id_usuario);
+//     if (!route) {
+//       return res.status(404).json({ message: 'load not found' });
+//     }
+//     return res.status(200).json({ message: 'load deleted successfully' });
+//   } catch (error) {
+//     return res.status(500).json({ message: 'Error deleting load' });
+//   }
+// });
+
+
+
 
 
 module.exports = route;

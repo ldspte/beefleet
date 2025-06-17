@@ -16,20 +16,20 @@ const getClientsById = async(id_cliente) => {
     return result;
 }
 
-const createClient = async(tipo_documento, documento, nombre_cliente, apellido_cliente, direccion, ciudad, telefono, empresa) => {
+const createClient = async(nit, direccion, ciudad, telefono, empresa) => {
     const result = await db.query(`
-        INSERT INTO clientes (tipo_documento, documento, nombre_cliente, apellido_cliente, direccion, ciudad, telefono, empresa) VALUES  (?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO clientes (nit, direccion, ciudad, telefono, empresa) VALUES  (?, ?, ?, ?, ?)
     `,
-    [tipo_documento, documento, nombre_cliente, apellido_cliente, direccion, ciudad, telefono, empresa]
+    [nit, direccion, ciudad, telefono, empresa]
     );
     return result;
 }
 
-const updateClient = async(id_cliente, tipo_documento, documento, nombre_cliente, apellido_cliente, direccion, ciudad, telefono, empresa) => {
+const updateClient = async(id_cliente, nit, direccion, ciudad, telefono, empresa) => {
     const result = await db.query(`
-        UPDATE clientes SET tipo_documento = ?, documento = ?, nombre_cliente = ?, apellido_cliente = ?, direccion = ?, ciudad = ?, telefono = ?, empresa = ? WHERE id_cliente = ?
+        UPDATE clientes SET  nit = ?, direccion = ?, ciudad = ?, telefono = ?, empresa = ? WHERE id_cliente = ?
     `,
-    [tipo_documento, documento, nombre_cliente, apellido_cliente, direccion, ciudad, telefono, empresa, id_cliente]
+    [nit, direccion, ciudad, telefono, empresa, id_cliente]
     );
     return result;
 }
