@@ -23,7 +23,7 @@ const getUsersById = async(id_usuario) => {
   `,
   [id_usuario]
   );
-  return result.length > 0 ? result[0] : null;
+ return result[0].length > 0 ? result[0][0] : null;
 }
 
 const createUser = async(nombre_usuario, apellido_usuario, correo_usuario) => {
@@ -43,8 +43,6 @@ const updateUser = async(id_usuario, nombre_usuario, apellido_usuario, correo_us
     );
     return result.affectedRows > 0;
 }
-
-
 
 module.exports = {
     getUsers,
