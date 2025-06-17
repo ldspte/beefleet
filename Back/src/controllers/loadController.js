@@ -5,16 +5,16 @@ const getLoads = async() => {
   const results = await db.query(`
     SELECT * FROM cargas  
   `)
-  return results;
+  return results.length > 0 ? results[0] : null;
 }
 
 const getLoadsById = async(id_carga) => {
-    const result = await db.query(`
+    const results = await db.query(`
         SELECT * FROM cargas WHERE id_carga = ?
     `,
     [id_carga]
     );
-    return result;
+    return results.length > 0 ? results[0] : null;
 }
 
 const createLoad = async( descripcion, peso, foto_carga, fecha_inicio, fecha_fin, vehiculo, cliente, conductor) => {

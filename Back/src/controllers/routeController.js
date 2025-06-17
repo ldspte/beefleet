@@ -4,16 +4,16 @@ const getRoutes = async() => {
   const results = await db.query(`
     SELECT * FROM rutas
   `)
-  return results;
+  return results.length > 0 ? results[0] : null;
 }
 
 const getRoutesById = async(id_ruta) => {
-  const result = await db.query(`
+  const results = await db.query(`
     SELECT * FROM rutas WHERE id_ruta = ?
   `,
   [id_ruta]
   );
-  return result;
+  return results.length > 0 ? results[0] : null;
 }
 
 const createRoute = async(origen, destino, distancia, carga) => {

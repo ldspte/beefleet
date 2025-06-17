@@ -765,7 +765,7 @@ route.post('/forgot-password', async (req, res) => {
     
     if (!usuarioExiste) {
       return res.status(404).json({ 
-        success: false, 
+        success: false,
         message: 'No encontramos una cuenta con ese correo electrónico' 
       });
     }
