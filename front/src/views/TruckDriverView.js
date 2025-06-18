@@ -11,32 +11,44 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const TruckDriverView = ({ conductorId = 1 }) => {
   const navigation = useNavigation();
-  const [truckData, setTruckData] = useState(null);
+  const [truckData, setTruckData] = useState({
+    placa: '',
+    modelo: '',
+    capacidad: '',
+    kilometraje: '',
+    color:'',
+    tipo: '',
+    marca: '',
+    conductor: '',
+    estado_vehiculo: ''
+  });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   // Función para obtener los datos del camión desde la base de datos
   const fetchTruckData = async () => {
     try {
-      // Aquí harías la consulta a tu base de datos
-      // Por ejemplo: const response = await fetch(`/api/vehiculo/conductor/${conductorId}`);
-      
-      // Simulando datos de la base de datos basados en tu tabla
-      const mockData = {
-        id_vehiculo: 1,
-        placa: 'ABC123',
-        modelo: '2014',
-        peso: 590,
-        matricula: '1234567',
-        seguro: 'car',
-        estado_vehiculo: 1,
-        conductor: 1
-      };
-      
-      setTruckData(mockData);
+      const token = await AsyncStorage.getItem('token');
+      const driverId = await AsyncStorage.getItem('id_conductor');
+      console.log(driverId);
+      const response = await fetch(`http://localhost:3001/api/vehicle/${driverId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        setTruckData(data[0]);
+      } else {
+        Alert.alert('Error', 'No se pudo obtener la información del usuario.');
+      }
     } catch (error) {
       console.error('Error al obtener datos del camión:', error);
       Alert.alert('Error', 'No se pudieron cargar los datos del camión');
@@ -143,23 +155,23 @@ const TruckDriverView = ({ conductorId = 1 }) => {
               <Icon name="monitor-weight" size={20} color="#666" />
               <Text style={styles.infoLabel}>Peso (kg)</Text>
             </View>
-            <Text style={styles.infoValue}>{truckData.peso.toLocaleString()}</Text>
+            <Text style={styles.infoValue}>{truckData.capacidad.toLocaleString()}</Text>
           </View>
 
           <View style={styles.infoItem}>
             <View style={styles.infoHeader}>
               <Icon name="description" size={20} color="#666" />
-              <Text style={styles.infoLabel}>Matrícula</Text>
+              <Text style={styles.infoLabel}>Tipo</Text>
             </View>
-            <Text style={styles.infoValue}>{truckData.matricula}</Text>
+            <Text style={styles.infoValue}>{truckData.tipo}</Text>
           </View>
 
           <View style={styles.infoItem}>
             <View style={styles.infoHeader}>
               <Icon name="security" size={20} color="#666" />
-              <Text style={styles.infoLabel}>Seguro</Text>
+              <Text style={styles.infoLabel}>Marca</Text>
             </View>
-            <Text style={styles.infoValue}>{truckData.seguro}</Text>
+            <Text style={styles.infoValue}>{truckData.marca}</Text>
           </View>
         </View>
       </View>

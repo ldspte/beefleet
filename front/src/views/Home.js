@@ -1,11 +1,49 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = ({ }) => {
 const navigation = useNavigation();
-
+  const [vehicleInfo, setVehicleInfo] = useState({
+    placa: '',
+    modelo: '',
+    capacidad: '',
+    kilometraje: '',
+    color:'',
+    tipo: '',
+    marca: '',
+    conductor: '',
+    estado_vehiculo: ''
+  })
+  useEffect(() => {
+    const fetchDataVehicle = async() => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        const driverId = await AsyncStorage.getItem('id_conductor');
+        console.log(driverId);
+        const response = await fetch(`http://localhost:3001/api/vehicle/${driverId}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data);
+          setVehicleInfo(data[0]);
+        } else {
+          Alert.alert('Error', 'No se pudo obtener la información del vehiculo');
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        Alert.alert('Error', 'Hubo un problema al obtener la información del usuario.');
+      }
+    }
+    fetchDataVehicle()
+  }, []);
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -21,7 +59,7 @@ const navigation = useNavigation();
           >
             <Ionicons name="car-outline" size={40} color="#FB8500" />
             <Text style={styles.cardTitle}>Tu Vehículo</Text>
-            <Text style={styles.cardCount}>ABC 123</Text>
+            <Text style={styles.cardCount}>{vehicleInfo.placa}</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
