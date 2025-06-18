@@ -597,10 +597,10 @@ route.get('/api/reports', async (req,res) => {
 
 //obtener reporte por ID
 
-route.get('/api/reports/:id_estado', async (req,res) => {
-  const { id_estado } = req.params;
+route.get('/api/reports/:id_reporte', async (req,res) => {
+  const { id_reporte } = req.params;
   try {
-    const route = await getStateVehiclesById(id_estado);
+    const route = await getStateVehiclesById(id_reporte);
     if (!route) {
       return res.status(404).json({ message: 'Route not found' });
     }
@@ -613,10 +613,9 @@ route.get('/api/reports/:id_estado', async (req,res) => {
 // crear reporte
 
 route.post('/api/reports', async (req,res) => {
-  const {descripcion, foto, tipo_estado, tipo_reporte} = req.body;
+  const {descripcion, vehiculo, tipo_reporte} = req.body;
   try {
-    const route = await createStateVehicle(descripcion, foto, tipo_estado, tipo_reporte);
-    const reporte = await updateVehicle() 
+    const route = await createStateVehicle(descripcion, vehiculo, tipo_reporte);
     return res.status(201).json({ route });
   } catch (error) {
     return res.status(500).json({ message: 'Error creating State' });
@@ -626,9 +625,9 @@ route.post('/api/reports', async (req,res) => {
 // actualizar reporte
 
 route.put('/api/reports/:id_estado', async (req,res) => {
-  const {id_estado, descripcion, foto, tipo_estado, tipo_reporte} = req.body;
+  const {id_reporte, descripcion, vehiculo, tipo_reporte} = req.body;
   try {
-    const route = await updateStateVehicle(id_estado, descripcion, foto, tipo_estado, tipo_reporte);
+    const route = await updateStateVehicle(id_reporte, descripcion, vehiculo, tipo_reporte);
     if (!route) {
       return res.status(404).json({ message: 'State not found' });
     }
@@ -640,10 +639,10 @@ route.put('/api/reports/:id_estado', async (req,res) => {
 
 // eliminar reporte
 
-route.delete('/api/reports/:id_estado', async (req,res) => {
-  const { id_estado } = req.params;
+route.delete('/api/reports/:id_reporte', async (req,res) => {
+  const { id_reporte } = req.params;
   try {
-    const route = await deleteStateVehicle(id_estado);
+    const route = await deleteStateVehicle(id_reporte);
     if (!route) {
       return res.status(404).json({ message: 'State not found' });
     }

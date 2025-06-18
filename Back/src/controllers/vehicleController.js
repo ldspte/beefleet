@@ -55,6 +55,13 @@ const getDriverByVehicle = async (id_vehiculo) => {
     }
 }
 
+const getVehicleByDriver = async(id_conductor) => {
+  const results = await db.query(`
+      SELECT * FROM Vehiculos WHERE conductor = ?
+    `, [id_conductor]);
+    return results.length > 0 ? results[0] : null;
+}
+
 
 
 module.exports = {
@@ -63,6 +70,7 @@ module.exports = {
   createVehicle,
   updateVehicle,
   deleteVehicle,
-  getDriverByVehicle
+  getDriverByVehicle,
+  getVehicleByDriver
 }
 

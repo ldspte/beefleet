@@ -3,43 +3,43 @@ const {db} = require('../database.js');
 
 const getStateVehicles = async() => {
     const results = await db.query(`
-        SELECT * FROM estado_vehiculos  
+        SELECT * FROM reporte_vehiculos  
     `)
      return results.length > 0 ? results[0] : null;
 }
 
-const getStateVehiclesById = async(id_estado) => {
+const getStateVehiclesById = async(id_reporte) => {
     const result = await db.query(`
-        SELECT * FROM estado_vehiculos WHERE id_estado = ?
+        SELECT * FROM reporte_vehiculos WHERE id_reporte = ?
     `,
-    [id_estado]
+    [id_reporte]
     );
     return result;
 }
 
-const createStateVehicle = async(descripcion, foto, tipo_estado, tipo_reporte) => {
+const createStateVehicle = async(descripcion, vehiculo, tipo_reporte) => {
     const result = await db.query(`
-        INSERT INTO estado_vehiculos (descripcion, foto, tipo_estado, tipo_reporte) VALUES  (?, ?, ?, ?)
+        INSERT INTO estado_vehiculos (descripcion, vehiculo, tipo_reporte) VALUES  (?, ?, ?)
     `,
-    [descripcion, foto, tipo_estado, tipo_reporte]
+    [descripcion, vehiculo, tipo_reporte]
     );
     return result;
 }
 
-const updateStateVehicle = async(id_estado, descripcion, foto, tipo_estado, tipo_reporte) => {
+const updateStateVehicle = async(id_reporte, descripcion, vehiculo, tipo_reporte) => {
     const result = await db.query(`
-        UPDATE estado_vehiculos SET descripcion = ?, foto = ?, tipo_estado = ?, tipo_reporte WHERE id_estado = ?
+        UPDATE reporte_vehiculos SET descripcion = ?, vehiculo = ? ,tipo_estado = ?, tipo_reporte WHERE id_reporte = ?
     `,
-    [descripcion, foto, tipo_estado, tipo_reporte, id_estado]
+    [id_reporte, descripcion, vehiculo, tipo_reporte]
     );
     return result;
 }
 
-const deleteStateVehicle = async(id_estado) => {
+const deleteStateVehicle = async(id_reporte) => {
     const result = await db.query(`
-        DELETE FROM estado_vehiculos WHERE id_estado = ?
+        DELETE FROM reporte_vehiculos WHERE id_reporte = ?
     `,
-    [id_estado]
+    [id_reporte]
     );
     return result;
 }
