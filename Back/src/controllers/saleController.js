@@ -2,9 +2,9 @@ const {db} = require('../database.js');
 
 const getSales = async() => {
     const results = await db.query(`
-        SELECT * FROM ventas  
+        SELECT * FROM Ventas  
     `)
-    return results;
+    return results.length > 0 ? results[0] : null;
 }
 
 const getSalesById = async(id_venta) => {
@@ -16,28 +16,28 @@ const getSalesById = async(id_venta) => {
 
 }
 
-const createSale = async(fecha, valor, descripcion, carga) => {
+const createSale = async( valor, carga) => {
     const result = await db.query(`
-        INSERT INTO ventas (fecha, valor, descripcion, carga) VALUES  (?, ?, ?, ?)
+        INSERT INTO ventas (valor, carga) VALUES  (?, ?)
     `,
-    [fecha, valor, descripcion, carga]
+    [ valor, carga]
     );
     return result;
 }
 
 
-const updateSale = async(id_venta, fecha, valor, descripcion, carga) => {
+const updateSale = async(id_venta, valor, carga) => {
     const result = await db.query(`
-        UPDATE ventas SET fecha = ?, valor = ?, descripcion = ?, carga = ? WHERE id_venta = ?
+        UPDATE ventas SET  valor = ?, carga = ? WHERE id_venta = ?
     `,
-    [fecha, valor, descripcion, carga, id_venta]
+    [valor, carga, id_venta]
     );
     return result;
 }
 
 const deleteSale = async(id_venta) => {
     const result = await db.query(`
-        DELETE FROM ventas WHERE id_venta = ?
+        DELETE FROM Ventas WHERE id_venta = ?
     `,
     [id_venta]
     );

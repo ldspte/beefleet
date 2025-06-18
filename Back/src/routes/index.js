@@ -13,7 +13,7 @@ const {getUsers, getUsersById, createUser, updateUser} = require('../controllers
 const {getSales, getSalesById, createSale, updateSale, deleteSale} = require('../controllers/saleController');
 const {getRoutes, getRoutesById, createRoute, updateRoute, deleteRoute} = require('../controllers/routeController');
 const {getVehicles, getVehiclesById, createVehicle, updateVehicle, deleteVehicle, getDriverByVehicle} = require('../controllers/vehicleController');
-const {getLoads, getLoadsById, getLoadsByDriver, createLoad, updateLoad, deleteLoad} = require('../controllers/loadController');
+const {getLoads, getLoadsById, getLoadsByDriver, createLoad, updateLoad, deleteLoad, updateStateLoad} = require('../controllers/loadController');
 const {getStateVehicles, getStateVehiclesById, createStateVehicle, updateStateVehicle, deleteStateVehicle } = require('../controllers/stateVehicleController');
 const { error } = require('console');
 
@@ -452,7 +452,7 @@ route.delete('/api/clients/:id_cliente',  async (req,res) => {
 
 //obtener ventas
 
-route.get('api/sales',  async (req,res) => {
+route.get('/api/sales',  async (req,res) => {
   try {
     const values = await getSales();
     return res.status(200).json(values);
@@ -463,7 +463,7 @@ route.get('api/sales',  async (req,res) => {
 
 //obtener Venta por ID 
 
-route.get('api/sales/:id_venta',  async (req,res) => {
+route.get('/api/sales/:id_venta',  async (req,res) => {
   const { id_venta } = req.params;
   try {
     const sale = await getSalesById(id_venta);
@@ -481,12 +481,18 @@ route.get('api/sales/:id_venta',  async (req,res) => {
 
 
 route.post('/api/sales', async (req,res) => {
-  const {fecha, valor, descripcion, carga} = req.body;
+  const { valor, carga} = req.body;
   try {
-    const sale = await createSale(fecha, valor, descripcion, carga);
-    return res.status(201).json({ sale });
+    const sale = await createSale(valor, carga);
+    const estado = 'Confirmada';
+    const updateResult = await updateStateLoad(estado, carga);
+    if (updateResult.affectedRows > 0) {
+      return res.status(200).json({ sale });
+    } else {
+      return res.status(500).json({ message: 'Error updating sale status' });
+    }
   } catch (error) {
-    return res.status(500).json({ message: 'Error creating sale' });
+    return res.status(500).json({ message: 'Error creating sale', error });
   }
 });
 
@@ -495,9 +501,9 @@ route.post('/api/sales', async (req,res) => {
 
 route.put('/api/sales/:id_venta',  async (req,res) => {
   const { id_venta } = req.params;
-  const {fecha, valor, descripcion, carga} = req.body;
+  const { valor, carga} = req.body;
   try {
-    const sale = await updateSale(id_venta, fecha, valor, descripcion, carga);
+    const sale = await updateSale(id_venta, valor, carga);
     if (!sale) {
       return res.status(404).json({ message: 'Sale not found' });
     }

@@ -36,6 +36,14 @@ const updateLoad = async(id_carga, descripcion, peso, foto_carga, fecha_inicio, 
     return result;
 }
 
+const updateStateLoad = async( estado, carga) =>{
+  const [result] = await db.query(
+    'UPDATE cargas SET estado = ? WHERE id_carga = ?',
+    [estado, carga]
+  );
+  return result;
+}
+
 const deleteLoad = async(id_carga) => {
     const result = await db.query(`
         DELETE FROM cargas WHERE id_carga = ?
@@ -61,5 +69,6 @@ module.exports = {
   createLoad,
   updateLoad,
   deleteLoad,
-  getLoadsByDriver
+  getLoadsByDriver,
+  updateStateLoad
 }

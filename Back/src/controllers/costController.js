@@ -2,7 +2,7 @@ const {db} = require('../database.js');
 
 const getCosts = async() => {
     const results = await db.query(`
-        SELECT * FROM costos  
+        SELECT * FROM costos 
     `)
     return results;
 }
