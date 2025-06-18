@@ -36,7 +36,7 @@ const updateVehicle = async(id_vehiculo, placa, marca, modelo, kilometraje, colo
 
 const deleteVehicle = async(id_vehiculo) => {
     const result = await db.query(`
-        DELETE FROM vehiculos WHERE id_vehiculo = ?
+      DELETE FROM vehiculos WHERE id_vehiculo = ?
     `,
     [id_vehiculo]
     );

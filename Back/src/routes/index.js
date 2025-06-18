@@ -324,46 +324,22 @@ route.post('/api/vehicles', async (req, res) => {
 
 // Actualizar vehiculo
 
+
 route.put('/api/vehicles/:id_vehiculo', async (req, res) => {
-  const {id_vehiculo} = req.params;
-  const {placa, marca, modelo, kilometraje, color, capacidad, tipo, conductor, estado_vehiculo } = req.body;
+  const { id_vehiculo } = req.params;
+  const { placa, marca, modelo, kilometraje, color, capacidad, tipo, conductor, estado_vehiculo } = req.body;
+
 
   try {
-    // Obtener el conductor actual del vehículo
-    const lastDriver = await getDriverByVehicle(id_vehiculo);
-    console.log(lastDriver.conductor);
-    // Actualizar el vehículo
-    const vehicle = await updateVehicle(placa, marca, modelo, kilometraje, color, capacidad, tipo, conductor, estado_vehiculo);
-    // Verificar si el vehículo fue actualizado
+    const vehicle = await updateVehicle(id_vehiculo, placa, marca, modelo, kilometraje, color, capacidad, tipo, conductor, estado_vehiculo);
+    
     if (!vehicle) {
       return res.status(404).json({ message: 'Vehicle not found' });
     }
-    const newDriver = await getDriverByVehicle(id_vehiculo);
-    console.log(newDriver.conductor);
-
-    // Si el conductor ha cambiado, actualizar los estados de los conductores
-    if (lastDriver !== newDriver) {
-      const estadoActivo = 'Activo';
-      const estadoEnruta = 'En ruta';
-
-      // Actualizar estado del conductor anterior
-      const updateLastDriver = await updateStateDriver(estadoActivo, lastDriver.conductor);
-      console.log(lastDriver);
-      // Actualizar estado del nuevo conductor
-      const updateDriver = await updateStateDriver(estadoEnruta, newDriver.conductor);
-      console.log(newDriver.conductor);
-      // Verificar si ambos estados fueron actualizados correctamente
-      if (updateLastDriver.affectedRows > 0 && updateDriver.affectedRows > 0) {
-        return res.status(200).json({ message: 'Vehicle and driver statuses updated successfully', vehicle });
-      } else {
-        return res.status(500).json({ message: 'Error updating driver statuses'});
-      }
-    }
-
-    // Si no hay cambio de conductor, solo devolver el mensaje de éxito
-    return res.status(200).json({ message: 'Vehicle updated successfully', vehicle });
+    return res.status(200).json({ vehicle });
   } catch (error) {
-    return res.status(500).json({ message: 'Error updating vehicle', error });
+    console.error(error); // Log the error for debugging
+    return res.status(500).json({ message: 'Error updating vehicle', error: error.message });
   }
 });
 
