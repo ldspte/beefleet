@@ -20,7 +20,6 @@ const ReportesScreen = () => {
   // Define reportTypeOptions como un array para usarlo con .map()
   const reportTypeOptions = ['Falla mecánica', 'Retraso', 'Accidente', 'Problema de carga', 'Carga completada', 'En viaje', 'Descarga completada', 'Otro'];
   const [showReportTypeDropdown, setShowReportTypeDropdown] = useState(false);
-  const [etapaActual, setEtapaActual] = useState('');
   const [estadoCarga, setEstadoCarga] = useState('');
   const [emergencyModalVisible, setEmergencyModalVisible] = useState(false);
   const [imageModalVisible, setImageModalVisible] = useState(false);
@@ -175,49 +174,6 @@ const ReportesScreen = () => {
             </View>
           )}
 
-          <Text style={styles.statusSectionTitle}>Etapa actual</Text>
-          
-          <View style={styles.statusButtonsContainer}>
-            <TouchableOpacity 
-              style={[
-                styles.statusButton, 
-                etapaActual === 'carga completada' && styles.statusButtonActive
-              ]}
-              onPress={() => setEtapaActual('carga completada')}
-            >
-              <Text style={[
-                styles.statusButtonText,
-                etapaActual === 'carga completada' && styles.statusButtonTextActive
-              ]}>Carga completada</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={[
-                styles.statusButton, 
-                etapaActual === 'en viaje' && styles.statusButtonActive
-              ]}
-              onPress={() => setEtapaActual('en viaje')}
-            >
-              <Text style={[
-                styles.statusButtonText,
-                etapaActual === 'en viaje' && styles.statusButtonTextActive
-              ]}>Viajando</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={[
-                styles.statusButton, 
-                etapaActual === 'descarga completada' && styles.statusButtonActive
-              ]}
-              onPress={() => setEtapaActual('descarga completada')}
-            >
-              <Text style={[
-                styles.statusButtonText,
-                etapaActual === 'descarga completada' && styles.statusButtonTextActive
-              ]}>Descarga completada</Text>
-            </TouchableOpacity>
-          </View>
-
                     {/* Botón de enviar */}
           <TouchableOpacity 
             style={styles.sendButton}
@@ -261,7 +217,7 @@ const ReportesScreen = () => {
               style={styles.emergencyContactButton}
               onPress={() => callNumber('123.456.7890')}
             >
-              <Text style={styles.emergencyContactName}>Oscar Jefe:</Text>
+              <Text style={styles.emergencyContactName}>Jefe:</Text>
               <Text style={styles.emergencyContactNumber}>123.456.7890</Text>
               <Ionicons name="call" size={24} color="#4CAF50" style={styles.callIcon} />
             </TouchableOpacity>
@@ -277,7 +233,7 @@ const ReportesScreen = () => {
             
             <TouchableOpacity 
               style={styles.emergencyContactButton}
-              onPress={() => callNumber('911')}
+              onPress={() => callNumber('123')}
             >
               <Text style={styles.emergencyContactName}>Línea de Emergencias Médicas:</Text>
               <Text style={styles.emergencyContactNumber}>911</Text>

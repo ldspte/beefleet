@@ -81,21 +81,6 @@ const ConduUser = ({ navigation }) => {
           <Text style={styles.headerSubtitle}>Conductor Activo</Text>
         </View>
 
-        {/* Estadísticas Cards */}
-        <View style={styles.cardsContainer}>
-          <View style={styles.card}>
-            <Ionicons name="notifications-outline" size={32} color="#FB8500" />
-            <Text style={styles.cardTitle}>Notificaciones</Text>
-            <Text style={styles.cardCount}>5</Text>
-          </View>
-          
-          <View style={styles.card}>
-            <Ionicons name="car-outline" size={32} color="#FB8500" />
-            <Text style={styles.cardTitle}>Viajes</Text>
-            <Text style={styles.cardCount}>352</Text>
-          </View>
-        </View>
-
         <View style={styles.cardsContainer}>
           <View style={styles.card}>
             <Ionicons name="time-outline" size={32} color="#FB8500" />
