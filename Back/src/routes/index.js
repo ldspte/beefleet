@@ -12,7 +12,7 @@ const {getClients, getClientsById, createClient, updateClient, deleteClient} = r
 const {getUsers, getUsersById, createUser, updateUser} = require('../controllers/usersController');
 const {getSales, getSalesById, createSale, updateSale, deleteSale} = require('../controllers/saleController');
 const {getRoutes, getRoutesById, createRoute, updateRoute, deleteRoute} = require('../controllers/routeController');
-const {getVehicles, getVehiclesById, createVehicle, updateVehicle, deleteVehicle, getDriverByVehicle} = require('../controllers/vehicleController');
+const {getVehicles, getVehiclesById, createVehicle, updateVehicle, deleteVehicle, getDriverByVehicle, getVehicleByDriver} = require('../controllers/vehicleController');
 const {getLoads, getLoadsById, getLoadsByDriver, createLoad, updateLoad, deleteLoad, updateStateLoad} = require('../controllers/loadController');
 const {getStateVehicles, getStateVehiclesById, createStateVehicle, updateStateVehicle, deleteStateVehicle } = require('../controllers/stateVehicleController');
 const { error } = require('console');
@@ -1023,6 +1023,19 @@ route.put('/api/admin/:id_usuario', async (req,res) => {
 //   }
 // });
 
+
+route.get('/api/vehicle/:id_conductor', async (req,res) => {
+  const { id_conductor } = req.params;
+  try {
+    const route = await getVehicleByDriver(id_conductor);
+    if (!route) {
+      return res.status(404).json({ message: 'Vehicle not found' });
+    }
+    return res.status(200).json(route);
+  } catch (error) {
+    return res.status(500).json({ message: 'Error fetching Vehicle' });
+  }
+});
 
 
 
