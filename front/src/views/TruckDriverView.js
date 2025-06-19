@@ -184,11 +184,6 @@ const TruckDriverView = ({ conductorId = 1 }) => {
           <Icon name="report-problem" size={20} color="white" />
           <Text style={styles.primaryButtonText}>Reportar Problema</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity style={styles.secondaryButton} onPress={() => Alert.alert('Funcionalidad', 'Ver historial')}>
-          <Icon name="history" size={20} color="#2196F3" />
-          <Text style={styles.secondaryButtonText}>Ver Historial</Text>
-        </TouchableOpacity>
       </View>
     </ScrollView>
   );
